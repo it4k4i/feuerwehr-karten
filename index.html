@@ -188,16 +188,29 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
 .status-bar.show{display:flex;}
 .status-spinner{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
 @keyframes spin{to{transform:rotate(360deg);}}
+/* warning modal */
+.warn-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:500;}
+.warn-box{background:var(--panel2);border:2px solid var(--accent);border-radius:14px;padding:28px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.7);}
+.warn-box .warn-icon{font-size:3rem;margin-bottom:12px;}
+.warn-box h2{font-family:'Oswald',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--text);margin-bottom:10px;}
+.warn-box p{font-size:.78rem;color:var(--text2);line-height:1.7;margin-bottom:18px;}
+.warn-box .warn-check{display:flex;align-items:center;gap:8px;justify-content:center;margin-bottom:18px;font-size:.7rem;color:var(--text2);cursor:pointer;}
+.warn-box .warn-check input{width:14px;height:14px;accent-color:var(--accent);}
+.warn-btn{padding:10px 28px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-family:'Oswald',sans-serif;font-size:.95rem;letter-spacing:2px;cursor:pointer;}
+.warn-btn:hover{filter:brightness(1.1);}
 </style>
 </head>
 <body>
 <div class="screen-ui">
   <div class="hdr">
     <div class="hdr-logo">🔥</div>
-    <div><h1>FEUERWEHR KARTEN</h1><p>Gerätekunde · Pokémon Edition</p></div>
-    <div class="hdr-counter">
-      <span class="hdr-cnt-num" id="hdrCnt">0</span>
-      <span class="hdr-cnt-lbl">Karten</span>
+    <div><h1>FEUERWEHR KARTEN</h1><p data-i18n="subtitle">Gerätekunde · Pokémon Edition</p></div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+      <button onclick="toggleLang()" id="langBtn" style="background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text2);font-size:.7rem;cursor:pointer;font-family:'Libre Franklin',sans-serif;transition:all .15s;" onmouseover="this.style.borderColor='#fff';this.style.color='#fff'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">🌐 EN</button>
+      <div class="hdr-counter">
+        <span class="hdr-cnt-num" id="hdrCnt">0</span>
+        <span class="hdr-cnt-lbl" data-i18n="cards">Karten</span>
+      </div>
     </div>
   </div>
   <div class="body">
@@ -205,41 +218,41 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
 
       <!-- NEW CARD -->
       <div class="sb-section">
-        <div class="sb-title" onclick="toggleSection(this)">🃏 Neue Karte<span class="sb-chevron">▾</span></div>
+        <div class="sb-title" onclick="toggleSection(this)">🃏 <span data-i18n="secNewCard">Neue Karte</span><span class="sb-chevron">▾</span></div>
         <div class="sb-body">
-          <div class="fg"><label>Gerätename</label><input type="text" id="devName" placeholder="z.B. B-Schlauch" /></div>
-          <div class="fg"><label>Kategorie</label><div class="cat-list" id="catList"></div></div>
+          <div class="fg"><label data-i18n="deviceName">Gerätename</label><input type="text" id="devName" data-i18n-placeholder="deviceNamePh" placeholder="z.B. B-Schlauch" /></div>
+          <div class="fg"><label data-i18n="category">Kategorie</label><div class="cat-list" id="catList"></div></div>
           <div class="fg" style="margin-top:10px;">
-            <label>Foto</label>
-            <div class="upzone" id="upZone"><input type="file" id="upInput" accept="image/*" /><div class="ico">📷</div><p>Foto hochladen</p><img class="prev" id="upPrev" /></div>
+            <label data-i18n="photo">Foto</label>
+            <div class="upzone" id="upZone"><input type="file" id="upInput" accept="image/*" /><div class="ico">📷</div><p data-i18n="uploadPhoto">Foto hochladen</p><img class="prev" id="upPrev" /></div>
           </div>
-          <button class="btn-primary" onclick="addCard()" style="margin-top:10px;">+ KARTE HINZUFÜGEN</button>
-          <button class="btn-ghost" onclick="openBulkModal()" style="margin-top:6px;">📦 MEHRERE AUF EINMAL</button>
+          <button class="btn-primary" onclick="addCard()" style="margin-top:10px;" data-i18n="addCard">+ KARTE HINZUFÜGEN</button>
+          <button class="btn-ghost" onclick="openBulkModal()" style="margin-top:6px;" data-i18n="addMultiple">📦 MEHRERE AUF EINMAL</button>
         </div>
       </div>
 
       <!-- CATEGORIES -->
       <div class="sb-section">
-        <div class="sb-title" onclick="toggleSection(this)">🎨 Kategorien<span class="sb-chevron">▾</span></div>
+        <div class="sb-title" onclick="toggleSection(this)">🎨 <span data-i18n="secCategories">Kategorien</span><span class="sb-chevron">▾</span></div>
         <div class="sb-body">
           <div id="catMgmtList" class="cat-list" style="max-height:none;"></div>
-          <button class="btn-add-cat" onclick="openCatModal(null)">+ Neue Kategorie</button>
+          <button class="btn-add-cat" onclick="openCatModal(null)" data-i18n="addCategory">+ Neue Kategorie</button>
         </div>
       </div>
 
       <!-- BACK -->
       <div class="sb-section">
-        <div class="sb-title" onclick="toggleSection(this)">🔄 Rückseite<span class="sb-chevron">▾</span></div>
+        <div class="sb-title" onclick="toggleSection(this)">🔄 <span data-i18n="secBackside">Rückseite</span><span class="sb-chevron">▾</span></div>
         <div class="sb-body">
-          <p style="font-size:.62rem;color:var(--text2);margin-bottom:8px;">Standard: Feuerwehr-Design. Eigenes Bild ersetzt es.</p>
-          <div class="upzone" id="bgZone"><input type="file" id="bgInput" accept="image/*" /><div class="ico">🖼</div><p>Eigenes Rückseitenbild</p><img class="prev" id="bgPrev" /></div>
-          <button class="btn-ghost" onclick="clearBg()">✕ Standard-Rückseite</button>
+          <p style="font-size:.62rem;color:var(--text2);margin-bottom:8px;" data-i18n="backsideHint">Standard: Feuerwehr-Design. Eigenes Bild ersetzt es.</p>
+          <div class="upzone" id="bgZone"><input type="file" id="bgInput" accept="image/*" /><div class="ico">🖼</div><p data-i18n="uploadBackside">Eigenes Rückseitenbild</p><img class="prev" id="bgPrev" /></div>
+          <button class="btn-ghost" onclick="clearBg()" data-i18n="resetBackside">✕ Standard-Rückseite</button>
           <div class="fg" style="margin-top:10px;">
-            <label>Bild-Skalierung</label>
+            <label data-i18n="imageScale">Bild-Skalierung</label>
             <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;">
-              <label class="radio-chip"><input type="radio" name="bgScale" value="fit" checked onchange="globalSettings.bgScale=this.value;"/><span>↔ Einpassen</span></label>
-              <label class="radio-chip"><input type="radio" name="bgScale" value="cover" onchange="globalSettings.bgScale=this.value;"/><span>⬛ Füllen</span></label>
-              <label class="radio-chip"><input type="radio" name="bgScale" value="stretch" onchange="globalSettings.bgScale=this.value;"/><span>⤢ Strecken</span></label>
+              <label class="radio-chip"><input type="radio" name="bgScale" value="fit" checked onchange="globalSettings.bgScale=this.value;"/><span data-i18n="scaleFit">↔ Einpassen</span></label>
+              <label class="radio-chip"><input type="radio" name="bgScale" value="cover" onchange="globalSettings.bgScale=this.value;"/><span data-i18n="scaleCover">⬛ Füllen</span></label>
+              <label class="radio-chip"><input type="radio" name="bgScale" value="stretch" onchange="globalSettings.bgScale=this.value;"/><span data-i18n="scaleStretch">⤢ Strecken</span></label>
             </div>
           </div>
         </div>
@@ -247,31 +260,31 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
 
       <!-- GLOBAL SETTINGS -->
       <div class="sb-section">
-        <div class="sb-title" onclick="toggleSection(this)">⚙ Globale Einstellungen<span class="sb-chevron">▾</span></div>
+        <div class="sb-title" onclick="toggleSection(this)">⚙ <span data-i18n="secGlobal">Globale Einstellungen</span><span class="sb-chevron">▾</span></div>
         <div class="sb-body">
           <div class="fg">
-            <label>Kategorie-Größe (global)</label>
+            <label data-i18n="catSizeGlobal">Kategorie-Größe (global)</label>
             <div class="grad-row" style="margin-bottom:0;">
               <input type="range" id="gCatSize" min="12" max="60" value="28" style="flex:1;accent-color:var(--accent);" oninput="globalSettings.catSize=parseInt(this.value);document.getElementById('gCatSizeVal').textContent=this.value;render();" />
               <span id="gCatSizeVal" style="font-size:.65rem;color:var(--yellow);width:28px;text-align:right;">28</span>
             </div>
-            <p style="font-size:.58rem;color:var(--text2);margin-top:4px;">Gilt für alle Kategorien ohne eigene Größe.</p>
+            <p style="font-size:.58rem;color:var(--text2);margin-top:4px;" data-i18n="catSizeHint">Gilt für alle Kategorien ohne eigene Größe.</p>
           </div>
           <div class="fg">
-            <label>Seriennummer</label>
+            <label data-i18n="serialNumber">Seriennummer</label>
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
               <label class="toggle"><input type="checkbox" id="gSerialShow" checked onchange="globalSettings.serialShow=this.checked;render();"/><span class="toggle-slider"></span></label>
-              <span style="font-size:.7rem;color:var(--text2);">Nummer anzeigen</span>
+              <span style="font-size:.7rem;color:var(--text2);" data-i18n="showNumber">Nummer anzeigen</span>
             </div>
             <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;" id="serialPrefixRow">
-              <span style="font-size:.62rem;color:var(--text2);white-space:nowrap;">Präfix:</span>
+              <span style="font-size:.62rem;color:var(--text2);white-space:nowrap;" data-i18n="prefix">Präfix:</span>
               <input type="text" id="gSerialPrefix" value="FW-" maxlength="10" style="width:70px;background:#12141a;border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:'Libre Franklin',sans-serif;font-size:.8rem;padding:4px 7px;outline:none;" oninput="globalSettings.serialPrefix=this.value;updateSerialNumbers();render();" placeholder="FW-" />
-              <span style="font-size:.62rem;color:var(--text2);">z.B. EPP-, FW-, TLF-</span>
+              <span style="font-size:.62rem;color:var(--text2);" data-i18n="prefixHint">z.B. EPP-, FW-, TLF-</span>
             </div>
             <div style="display:flex;align-items:center;gap:8px;">
               <input type="color" id="gSerialColor" value="#bbbbbb" style="width:32px;height:32px;border-radius:6px;border:1.5px solid var(--border);cursor:pointer;padding:2px;background:#12141a;" oninput="globalSettings.serialColor=this.value;document.getElementById('gSerialColorHex').value=this.value;render();" />
               <input class="hex-input" id="gSerialColorHex" value="#bbbbbb" maxlength="7" style="width:64px;" oninput="applyHexToColor('gSerialColor','gSerialColorHex',v=>{globalSettings.serialColor=v;render();})" />
-              <span style="font-size:.62rem;color:var(--text2);">Farbe</span>
+              <span style="font-size:.62rem;color:var(--text2);" data-i18n="color">Farbe</span>
             </div>
           </div>
         </div>
@@ -279,41 +292,46 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
 
       <!-- SAVE / LOAD -->
       <div class="sb-section">
-        <div class="sb-title" onclick="toggleSection(this)">💾 Speichern &amp; Laden<span class="sb-chevron">▾</span></div>
+        <div class="sb-title" onclick="toggleSection(this)">💾 <span data-i18n="saveLoad">Speichern &amp; Laden</span><span class="sb-chevron">▾</span></div>
         <div class="sb-body">
-          <button class="btn-save-load" onclick="saveProject()">💾 Als JSON speichern <span style="font-size:.6rem;opacity:.7;">(Bilder eingebettet)</span></button>
-          <button class="btn-save-load" onclick="saveProjectZip()">📦 Als ZIP speichern <span style="font-size:.6rem;opacity:.7;">(Bilder separat, kleiner)</span></button>
-          <button class="btn-save-load" onclick="document.getElementById('loadInput').click()">📂 Projekt laden <span style="font-size:.6rem;opacity:.7;">(.json oder .zip)</span></button>
+          <div id="autosaveStatus" style="font-size:.6rem;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:5px;">
+            <span id="autosaveDot" style="width:7px;height:7px;border-radius:50%;background:#444;flex-shrink:0;"></span>
+            <span id="autosaveText" data-i18n="autosaveIdle">Browser-Autosave: —</span>
+          </div>
+          <button class="btn-save-load" onclick="saveProject()">💾 <span data-i18n="saveJson">Als JSON speichern</span> <span style="font-size:.6rem;opacity:.7;" data-i18n="saveJsonHint">(Bilder eingebettet)</span></button>
+          <button class="btn-save-load" onclick="saveProjectZip()">📦 <span data-i18n="saveZip">Als ZIP speichern</span> <span style="font-size:.6rem;opacity:.7;" data-i18n="saveZipHint">(Bilder separat, kleiner)</span></button>
+          <button class="btn-save-load" onclick="document.getElementById('loadInput').click()">📂 <span data-i18n="loadProject">Projekt laden</span> <span style="font-size:.6rem;opacity:.7;">(.json oder .zip)</span></button>
+          <button class="btn-ghost" onclick="clearBrowserSave()" style="margin-top:4px;">🗑 <span data-i18n="clearAutosave">Browser-Autosave löschen</span></button>
           <input type="file" id="loadInput" accept=".json,.zip" style="display:none;" onchange="loadProject(this)" />
-          <p style="font-size:.58rem;color:var(--text2);margin-top:6px;line-height:1.5;">JSON: alles in einer Datei. ZIP: JSON + Bilder als separate Dateien, deutlich kleiner.</p>
+          <p style="font-size:.58rem;color:var(--text2);margin-top:6px;line-height:1.5;" data-i18n="saveHint">JSON: alles in einer Datei. ZIP: JSON + Bilder als separate Dateien, deutlich kleiner. Der Browser speichert automatisch beim Arbeiten.</p>
         </div>
       </div>
 
       <!-- PRINT -->
       <div class="sb-section">
-        <div class="sb-title" onclick="toggleSection(this)">🖨 Drucken<span class="sb-chevron">▾</span></div>
+        <div class="sb-title" onclick="toggleSection(this)">🖨 <span data-i18n="secPrint">Drucken</span><span class="sb-chevron">▾</span></div>
         <div class="sb-body">
           <div class="fg">
-            <label>Duplex-Modus</label>
+            <label data-i18n="duplexMode">Duplex-Modus</label>
             <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px;">
               <label class="radio-chip" style="justify-content:flex-start;gap:8px;padding:7px 10px;">
                 <input type="radio" name="duplexMode" value="longEdge" checked style="display:inline;width:13px;height:13px;accent-color:var(--accent);flex-shrink:0;" />
-                <span style="display:flex;flex-direction:column;gap:1px;"><b style="font-size:.7rem;">Lange Kante</b><span style="font-size:.58rem;color:var(--text2);">Hochformat · Buch-Umblättern</span></span>
+                <span style="display:flex;flex-direction:column;gap:1px;"><b style="font-size:.7rem;" data-i18n="longEdge">Lange Kante</b><span style="font-size:.58rem;color:var(--text2);" data-i18n="longEdgeHint">Hochformat · Buch-Umblättern</span></span>
               </label>
               <label class="radio-chip" style="justify-content:flex-start;gap:8px;padding:7px 10px;">
                 <input type="radio" name="duplexMode" value="shortEdge" style="display:inline;width:13px;height:13px;accent-color:var(--accent);flex-shrink:0;" />
-                <span style="display:flex;flex-direction:column;gap:1px;"><b style="font-size:.7rem;">Kurze Kante</b><span style="font-size:.58rem;color:var(--text2);">Hochformat · Block-Umblättern</span></span>
+                <span style="display:flex;flex-direction:column;gap:1px;"><b style="font-size:.7rem;" data-i18n="shortEdge">Kurze Kante</b><span style="font-size:.58rem;color:var(--text2);" data-i18n="shortEdgeHint">Hochformat · Block-Umblättern</span></span>
               </label>
               <label class="radio-chip" style="justify-content:flex-start;gap:8px;padding:7px 10px;">
                 <input type="radio" name="duplexMode" value="manual" style="display:inline;width:13px;height:13px;accent-color:var(--accent);flex-shrink:0;" />
-                <span style="display:flex;flex-direction:column;gap:1px;"><b style="font-size:.7rem;">Manuell</b><span style="font-size:.58rem;color:var(--text2);">Blatt selbst wenden</span></span>
+                <span style="display:flex;flex-direction:column;gap:1px;"><b style="font-size:.7rem;" data-i18n="manual">Manuell</b><span style="font-size:.58rem;color:var(--text2);" data-i18n="manualHint">Blatt selbst wenden</span></span>
               </label>
             </div>
           </div>
-          <button class="btn-sec" id="btnPrint" onclick="doPrint()" style="margin-top:4px;">DRUCKEN (Vorder + Rückseite)</button>
-          <button class="btn-ghost" onclick="clearAll()">🗑 Alle Karten löschen</button>
-          <p class="cnt">Karten: <b id="cnt">0</b> &nbsp;|&nbsp; <b id="pgcnt">0</b> Seite(n)</p>
-          <div class="info-box" style="margin-top:10px;">
+          <button class="btn-sec" id="btnPrint" onclick="doPrint()" style="margin-top:4px;" data-i18n="printBtn">DRUCKEN (Vorder + Rückseite)</button>
+          <button class="btn-ghost" onclick="clearAll()" data-i18n="deleteAll">🗑 Alle Karten löschen</button>
+          <p class="cnt"><span data-i18n="cards">Karten</span>: <b id="cnt">0</b> &nbsp;|&nbsp; <b id="pgcnt">0</b> <span data-i18n="pages">Seite(n)</span></p>
+          <div class="info-box" style="margin-top:10px;" data-i18n="printTip">
             <strong>Drucktipp:</strong> Beidseitig aktivieren, dann Modus wählen.<br>
             <strong>Nicht sicher?</strong> Erst 1 Seite drucken und Drehrichtung prüfen.
           </div>
@@ -322,20 +340,19 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
 
       <!-- PROFESSIONAL EXPORT -->
       <div class="sb-section">
-        <div class="sb-title" onclick="toggleSection(this)">🏭 Profi-Export<span class="sb-chevron">▾</span></div>
+        <div class="sb-title" onclick="toggleSection(this)">🏭 <span data-i18n="secProfiExport">Profi-Export</span><span class="sb-chevron">▾</span></div>
         <div class="sb-body">
-          <p style="font-size:.62rem;color:var(--text2);margin-bottom:10px;line-height:1.6;">300 DPI Export für Plastikkarten-Druckfirma.</p>
-
+          <p style="font-size:.62rem;color:var(--text2);margin-bottom:10px;line-height:1.6;" data-i18n="profiExportHint">300 DPI Export für Plastikkarten-Druckfirma.</p>
           <div class="fg">
-            <label>Kartengröße</label>
+            <label data-i18n="cardSize">Kartengröße</label>
             <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px;">
               <label class="radio-chip" style="justify-content:flex-start;gap:8px;">
                 <input type="radio" name="cardSizePreset" value="pokemon" checked style="display:inline;width:12px;height:12px;accent-color:var(--accent);flex-shrink:0;" onchange="updateCardSizeInputs()" />
-                <span style="display:flex;flex-direction:column;gap:1px;"><b style="font-size:.68rem;">Pokémon (aktuell)</b><span style="font-size:.56rem;color:var(--text2);">63 × 88 mm</span></span>
+                <span style="display:flex;flex-direction:column;gap:1px;"><b style="font-size:.68rem;" data-i18n="sizeTradingCard">Trading Card (aktuell)</b><span style="font-size:.56rem;color:var(--text2);">63 × 88 mm</span></span>
               </label>
               <label class="radio-chip" style="justify-content:flex-start;gap:8px;">
                 <input type="radio" name="cardSizePreset" value="cr80" style="display:inline;width:12px;height:12px;accent-color:var(--accent);flex-shrink:0;" onchange="updateCardSizeInputs()" />
-                <span style="display:flex;flex-direction:column;gap:1px;"><b style="font-size:.68rem;">CR80 (EC-Karte)</b><span style="font-size:.56rem;color:var(--text2);">85,6 × 54 mm — Standard Plastikkarte</span></span>
+                <span style="display:flex;flex-direction:column;gap:1px;"><b style="font-size:.68rem;">CR80</b><span style="font-size:.56rem;color:var(--text2);" data-i18n="cr80Hint">85,6 × 54 mm — Standard Plastikkarte</span></span>
               </label>
               <label class="radio-chip" style="justify-content:flex-start;gap:8px;">
                 <input type="radio" name="cardSizePreset" value="a6" style="display:inline;width:12px;height:12px;accent-color:var(--accent);flex-shrink:0;" onchange="updateCardSizeInputs()" />
@@ -343,10 +360,10 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
               </label>
               <label class="radio-chip" style="justify-content:flex-start;gap:8px;">
                 <input type="radio" name="cardSizePreset" value="custom" style="display:inline;width:12px;height:12px;accent-color:var(--accent);flex-shrink:0;" onchange="updateCardSizeInputs()" />
-                <span style="display:flex;flex-direction:column;gap:1px;"><b style="font-size:.68rem;">Benutzerdefiniert</b><span style="font-size:.56rem;color:var(--text2);">Eigene Maße</span></span>
+                <span style="display:flex;flex-direction:column;gap:1px;"><b style="font-size:.68rem;" data-i18n="customSize">Benutzerdefiniert</b><span style="font-size:.56rem;color:var(--text2);" data-i18n="customSizeHint">Eigene Maße</span></span>
               </label>
             </div>
-            <div id="customSizeFields" style="display:none;margin-top:8px;display:none;">
+            <div id="customSizeFields" style="display:none;margin-top:8px;">
               <div style="display:flex;gap:6px;align-items:center;margin-top:6px;">
                 <input type="number" id="customW" value="63" min="10" max="300" style="width:60px;background:#12141a;border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:.8rem;padding:4px 6px;outline:none;" />
                 <span style="font-size:.7rem;color:var(--text2);">×</span>
@@ -355,23 +372,21 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
               </div>
             </div>
           </div>
-
           <div class="fg">
-            <label>Beschnittrand (Bleed)</label>
+            <label data-i18n="bleed">Beschnittrand (Bleed)</label>
             <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;">
-              <label class="radio-chip"><input type="radio" name="bleedMode" value="0" checked onchange="render()"/><span>Kein Rand</span></label>
+              <label class="radio-chip"><input type="radio" name="bleedMode" value="0" checked onchange="render()"/><span data-i18n="noBleed">Kein Rand</span></label>
               <label class="radio-chip"><input type="radio" name="bleedMode" value="3" onchange="render()"/><span>3mm</span></label>
               <label class="radio-chip"><input type="radio" name="bleedMode" value="5" onchange="render()"/><span>5mm</span></label>
             </div>
-            <p style="font-size:.56rem;color:var(--text2);margin-top:4px;">Bleed-Rand wird in der Karten-Vorschau angezeigt.</p>
+            <p style="font-size:.56rem;color:var(--text2);margin-top:4px;" data-i18n="bleedHint">Bleed-Rand wird in der Karten-Vorschau angezeigt.</p>
           </div>
-
           <div class="fg">
-            <label>Export-Format</label>
+            <label data-i18n="exportFormat">Export-Format</label>
             <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px;">
-              <button class="btn-ghost" id="btnExportPNG" onclick="exportProfessional('png-single')" style="text-align:left;padding:8px 10px;">🖼 PNG Einzeldateien<span style="font-size:.58rem;color:var(--text2);display:block;">FW-001-vorder.png …</span></button>
-              <button class="btn-ghost" id="btnExportZIP" onclick="exportProfessional('zip')" style="text-align:left;padding:8px 10px;">📦 ZIP (alle PNGs)<span style="font-size:.58rem;color:var(--text2);display:block;">Alle Karten in einem Archiv</span></button>
-              <button class="btn-ghost" id="btnExportPDF" onclick="exportProfessional('pdf')" style="text-align:left;padding:8px 10px;">📄 PDF (1 Karte/Seite)<span style="font-size:.58rem;color:var(--text2);display:block;">Vorder + Rückseite abwechselnd</span></button>
+              <button class="btn-ghost" id="btnExportPNG" onclick="exportProfessional('png-single')" style="text-align:left;padding:8px 10px;">🖼 <span data-i18n="exportPNG">PNG Einzeldateien</span><span style="font-size:.58rem;color:var(--text2);display:block;" data-i18n="exportPNGHint">FW-001-vorder.png …</span></button>
+              <button class="btn-ghost" id="btnExportZIP" onclick="exportProfessional('zip')" style="text-align:left;padding:8px 10px;">📦 <span data-i18n="exportZIP">ZIP (alle PNGs)</span><span style="font-size:.58rem;color:var(--text2);display:block;" data-i18n="exportZIPHint">Alle Karten in einem Archiv</span></button>
+              <button class="btn-ghost" id="btnExportPDF" onclick="exportProfessional('pdf')" style="text-align:left;padding:8px 10px;">📄 <span data-i18n="exportPDF">PDF (1 Karte/Seite)</span><span style="font-size:.58rem;color:var(--text2);display:block;" data-i18n="exportPDFHint">Vorder + Rückseite abwechselnd</span></button>
             </div>
           </div>
           <p class="bulk-summary" id="exportStatus"></p>
@@ -381,18 +396,15 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
 
     <div class="preview">
       <div class="preview-hdr">
-        <h2>VORSCHAU</h2>
-        <!-- View mode -->
-        <button class="tb-btn active" id="btnViewDom" onclick="setViewMode('dom')">🃏 Karten</button>
-        <button class="tb-btn" id="btnViewPrint" onclick="setViewMode('print')">🖨 Druckvorschau</button>
-        <!-- Sort -->
+        <h2 data-i18n="preview">VORSCHAU</h2>
+        <button class="tb-btn active" id="btnViewDom" onclick="setViewMode('dom')" data-i18n="viewCards">🃏 Karten</button>
+        <button class="tb-btn" id="btnViewPrint" onclick="setViewMode('print')" data-i18n="viewPrint">🖨 Druckvorschau</button>
         <select class="tb-select" id="sortSelect" onchange="setSortOrder(this.value)" title="Sortierung">
-          <option value="serial">🔢 FW-Nummer</option>
-          <option value="name">🔤 Name A–Z</option>
-          <option value="category">🎨 Kategorie</option>
+          <option value="serial" data-i18n="sortSerial">🔢 FW-Nummer</option>
+          <option value="name" data-i18n="sortName">🔤 Name A–Z</option>
+          <option value="category" data-i18n="sortCat">🎨 Kategorie</option>
         </select>
-        <!-- Flip -->
-        <button class="tb-btn" id="flipToggleBtn" onclick="toggleFlipAll()">🔄 Rückseite</button>
+        <button class="tb-btn" id="flipToggleBtn" onclick="toggleFlipAll()" data-i18n="showBack">🔄 Rückseite</button>
       </div>
       <div class="cgrid" id="cgrid">
         <div class="empty-state" id="emptyMsg"><span class="eico">🚒</span>Noch keine Karten – links erstellen!</div>
@@ -526,6 +538,22 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
       <button class="mbtn save" onclick="addBulkCards()">ALLE HINZUFÜGEN</button>
       <button class="mbtn cancel" onclick="closeBulkModal()">ABBRECHEN</button>
     </div>
+  </div>
+</div>
+
+<!-- WARNING MODAL -->
+<div class="warn-overlay" id="warnOverlay" style="display:none;">
+  <div class="warn-box">
+    <div class="warn-icon">⚠️</div>
+    <h2 data-i18n="warnTitle">WICHTIGER HINWEIS</h2>
+    <p data-i18n="warnText">Diese App speichert deine Daten <strong>nur im Browser</strong>.<br>
+    Beim Löschen des Browser-Caches oder auf einem anderen Gerät sind deine Karten weg.<br><br>
+    <strong>Speichere dein Projekt regelmäßig</strong> als JSON oder ZIP auf deinem Computer!</p>
+    <label class="warn-check">
+      <input type="checkbox" id="warnDontShow" />
+      <span data-i18n="warnDontShow">Nicht mehr anzeigen</span>
+    </label>
+    <button class="warn-btn" onclick="closeWarning()" data-i18n="warnOk">VERSTANDEN</button>
   </div>
 </div>
 
@@ -1220,7 +1248,7 @@ function applyProjectData(data, imageMap){
   if(!selCatId||!categories.find(c=>c.id===selCatId)) selCatId=categories[0]?.id||null;
   invalidatePrintCache();
   renderCatList(); renderCatMgmt(); render();
-
+  scheduleAutosave();
   const warnStr=warnings.length?`\n\n⚠ Hinweise:\n${warnings.join('\n')}` : '';
   alert(`✅ ${cards.length} Karten geladen!${warnStr}`);
 }
@@ -1293,7 +1321,7 @@ document.getElementById('upInput').addEventListener('change',function(e){
 document.getElementById('bgInput').addEventListener('change',function(e){
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
-  r.onload=ev=>{bgImg=ev.target.result;const p=document.getElementById('bgPrev');p.src=bgImg;p.style.display='block';document.getElementById('bgZone').classList.add('has');};
+  r.onload=ev=>{bgImg=ev.target.result;const p=document.getElementById('bgPrev');p.src=bgImg;p.style.display='block';document.getElementById('bgZone').classList.add('has');scheduleAutosave();};
   r.readAsDataURL(f);
 });
 function clearBg(){bgImg=null;document.getElementById('bgPrev').style.display='none';document.getElementById('bgZone').classList.remove('has');}
@@ -1308,10 +1336,10 @@ function addCard(){
   document.getElementById('devName').value='';
   document.getElementById('upPrev').style.display='none';
   document.getElementById('upZone').classList.remove('has');
-  curImg=null; render();
+  curImg=null; scheduleAutosave(); render();
 }
-function deleteCard(id){if(!confirm('Karte löschen?'))return;cards=cards.filter(c=>c.id!==id);invalidatePrintCache(id);render();}
-function clearAll(){if(cards.length&&confirm('Alle Karten löschen?')){cards=[];invalidatePrintCache();render();}}
+function deleteCard(id){if(!confirm('Karte löschen?'))return;cards=cards.filter(c=>c.id!==id);invalidatePrintCache(id);scheduleAutosave();render();}
+function clearAll(){if(cards.length&&confirm('Alle Karten löschen?')){cards=[];invalidatePrintCache();scheduleAutosave();render();}}
 
 /* ============================================================  CARD EDIT MODAL  ============================================================ */
 function openCardModal(id){
@@ -1352,6 +1380,7 @@ function saveCard(){
   cards[idx].name=name; cards[idx].catId=catId;
   if(editCardImg!==undefined) cards[idx].img=editCardImg;
   invalidatePrintCache(editingCardId);
+  scheduleAutosave();
   closeCardModal(); render();
 }
 
@@ -1499,6 +1528,7 @@ function saveCat(){
   if(editingCatId){const i=categories.findIndex(c=>c.id===editingCatId);if(i>=0)categories[i]=cat;}
   else{categories.push(cat);selCatId=cat.id;}
   invalidatePrintCache();
+  scheduleAutosave();
   closeCatModal();renderCatList();renderCatMgmt();render();
 }
 function deleteCat(){
@@ -1578,7 +1608,7 @@ function addBulkCards(){
       cards.push({id:Date.now()+Math.random(),name,catId,img,serial:'FW-'+String(cards.length+1).padStart(3,'0')});
     });
   }
-  closeBulkModal(); render();
+  closeBulkModal(); scheduleAutosave(); render();
 }
 
 /* ============================================================  CSV IMPORT  ============================================================ */
@@ -2076,8 +2106,213 @@ body{background:#fff;}
   });
 }
 
+/* ============================================================  I18N  ============================================================ */
+const TRANSLATIONS = {
+  de: {
+    subtitle:'Gerätekunde · Trading Card Edition', cards:'Karten', pages:'Seite(n)',
+    // sections
+    secNewCard:'Neue Karte', secCategories:'Kategorien', secBackside:'Rückseite',
+    secGlobal:'Globale Einstellungen', saveLoad:'Speichern & Laden',
+    secPrint:'Drucken', secProfiExport:'Profi-Export',
+    // new card
+    deviceName:'Gerätename', deviceNamePh:'z.B. B-Schlauch',
+    category:'Kategorie', photo:'Foto', uploadPhoto:'Foto hochladen',
+    addCard:'+ KARTE HINZUFÜGEN', addMultiple:'📦 MEHRERE AUF EINMAL',
+    addCategory:'+ Neue Kategorie',
+    // backside
+    backsideHint:'Standard: Feuerwehr-Design. Eigenes Bild ersetzt es.',
+    uploadBackside:'Eigenes Rückseitenbild', resetBackside:'✕ Standard-Rückseite',
+    imageScale:'Bild-Skalierung', scaleFit:'↔ Einpassen', scaleCover:'⬛ Füllen', scaleStretch:'⤢ Strecken',
+    // global
+    catSizeGlobal:'Kategorie-Größe (global)', catSizeHint:'Gilt für alle Kategorien ohne eigene Größe.',
+    serialNumber:'Seriennummer', showNumber:'Nummer anzeigen',
+    prefix:'Präfix:', prefixHint:'z.B. EPP-, FW-, TLF-', color:'Farbe',
+    // save/load
+    saveJson:'Als JSON speichern', saveJsonHint:'(Bilder eingebettet)',
+    saveZip:'Als ZIP speichern', saveZipHint:'(Bilder separat, kleiner)',
+    loadProject:'Projekt laden', clearAutosave:'Browser-Autosave löschen',
+    saveHint:'JSON: alles in einer Datei. ZIP: JSON + Bilder als separate Dateien, deutlich kleiner. Der Browser speichert automatisch beim Arbeiten.',
+    autosaveIdle:'Browser-Autosave: —', autosaveSaved:'Browser-Autosave: ✓ Gespeichert',
+    autosaveSaving:'Browser-Autosave: Speichern…', autosaveLoaded:'Browser-Autosave: geladen',
+    // print
+    duplexMode:'Duplex-Modus',
+    longEdge:'Lange Kante', longEdgeHint:'Hochformat · Buch-Umblättern',
+    shortEdge:'Kurze Kante', shortEdgeHint:'Hochformat · Block-Umblättern',
+    manual:'Manuell', manualHint:'Blatt selbst wenden',
+    printBtn:'DRUCKEN (Vorder + Rückseite)', deleteAll:'🗑 Alle Karten löschen',
+    printTip:'<strong>Drucktipp:</strong> Beidseitig aktivieren, dann Modus wählen.<br><strong>Nicht sicher?</strong> Erst 1 Seite drucken und Drehrichtung prüfen.',
+    // profi export
+    profiExportHint:'300 DPI Export für Plastikkarten-Druckfirma.',
+    cardSize:'Kartengröße', sizeTradingCard:'Trading Card (aktuell)',
+    cr80Hint:'85,6 × 54 mm — Standard Plastikkarte',
+    customSize:'Benutzerdefiniert', customSizeHint:'Eigene Maße',
+    bleed:'Beschnittrand (Bleed)', noBleed:'Kein Rand',
+    bleedHint:'Bleed-Rand wird in der Karten-Vorschau angezeigt.',
+    exportFormat:'Export-Format',
+    exportPNG:'PNG Einzeldateien', exportPNGHint:'FW-001-vorder.png …',
+    exportZIP:'ZIP (alle PNGs)', exportZIPHint:'Alle Karten in einem Archiv',
+    exportPDF:'PDF (1 Karte/Seite)', exportPDFHint:'Vorder + Rückseite abwechselnd',
+    // preview toolbar
+    preview:'VORSCHAU', viewCards:'🃏 Karten', viewPrint:'🖨 Druckvorschau',
+    sortSerial:'🔢 FW-Nummer', sortName:'🔤 Name A–Z', sortCat:'🎨 Kategorie',
+    showBack:'🔄 Rückseite',
+    // warning
+    warnTitle:'WICHTIGER HINWEIS',
+    warnText:'Diese App speichert deine Daten <strong>nur im Browser</strong>.<br>Beim Löschen des Browser-Caches oder auf einem anderen Gerät sind deine Karten weg.<br><br><strong>Speichere dein Projekt regelmäßig</strong> als JSON oder ZIP auf deinem Computer!',
+    warnDontShow:'Nicht mehr anzeigen', warnOk:'VERSTANDEN',
+  },
+  en: {
+    subtitle:'Equipment Training · Trading Card Edition', cards:'Cards', pages:'Page(s)',
+    // sections
+    secNewCard:'New Card', secCategories:'Categories', secBackside:'Back Side',
+    secGlobal:'Global Settings', saveLoad:'Save & Load',
+    secPrint:'Print', secProfiExport:'Pro Export',
+    // new card
+    deviceName:'Device Name', deviceNamePh:'e.g. Fire Hose',
+    category:'Category', photo:'Photo', uploadPhoto:'Upload photo',
+    addCard:'+ ADD CARD', addMultiple:'📦 ADD MULTIPLE',
+    addCategory:'+ New Category',
+    // backside
+    backsideHint:'Default: Fire dept. design. Custom image replaces it.',
+    uploadBackside:'Custom back image', resetBackside:'✕ Default back',
+    imageScale:'Image Scaling', scaleFit:'↔ Fit', scaleCover:'⬛ Fill', scaleStretch:'⤢ Stretch',
+    // global
+    catSizeGlobal:'Category Size (global)', catSizeHint:'Applies to all categories without own size.',
+    serialNumber:'Serial Number', showNumber:'Show number',
+    prefix:'Prefix:', prefixHint:'e.g. FD-, EMS-, RES-', color:'Color',
+    // save/load
+    saveJson:'Save as JSON', saveJsonHint:'(images embedded)',
+    saveZip:'Save as ZIP', saveZipHint:'(images separate, smaller)',
+    loadProject:'Load project', clearAutosave:'Clear browser autosave',
+    saveHint:'JSON: everything in one file. ZIP: JSON + images as separate files, much smaller. The browser saves automatically while you work.',
+    autosaveIdle:'Browser autosave: —', autosaveSaved:'Browser autosave: ✓ Saved',
+    autosaveSaving:'Browser autosave: Saving…', autosaveLoaded:'Browser autosave: loaded',
+    // print
+    duplexMode:'Duplex Mode',
+    longEdge:'Long Edge', longEdgeHint:'Portrait · Book flip',
+    shortEdge:'Short Edge', shortEdgeHint:'Portrait · Block flip',
+    manual:'Manual', manualHint:'Flip sheet yourself',
+    printBtn:'PRINT (Front + Back)', deleteAll:'🗑 Delete all cards',
+    printTip:'<strong>Print tip:</strong> Enable duplex, then select mode.<br><strong>Not sure?</strong> Print 1 page first and check the flip direction.',
+    // profi export
+    profiExportHint:'300 DPI export for professional card printing.',
+    cardSize:'Card Size', sizeTradingCard:'Trading Card (current)',
+    cr80Hint:'85.6 × 54 mm — Standard plastic card',
+    customSize:'Custom', customSizeHint:'Custom dimensions',
+    bleed:'Bleed (crop margin)', noBleed:'No margin',
+    bleedHint:'Bleed margin is shown in the card preview.',
+    exportFormat:'Export Format',
+    exportPNG:'PNG individual files', exportPNGHint:'FW-001-front.png …',
+    exportZIP:'ZIP (all PNGs)', exportZIPHint:'All cards in one archive',
+    exportPDF:'PDF (1 card/page)', exportPDFHint:'Front + back alternating',
+    // preview toolbar
+    preview:'PREVIEW', viewCards:'🃏 Cards', viewPrint:'🖨 Print Preview',
+    sortSerial:'🔢 Serial No.', sortName:'🔤 Name A–Z', sortCat:'🎨 Category',
+    showBack:'🔄 Back side',
+    // warning
+    warnTitle:'IMPORTANT NOTE',
+    warnText:'This app stores your data <strong>in the browser only</strong>.<br>If you clear your browser cache or use another device, your cards will be lost.<br><br><strong>Save your project regularly</strong> as JSON or ZIP to your computer!',
+    warnDontShow:"Don't show again", warnOk:'GOT IT',
+  }
+};
+
+let currentLang = localStorage.getItem('fw_lang') || 'de';
+
+function t(key){ return TRANSLATIONS[currentLang][key] || TRANSLATIONS['de'][key] || key; }
+
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    const val=t(key);
+    if(el.tagName==='OPTION') el.textContent=val;
+    else if(val.includes('<')) el.innerHTML=val;
+    else el.textContent=val;
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    el.placeholder=t(el.getAttribute('data-i18n-placeholder'));
+  });
+  document.getElementById('langBtn').textContent = currentLang==='de' ? '🌐 EN' : '🌐 DE';
+}
+
+function toggleLang(){
+  currentLang = currentLang==='de' ? 'en' : 'de';
+  localStorage.setItem('fw_lang', currentLang);
+  applyI18n();
+}
+
+/* ============================================================  WARNING MODAL  ============================================================ */
+function showWarning(){
+  if(localStorage.getItem('fw_warn_dismissed')==='1') return;
+  document.getElementById('warnOverlay').style.display='flex';
+  applyI18n(); // make sure warning text is translated
+}
+function closeWarning(){
+  if(document.getElementById('warnDontShow').checked){
+    localStorage.setItem('fw_warn_dismissed','1');
+  }
+  document.getElementById('warnOverlay').style.display='none';
+}
+
+/* ============================================================  BROWSER AUTOSAVE  ============================================================ */
+const AUTOSAVE_KEY = 'fw_autosave';
+let autosaveTimer = null;
+
+function scheduleAutosave(){
+  clearTimeout(autosaveTimer);
+  // Show "saving..." dot
+  setAutosaveDot('saving');
+  autosaveTimer = setTimeout(()=>{
+    try{
+      const data={
+        version:2, categories,
+        cards: cards.map(c=>({...c})),
+        bgImg: bgImg||null,
+        globalSettings,
+        savedAt: new Date().toISOString(),
+      };
+      localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(data));
+      setAutosaveDot('saved');
+    }catch(e){
+      // localStorage full or unavailable — silently ignore
+      setAutosaveDot('idle');
+    }
+  }, 2000); // debounce 2 seconds
+}
+
+function setAutosaveDot(state){
+  const dot=document.getElementById('autosaveDot');
+  const txt=document.getElementById('autosaveText');
+  if(!dot||!txt) return;
+  if(state==='saved'){dot.style.background='#4caf50';txt.setAttribute('data-i18n','autosaveSaved');txt.textContent=t('autosaveSaved');}
+  else if(state==='saving'){dot.style.background='var(--yellow)';txt.setAttribute('data-i18n','autosaveSaving');txt.textContent=t('autosaveSaving');}
+  else{dot.style.background='#444';txt.setAttribute('data-i18n','autosaveIdle');txt.textContent=t('autosaveIdle');}
+}
+
+function loadFromBrowser(){
+  try{
+    const raw=localStorage.getItem(AUTOSAVE_KEY);
+    if(!raw) return false;
+    const data=JSON.parse(raw);
+    applyProjectData(data, null);
+    setAutosaveDot('saved');
+    document.getElementById('autosaveText').textContent=t('autosaveLoaded')+' ('+new Date(data.savedAt).toLocaleString()+')';
+    return true;
+  }catch(e){ return false; }
+}
+
+function clearBrowserSave(){
+  if(!confirm(currentLang==='de'?'Browser-Autosave wirklich löschen?':'Really clear browser autosave?')) return;
+  localStorage.removeItem(AUTOSAVE_KEY);
+  setAutosaveDot('idle');
+}
+
 /* ============================================================  INIT  ============================================================ */
 renderCatList();renderCatMgmt();render();initColorPairs();
+applyI18n();
+// Load from browser autosave if available, else start fresh
+const hadAutosave = loadFromBrowser();
+if(!hadAutosave) render(); // re-render if no autosave
+showWarning();
 </script>
 </body>
 </html>
