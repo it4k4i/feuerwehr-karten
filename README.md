@@ -1,8 +1,10 @@
-[# 🔥 Feuerwehr Gerätekunde Karten Generator
+# 🔥 Feuerwehr Gerätekunde Karten Generator
 
 Erstelle professionelle Pokémon-style Gerätekunde-Karten für die Feuerwehr — kostenlos, ohne Anmeldung, direkt im Browser.
 
 **👉 [Jetzt öffnen](https://it4k4i.github.io/feuerwehr-karten)**
+**👉 [Jetzt öffnen (Cloudflare)](https://feuerwehr-karten.fabian98.workers.dev/)**
+
 
 ---
 
@@ -51,5 +53,12 @@ docker run -p 80:80 -v $(pwd)/index.html:/usr/share/nginx/html/index.html nginx:
 
 ## Lizenz
 
-MIT License — frei nutzbar, auch kommerziell.
-](https://USERNAME.github.io/feuerwehr-karten)
+
+
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
+
+- ✅ Kostenlos für private, gemeinnützige und Feuerwehr-Nutzung
+- ✅ Weitergabe und Anpassung erlaubt (mit Namensnennung)
+- ❌ Kommerzielle Nutzung nur mit schriftlicher Genehmigung
+
+Kontakt für kommerzielle Anfragen: GitHub Issues
