@@ -2254,14 +2254,59 @@ function closeWarning(){
 }
 
 /* ============================================================  BROWSER AUTOSAVE  ============================================================ */
-const AUTOSAVE_KEY = 'fw_autosave';
+/* ============================================================  BROWSER AUTOSAVE (IndexedDB)  ============================================================ */
+const IDB_NAME = 'fw_karten_db';
+const IDB_STORE = 'autosave';
+const IDB_KEY = 'project';
 let autosaveTimer = null;
+let _idb = null;
+
+function openIDB(){
+  if(_idb) return Promise.resolve(_idb);
+  return new Promise((res,rej)=>{
+    const req = indexedDB.open(IDB_NAME, 1);
+    req.onupgradeneeded = e => {
+      e.target.result.createObjectStore(IDB_STORE);
+    };
+    req.onsuccess = e => { _idb = e.target.result; res(_idb); };
+    req.onerror = () => rej(req.error);
+  });
+}
+
+async function idbSet(data){
+  const db = await openIDB();
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).put(data, IDB_KEY);
+    tx.oncomplete = ()=>res();
+    tx.onerror = ()=>rej(tx.error);
+  });
+}
+
+async function idbGet(){
+  const db = await openIDB();
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(IDB_STORE, 'readonly');
+    const req = tx.objectStore(IDB_STORE).get(IDB_KEY);
+    req.onsuccess = ()=>res(req.result);
+    req.onerror = ()=>rej(req.error);
+  });
+}
+
+async function idbDelete(){
+  const db = await openIDB();
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).delete(IDB_KEY);
+    tx.oncomplete = ()=>res();
+    tx.onerror = ()=>rej(tx.error);
+  });
+}
 
 function scheduleAutosave(){
   clearTimeout(autosaveTimer);
-  // Show "saving..." dot
   setAutosaveDot('saving');
-  autosaveTimer = setTimeout(()=>{
+  autosaveTimer = setTimeout(async ()=>{
     try{
       const data={
         version:2, categories,
@@ -2270,49 +2315,55 @@ function scheduleAutosave(){
         globalSettings,
         savedAt: new Date().toISOString(),
       };
-      localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(data));
-      setAutosaveDot('saved');
+      await idbSet(data);
+      const total = cards.length;
+      const withImg = cards.filter(c=>c.img).length;
+      setAutosaveDot('saved', `✓ ${total} Karten, ${withImg} Bilder`);
     }catch(e){
-      // localStorage full or unavailable — silently ignore
-      setAutosaveDot('idle');
+      setAutosaveDot('error', '✕ Autosave fehlgeschlagen');
+      console.warn('IndexedDB autosave error:', e);
     }
-  }, 2000); // debounce 2 seconds
+  }, 2000);
 }
 
-function setAutosaveDot(state){
+function setAutosaveDot(state, customText){
   const dot=document.getElementById('autosaveDot');
   const txt=document.getElementById('autosaveText');
   if(!dot||!txt) return;
-  if(state==='saved'){dot.style.background='#4caf50';txt.setAttribute('data-i18n','autosaveSaved');txt.textContent=t('autosaveSaved');}
-  else if(state==='saving'){dot.style.background='var(--yellow)';txt.setAttribute('data-i18n','autosaveSaving');txt.textContent=t('autosaveSaving');}
-  else{dot.style.background='#444';txt.setAttribute('data-i18n','autosaveIdle');txt.textContent=t('autosaveIdle');}
+  const colors={saved:'#4caf50', saving:'var(--yellow)', warn:'#ff9800', error:'#e63946', idle:'#444'};
+  dot.style.background = colors[state]||colors.idle;
+  if(customText){ txt.textContent=customText; }
+  else if(state==='saved'){txt.setAttribute('data-i18n','autosaveSaved');txt.textContent=t('autosaveSaved');}
+  else if(state==='saving'){txt.setAttribute('data-i18n','autosaveSaving');txt.textContent=t('autosaveSaving');}
+  else{txt.setAttribute('data-i18n','autosaveIdle');txt.textContent=t('autosaveIdle');}
 }
 
-function loadFromBrowser(){
+async function loadFromBrowser(){
   try{
-    const raw=localStorage.getItem(AUTOSAVE_KEY);
-    if(!raw) return false;
-    const data=JSON.parse(raw);
+    const data = await idbGet();
+    if(!data) return false;
     applyProjectData(data, null);
-    setAutosaveDot('saved');
-    document.getElementById('autosaveText').textContent=t('autosaveLoaded')+' ('+new Date(data.savedAt).toLocaleString()+')';
+    setAutosaveDot('saved', t('autosaveLoaded')+' ('+new Date(data.savedAt).toLocaleString()+')');
     return true;
   }catch(e){ return false; }
 }
 
-function clearBrowserSave(){
+async function clearBrowserSave(){
   if(!confirm(currentLang==='de'?'Browser-Autosave wirklich löschen?':'Really clear browser autosave?')) return;
-  localStorage.removeItem(AUTOSAVE_KEY);
-  setAutosaveDot('idle');
+  try{
+    await idbDelete();
+    setAutosaveDot('idle');
+  }catch(e){ console.warn('IDB delete error:', e); }
 }
 
 /* ============================================================  INIT  ============================================================ */
 renderCatList();renderCatMgmt();render();initColorPairs();
 applyI18n();
-// Load from browser autosave if available, else start fresh
-const hadAutosave = loadFromBrowser();
-if(!hadAutosave) render(); // re-render if no autosave
-showWarning();
+// Load from IndexedDB autosave if available
+loadFromBrowser().then(hadAutosave=>{
+  if(!hadAutosave) render();
+  showWarning();
+});
 </script>
 </body>
 </html>
