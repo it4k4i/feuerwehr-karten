@@ -281,10 +281,11 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
       <div class="sb-section">
         <div class="sb-title" onclick="toggleSection(this)">💾 Speichern &amp; Laden<span class="sb-chevron">▾</span></div>
         <div class="sb-body">
-          <button class="btn-save-load" onclick="saveProject()">💾 Projekt speichern (.json)</button>
-          <button class="btn-save-load" onclick="document.getElementById('loadInput').click()">📂 Projekt laden</button>
-          <input type="file" id="loadInput" accept=".json" style="display:none;" onchange="loadProject(this)" />
-          <p style="font-size:.58rem;color:var(--text2);margin-top:6px;line-height:1.5;">Alle Karten, Kategorien und die Rückseite werden gespeichert.</p>
+          <button class="btn-save-load" onclick="saveProject()">💾 Als JSON speichern <span style="font-size:.6rem;opacity:.7;">(Bilder eingebettet)</span></button>
+          <button class="btn-save-load" onclick="saveProjectZip()">📦 Als ZIP speichern <span style="font-size:.6rem;opacity:.7;">(Bilder separat, kleiner)</span></button>
+          <button class="btn-save-load" onclick="document.getElementById('loadInput').click()">📂 Projekt laden <span style="font-size:.6rem;opacity:.7;">(.json oder .zip)</span></button>
+          <input type="file" id="loadInput" accept=".json,.zip" style="display:none;" onchange="loadProject(this)" />
+          <p style="font-size:.58rem;color:var(--text2);margin-top:6px;line-height:1.5;">JSON: alles in einer Datei. ZIP: JSON + Bilder als separate Dateien, deutlich kleiner.</p>
         </div>
       </div>
 
@@ -1065,6 +1066,19 @@ body{
 }
 
 /* ============================================================  SAVE / LOAD  ============================================================ */
+
+// ---- Helper: load JSZip ----
+async function ensureJSZip(){
+  if(window.JSZip) return window.JSZip;
+  return new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+    s.onload=()=>res(window.JSZip); s.onerror=()=>rej(new Error('JSZip nicht geladen'));
+    document.head.appendChild(s);
+  });
+}
+
+// ---- Save as JSON (bilder eingebettet, wie bisher) ----
 function saveProject(){
   const data={
     version:2,
@@ -1080,6 +1094,56 @@ function saveProject(){
   a.download=`feuerwehr-karten-${new Date().toISOString().slice(0,10)}.json`;
   a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),10000);
+}
+
+// ---- Save as ZIP (JSON ohne Bilder + Bilder als separate Dateien) ----
+async function saveProjectZip(){
+  setStatus('ZIP wird erstellt…');
+  let JSZip;
+  try{ JSZip = await ensureJSZip(); }
+  catch(e){ hideStatus(); alert('ZIP-Export benötigt Internetverbindung für JSZip.'); return; }
+
+  const zip = new JSZip();
+  const imgFolder = zip.folder('bilder');
+
+  // Strip images from cards, store filename references instead
+  const cardsStripped = cards.map(c=>{
+    if(!c.img) return {...c, img:null};
+    const ext = c.img.startsWith('data:image/png') ? 'png' : 'jpg';
+    const filename = `${c.serial}-${c.name.replace(/[^a-zA-Z0-9äöüÄÖÜß\-_ ]/g,'').trim()}.${ext}`;
+    // Store image in zip
+    const base64 = c.img.split(',')[1];
+    imgFolder.file(filename, base64, {base64:true});
+    return {...c, img: filename}; // only filename in JSON
+  });
+
+  // Handle background image
+  let bgImgFile = null;
+  if(bgImg){
+    const ext = bgImg.startsWith('data:image/png') ? 'png' : 'jpg';
+    bgImgFile = `rueckseite.${ext}`;
+    const base64 = bgImg.split(',')[1];
+    zip.file(`bilder/${bgImgFile}`, base64, {base64:true});
+  }
+
+  const data = {
+    version: 3,
+    format: 'zip', // marker so loader knows images are separate files
+    categories,
+    cards: cardsStripped,
+    bgImg: bgImgFile,
+    globalSettings,
+    savedAt: new Date().toISOString(),
+  };
+  zip.file('projekt.json', JSON.stringify(data, null, 2));
+
+  const blob = await zip.generateAsync({type:'blob', compression:'DEFLATE', compressionOptions:{level:6}});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `feuerwehr-karten-${new Date().toISOString().slice(0,10)}.zip`;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),10000);
+  hideStatus();
 }
 
 // Default values used when a saved field is missing or invalid
@@ -1102,67 +1166,121 @@ function sanitizeCard(card, idx){
      serial: card.serial||(globalSettings.serialPrefix||'FW-')+String(idx+1).padStart(3,'0')});
 }
 
+// ---- Apply loaded data to app state ----
+function applyProjectData(data, imageMap){
+  // imageMap: { filename → dataURL } — for ZIP loads
+  let warnings=[];
+
+  if(Array.isArray(data.categories)&&data.categories.length>0){
+    categories = data.categories.map(sanitizeCategory).filter(Boolean);
+  } else {
+    warnings.push('Kategorien fehlten → Standard verwendet');
+  }
+
+  if(Array.isArray(data.cards)){
+    cards = data.cards.map((c,i)=>{
+      const card = sanitizeCard(c,i);
+      // Resolve image: if it's a filename (ZIP format), look it up in imageMap
+      if(card.img && !card.img.startsWith('data:') && imageMap){
+        card.img = imageMap[card.img] || null;
+      }
+      return card;
+    }).filter(Boolean);
+    cards.forEach(c=>{ if(!categories.find(cat=>cat.id===c.catId)) c.catId=categories[0]?.id||null; });
+  } else {
+    cards=[];
+    warnings.push('Keine Karten gefunden');
+  }
+
+  // Background image
+  if(data.bgImg!==undefined){
+    let bg = data.bgImg||null;
+    // ZIP format: bgImg is a filename
+    if(bg && !bg.startsWith('data:') && imageMap) bg = imageMap[bg]||null;
+    bgImg = bg;
+    const p=document.getElementById('bgPrev');
+    if(bgImg){p.src=bgImg;p.style.display='block';document.getElementById('bgZone').classList.add('has');}
+    else{p.style.display='none';document.getElementById('bgZone').classList.remove('has');}
+  }
+
+  // Global settings
+  const gs=(data.globalSettings&&typeof data.globalSettings==='object')?data.globalSettings:{};
+  globalSettings=Object.assign({},GLOBAL_DEFAULTS,gs);
+  try{
+    document.getElementById('gCatSize').value=globalSettings.catSize;
+    document.getElementById('gCatSizeVal').textContent=globalSettings.catSize;
+    document.getElementById('gSerialColor').value=globalSettings.serialColor;
+    document.getElementById('gSerialColorHex').value=globalSettings.serialColor;
+    const bgScaleEl=document.querySelector(`input[name="bgScale"][value="${globalSettings.bgScale}"]`);
+    if(bgScaleEl) bgScaleEl.checked=true;
+    const ssEl=document.getElementById('gSerialShow'); if(ssEl) ssEl.checked=globalSettings.serialShow!==false;
+    const spEl=document.getElementById('gSerialPrefix'); if(spEl) spEl.value=globalSettings.serialPrefix||'FW-';
+  }catch(uiErr){ warnings.push('Einige UI-Felder konnten nicht aktualisiert werden'); }
+
+  if(!selCatId||!categories.find(c=>c.id===selCatId)) selCatId=categories[0]?.id||null;
+  invalidatePrintCache();
+  renderCatList(); renderCatMgmt(); render();
+
+  const warnStr=warnings.length?`\n\n⚠ Hinweise:\n${warnings.join('\n')}` : '';
+  alert(`✅ ${cards.length} Karten geladen!${warnStr}`);
+}
+
+// ---- Load project — auto-detects JSON or ZIP ----
 function loadProject(input){
   const f=input.files[0]; if(!f)return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    try{
-      const data=JSON.parse(ev.target.result);
-      let warnings=[];
-
-      // Categories — sanitize each one, skip nulls
-      if(Array.isArray(data.categories)&&data.categories.length>0){
-        categories = data.categories.map(sanitizeCategory).filter(Boolean);
-      } else {
-        warnings.push('Kategorien fehlten → Standard verwendet');
-      }
-
-      // Cards — sanitize each one
-      if(Array.isArray(data.cards)){
-        cards = data.cards.map((c,i)=>sanitizeCard(c,i)).filter(Boolean);
-        // Fix catId if it points to missing category
-        cards.forEach(c=>{ if(!categories.find(cat=>cat.id===c.catId)) c.catId=categories[0]?.id||null; });
-      } else {
-        cards=[];
-        warnings.push('Keine Karten gefunden');
-      }
-
-      // Background image
-      if(data.bgImg!==undefined){
-        bgImg=data.bgImg||null;
-        const p=document.getElementById('bgPrev');
-        if(bgImg){p.src=bgImg;p.style.display='block';document.getElementById('bgZone').classList.add('has');}
-        else{p.style.display='none';document.getElementById('bgZone').classList.remove('has');}
-      }
-
-      // Global settings — merge with defaults
-      const gs = (data.globalSettings&&typeof data.globalSettings==='object') ? data.globalSettings : {};
-      globalSettings = Object.assign({}, GLOBAL_DEFAULTS, gs);
-      try{
-        document.getElementById('gCatSize').value=globalSettings.catSize;
-        document.getElementById('gCatSizeVal').textContent=globalSettings.catSize;
-        document.getElementById('gSerialColor').value=globalSettings.serialColor;
-        document.getElementById('gSerialColorHex').value=globalSettings.serialColor;
-        const bgScaleEl=document.querySelector(`input[name="bgScale"][value="${globalSettings.bgScale}"]`);
-        if(bgScaleEl) bgScaleEl.checked=true;
-        const ssEl=document.getElementById('gSerialShow'); if(ssEl) ssEl.checked=globalSettings.serialShow!==false;
-        const spEl=document.getElementById('gSerialPrefix'); if(spEl) spEl.value=globalSettings.serialPrefix||'FW-';
-      }catch(uiErr){ warnings.push('Einige UI-Felder konnten nicht aktualisiert werden'); }
-
-      // Ensure valid selCatId
-      if(!selCatId||!categories.find(c=>c.id===selCatId)) selCatId=categories[0]?.id||null;
-
-      invalidatePrintCache();
-      renderCatList(); renderCatMgmt(); render();
-
-      const warnStr = warnings.length ? `\n\n⚠ Hinweise:\n${warnings.join('\n')}` : '';
-      alert(`✅ ${cards.length} Karten geladen!${warnStr}`);
-    }catch(e){
-      alert('Fehler beim Laden: '+e.message+'\nDie Datei scheint kein gültiges Projektformat zu sein.');
-    }
-  };
-  reader.readAsText(f);
   input.value='';
+
+  const isZip = f.name.endsWith('.zip') || f.type==='application/zip';
+
+  if(isZip){
+    loadProjectZip(f);
+  } else {
+    // JSON
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      try{
+        const data=JSON.parse(ev.target.result);
+        applyProjectData(data, null);
+      }catch(e){
+        alert('Fehler beim Laden: '+e.message+'\nDie Datei scheint kein gültiges Projektformat zu sein.');
+      }
+    };
+    reader.readAsText(f);
+  }
+}
+
+async function loadProjectZip(file){
+  setStatus('ZIP wird geladen…');
+  let JSZip;
+  try{ JSZip = await ensureJSZip(); }
+  catch(e){ hideStatus(); alert('ZIP-Laden benötigt Internetverbindung für JSZip.'); return; }
+
+  try{
+    const zip = await JSZip.loadAsync(file);
+
+    // Read projekt.json
+    const jsonFile = zip.file('projekt.json');
+    if(!jsonFile) throw new Error('projekt.json nicht im ZIP gefunden');
+    const jsonText = await jsonFile.async('string');
+    const data = JSON.parse(jsonText);
+
+    // Read all images from bilder/ folder → { filename → dataURL }
+    const imageMap = {};
+    const imageFiles = Object.keys(zip.files).filter(name=>name.startsWith('bilder/')&&!zip.files[name].dir);
+    await Promise.all(imageFiles.map(async path=>{
+      const filename = path.replace('bilder/','');
+      const base64 = await zip.files[path].async('base64');
+      const ext = filename.split('.').pop().toLowerCase();
+      const mime = ext==='png'?'image/png':'image/jpeg';
+      imageMap[filename] = `data:${mime};base64,${base64}`;
+    }));
+
+    hideStatus();
+    applyProjectData(data, imageMap);
+  }catch(e){
+    hideStatus();
+    alert('Fehler beim Laden des ZIPs: '+e.message);
+  }
 }
 
 /* ============================================================  UPLOADS  ============================================================ */
