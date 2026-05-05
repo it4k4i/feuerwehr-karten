@@ -255,6 +255,13 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
 }
 .hdr-home:hover{border-color:#fff;color:#fff;}
 
+/* Elegant visible scrollbars – same style as fahrzeug-karten */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:rgba(255,255,255,.02);border-radius:4px;}
+::-webkit-scrollbar-thumb{background:#2a3050;border-radius:4px;border:1px solid rgba(255,255,255,.04);}
+::-webkit-scrollbar-thumb:hover{background:#3a4468;}
+* { scrollbar-width: thin; scrollbar-color: #2a3050 rgba(255,255,255,.02); }
+
 </style>
 </head>
 <body>
@@ -264,6 +271,9 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
     <div><h1>FEUERWEHR KARTEN</h1><p data-i18n="subtitle">Gerätekunde · Pokémon Edition</p></div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
       <a class="hdr-home" href="index.html" title="Gerätekunde Aktuell – Startseite">🏠</a>
+      <a href="https://github.com/issues/new" target="_blank" rel="noopener"
+         style="display:inline-flex;align-items:center;gap:4px;background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text2);font-size:.7rem;cursor:pointer;transition:all .15s;font-family:'Libre Franklin',sans-serif;text-decoration:none;"
+         onmouseover="this.style.borderColor='#fff';this.style.color='#fff'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">🐛 Bug melden</a>
       <button onclick="toggleLang()" id="langBtn" style="background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text2);font-size:.7rem;cursor:pointer;font-family:'Libre Franklin',sans-serif;transition:all .15s;" onmouseover="this.style.borderColor='#fff';this.style.color='#fff'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">🌐 EN</button>
       <div class="hdr-counter">
         <span class="hdr-cnt-num" id="hdrCnt">0</span>
@@ -2907,6 +2917,16 @@ async function wzDoProExport(pCards){
   const bleedpx=mm2px(bleed,dpi),cardW=mm2px(w,dpi),cardH=mm2px(h,dpi);
 
   if(et==='single'){
+    const useZip = pCards.length > 1;
+    const JSZip = useZip ? await loadJSZip() : null;
+    const zip = useZip ? new JSZip() : null;
+
+    // Group by prefix for folder structure
+    const getPrefix = card => {
+      const pfx = prefixes.find(p => p.id === card.prefixId);
+      return pfx ? pfx.value : '';
+    };
+
     for(let i=0;i<pCards.length;i++){
       document.getElementById('statusText').textContent=`Rendere ${i+1}/${pCards.length}…`;
       const cv=document.createElement('canvas');cv.width=totalW;cv.height=totalH;
@@ -2914,9 +2934,21 @@ async function wzDoProExport(pCards){
       const cc=await drawCardOnCanvas(pCards[i],cardW,cardH);ctx.drawImage(cc,bleedpx,bleedpx,cardW,cardH);
       if(showCrop) wz_drawProCropMarks(ctx,bleedpx,bleedpx,cardW,cardH,mm2px(3,dpi),1.5,bleed>0);
       if(showReg){const rr2=mm2px(4,dpi);[[totalW/2,rr2],[totalW/2,totalH-rr2],[rr2,totalH/2],[totalW-rr2,totalH/2]].forEach(([cx,cy])=>wz_drawRegistrationMark(ctx,cx,cy,rr2));}
-      const a=document.createElement('a');a.href=cv.toDataURL('image/png');
-      a.download=`PROFI_${wzFmt}_${dpi}dpi_${pCards[i].serial.replace(/[^a-z0-9äöüÄÖÜ\-]/gi,'_')}.png`;a.click();
-      await new Promise(r=>setTimeout(r,100));
+      const filename=`PROFI_${wzFmt}_${dpi}dpi_${pCards[i].serial.replace(/[^a-z0-9äöüÄÖÜ\-]/gi,'_')}.png`;
+      if(useZip){
+        const blob=await canvasToBlob(cv);
+        const pfxFolder = getPrefix(pCards[i]);
+        const path = pfxFolder ? `${pfxFolder}/${filename}` : filename;
+        zip.file(path, blob);
+      } else {
+        const a=document.createElement('a');a.href=cv.toDataURL('image/png');a.download=filename;a.click();
+        await new Promise(r=>setTimeout(r,100));
+      }
+    }
+    if(useZip){
+      document.getElementById('statusText').textContent='ZIP erstellen…';
+      const blob=await zip.generateAsync({type:'blob'});
+      downloadBlob(blob,`PROFI_${wzFmt}_${dpi}dpi.zip`);
     }
   } else {
     const paperW=et==='sheet_a3'?420:210;
@@ -2951,8 +2983,13 @@ async function wzDoStickerExport(pCards){
   const showCrop=document.getElementById('wzStkCrop').value==='1';
   const bleedpx=mm2px(bleed,dpi),cardW=mm2px(wmm,dpi),cardH=mm2px(hmm,dpi);
   const wpx=mm2px(wmm+bleed*2,dpi),hpx=mm2px(hmm+bleed*2,dpi);
+  const getPrefix = card => { const pfx=prefixes.find(p=>p.id===card.prefixId); return pfx?pfx.value:''; };
 
   if(et==='single'){
+    const useZip = pCards.length > 1;
+    const JSZip = useZip ? await loadJSZip() : null;
+    const zip = useZip ? new JSZip() : null;
+
     for(let i=0;i<pCards.length;i++){
       document.getElementById('statusText').textContent=`Sticker ${i+1}/${pCards.length}…`;
       const cc=await drawCardOnCanvas(pCards[i],cardW,cardH);
@@ -2961,9 +2998,20 @@ async function wzDoStickerExport(pCards){
       ctx.fillStyle=document.getElementById('wzStkBg')?.value||'#fff';ctx.fillRect(0,0,wpx,hpx);
       ctx.drawImage(cc,bleedpx,bleedpx,cardW,cardH);
       if(showCrop&&bleed>0){ctx.save();ctx.setLineDash([5,4]);ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=1;ctx.strokeRect(bleedpx,bleedpx,cardW,cardH);ctx.setLineDash([]);ctx.restore();}
-      const a=document.createElement('a');a.href=cv.toDataURL('image/png');
-      a.download=`STICKER_${pCards[i].serial.replace(/[^a-z0-9äöüÄÖÜ\-]/gi,'_')}.png`;a.click();
-      await new Promise(r=>setTimeout(r,80));
+      const filename=`STICKER_${pCards[i].serial.replace(/[^a-z0-9äöüÄÖÜ\-]/gi,'_')}.png`;
+      if(useZip){
+        const blob=await canvasToBlob(cv);
+        const pfxFolder=getPrefix(pCards[i]);
+        zip.file(pfxFolder?`${pfxFolder}/${filename}`:filename, blob);
+      } else {
+        const a=document.createElement('a');a.href=cv.toDataURL('image/png');a.download=filename;a.click();
+        await new Promise(r=>setTimeout(r,80));
+      }
+    }
+    if(useZip){
+      document.getElementById('statusText').textContent='ZIP erstellen…';
+      const blob=await zip.generateAsync({type:'blob'});
+      downloadBlob(blob,'STICKER_Export.zip');
     }
   } else {
     const paperW=et==='sheet_a3'?420:210;

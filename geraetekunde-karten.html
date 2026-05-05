@@ -210,6 +210,13 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
 }
 .hdr-home:hover{border-color:#fff;color:#fff;}
 
+/* Elegant visible scrollbars – same style as fahrzeug-karten */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:rgba(255,255,255,.02);border-radius:4px;}
+::-webkit-scrollbar-thumb{background:#2a3050;border-radius:4px;border:1px solid rgba(255,255,255,.04);}
+::-webkit-scrollbar-thumb:hover{background:#3a4468;}
+* { scrollbar-width: thin; scrollbar-color: #2a3050 rgba(255,255,255,.02); }
+
 </style>
 </head>
 <body>
@@ -219,6 +226,9 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
     <div><h1>FEUERWEHR KARTEN</h1><p data-i18n="subtitle">Gerätekunde · Pokémon Edition</p></div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
       <a class="hdr-home" href="index.html" title="Gerätekunde V2 – Startseite">🏠</a>
+      <a href="https://github.com/issues/new" target="_blank" rel="noopener"
+         style="display:inline-flex;align-items:center;gap:4px;background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text2);font-size:.7rem;cursor:pointer;transition:all .15s;font-family:'Libre Franklin',sans-serif;text-decoration:none;"
+         onmouseover="this.style.borderColor='#fff';this.style.color='#fff'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">🐛 Bug melden</a>
       <button onclick="toggleLang()" id="langBtn" style="background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text2);font-size:.7rem;cursor:pointer;font-family:'Libre Franklin',sans-serif;transition:all .15s;" onmouseover="this.style.borderColor='#fff';this.style.color='#fff'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">🌐 EN</button>
       <div class="hdr-counter">
         <span class="hdr-cnt-num" id="hdrCnt">0</span>

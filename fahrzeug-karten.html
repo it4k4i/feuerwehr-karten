@@ -450,6 +450,9 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
   </div>
   <div class="hdr-right">
     <a class="hdr-home" href="index.html">🏠</a>
+    <a href="https://github.com/issues/new" target="_blank" rel="noopener"
+       style="display:inline-flex;align-items:center;gap:4px;background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text2);font-size:.62rem;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.5px;text-decoration:none;transition:all .15s;"
+       onmouseover="this.style.borderColor='rgba(255,255,255,.4)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">🐛 Bug melden</a>
     <button class="hdr-lang" id="fzLangBtn" onclick="fzToggleLang()">🌐 EN</button>
     <div class="autosave"><div class="asdot" id="asDot"></div><span id="asTxt">Bereit</span></div>
     <div class="cnt-badge"><span class="num" id="hdrCnt">0</span><span class="lbl">KARTEN</span></div>
@@ -3003,6 +3006,27 @@ async function wzBuildPreview(){
 }
 
 
+// ── ZIP / Download helpers ──────────────────────────────
+function fzCanvasToBlob(canvas, quality=0.95){
+  return new Promise(res => canvas.toBlob(b => res(b), 'image/png', quality));
+}
+function fzDownloadBlob(blob, filename){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+async function fzLoadJSZip(){
+  if (window.JSZip) return window.JSZip;
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+    s.onload = () => res(window.JSZip);
+    s.onerror = () => rej(new Error('JSZip konnte nicht geladen werden'));
+    document.head.appendChild(s);
+  });
+}
+
 async function doWizardExport(){
   const pCards=wzGetCards();
   if(!pCards.length){alert('Keine Karten ausgewählt!');return;}
@@ -3111,6 +3135,14 @@ async function doWzProExport(pCards){
   const bleedpx=mm2px(bleed,dpi),cardW=mm2px(w,dpi),cardH=mm2px(h,dpi);
 
   if(et==='single'){
+    const useZip = pCards.length > 1;
+    const JSZipLib = useZip ? await fzLoadJSZip() : null;
+    const zip = useZip ? new JSZipLib() : null;
+    const getVehicleType = card => {
+      const vt = vehicleTypes.find(v => v.id === card.vehicleTypeId);
+      return vt ? vt.name.replace(/[^a-z0-9äöüÄÖÜ\-]/gi,'_') : '';
+    };
+
     for(let i=0;i<pCards.length;i++){
       document.getElementById('statusTxt').textContent=`Rendere ${i+1}/${pCards.length}…`;
       const cv=document.createElement('canvas');cv.width=totalW;cv.height=totalH;
@@ -3120,11 +3152,20 @@ async function doWzProExport(pCards){
       ctx.drawImage(cc,bleedpx,bleedpx,cardW,cardH);
       if(showCrop) drawProCropMarks(ctx,bleedpx,bleedpx,cardW,cardH,mm2px(3,dpi),1.5,bleed>0);
       if(showReg){const rr2=mm2px(4,dpi);[[totalW/2,rr2],[totalW/2,totalH-rr2],[rr2,totalH/2],[totalW-rr2,totalH/2]].forEach(([cx,cy])=>drawRegistrationMark(ctx,cx,cy,rr2));}
-      const a=document.createElement('a');
-      a.href=cv.toDataURL('image/png');
-      a.download=`PROFI_${wzFmt}_${dpi}dpi_${pCards[i].serial.replace('#','')}_${pCards[i].name.replace(/[^a-z0-9äöüÄÖÜ]/gi,'_')}.png`;
-      a.click();
-      await new Promise(r=>setTimeout(r,100));
+      const filename=`PROFI_${wzFmt}_${dpi}dpi_${pCards[i].serial.replace('#','')}_${pCards[i].name.replace(/[^a-z0-9äöüÄÖÜ]/gi,'_')}.png`;
+      if(useZip){
+        const blob=await fzCanvasToBlob(cv);
+        const folder=getVehicleType(pCards[i]);
+        zip.file(folder?`${folder}/${filename}`:filename, blob);
+      } else {
+        const a=document.createElement('a');a.href=cv.toDataURL('image/png');a.download=filename;a.click();
+        await new Promise(r=>setTimeout(r,100));
+      }
+    }
+    if(useZip){
+      document.getElementById('statusTxt').textContent='ZIP erstellen…';
+      const blob=await zip.generateAsync({type:'blob'});
+      fzDownloadBlob(blob,`PROFI_${wzFmt}_${dpi}dpi.zip`);
     }
   } else {
     const paperW=et==='sheet_a3'?420:210;
@@ -3168,22 +3209,39 @@ async function doWzStickerExport(pCards){
   const bleedpx=mm2px(bleed,dpi);
   const cardW=mm2px(wmm,dpi),cardH=mm2px(hmm,dpi);
   const wpx=mm2px(wmm+bleed*2,dpi),hpx=mm2px(hmm+bleed*2,dpi);
+  const getVehicleType = card => {
+    const vt = vehicleTypes.find(v => v.id === card.vehicleTypeId);
+    return vt ? vt.name.replace(/[^a-z0-9äöüÄÖÜ\-]/gi,'_') : '';
+  };
 
   if(et==='single'){
+    const useZip = pCards.length > 1;
+    const JSZipLib = useZip ? await fzLoadJSZip() : null;
+    const zip = useZip ? new JSZipLib() : null;
+
     for(let i=0;i<pCards.length;i++){
       document.getElementById('statusTxt').textContent=`Sticker ${i+1}/${pCards.length}…`;
       const cc=await renderCardCanvas(pCards[i]);
       const cv=document.createElement('canvas');cv.width=wpx;cv.height=hpx;
       const ctx=cv.getContext('2d');
       const stkBg=document.getElementById('wzStkBg')?.value||'#ffffff';
-  ctx.fillStyle=stkBg;ctx.fillRect(0,0,wpx,hpx);
+      ctx.fillStyle=stkBg;ctx.fillRect(0,0,wpx,hpx);
       ctx.drawImage(cc,bleedpx,bleedpx,cardW,cardH);
       if(showCrop&&bleed>0){ctx.save();ctx.setLineDash([5,4]);ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=1;ctx.strokeRect(bleedpx,bleedpx,cardW,cardH);ctx.setLineDash([]);ctx.restore();}
-      const a=document.createElement('a');
-      a.href=cv.toDataURL('image/png');
-      a.download=`STICKER_${pCards[i].serial.replace('#','')}_${pCards[i].name.replace(/[^a-z0-9äöüÄÖÜ]/gi,'_')}.png`;
-      a.click();
-      await new Promise(r=>setTimeout(r,80));
+      const filename=`STICKER_${pCards[i].serial.replace('#','')}_${pCards[i].name.replace(/[^a-z0-9äöüÄÖÜ]/gi,'_')}.png`;
+      if(useZip){
+        const blob=await fzCanvasToBlob(cv);
+        const folder=getVehicleType(pCards[i]);
+        zip.file(folder?`${folder}/${filename}`:filename, blob);
+      } else {
+        const a=document.createElement('a');a.href=cv.toDataURL('image/png');a.download=filename;a.click();
+        await new Promise(r=>setTimeout(r,80));
+      }
+    }
+    if(useZip){
+      document.getElementById('statusTxt').textContent='ZIP erstellen…';
+      const blob=await zip.generateAsync({type:'blob'});
+      fzDownloadBlob(blob,'STICKER_Export.zip');
     }
   } else {
     const paperW=et==='sheet_a3'?420:210;
@@ -3495,35 +3553,47 @@ async function doProExport(){
   showStatus('Profi-Export läuft…', 0);
 
   if(et==='single'){
+    const useZip = pCards.length > 1;
+    const JSZipLib = useZip ? await fzLoadJSZip() : null;
+    const zip = useZip ? new JSZipLib() : null;
+    const getVehicleType = card => {
+      const vt = vehicleTypes.find(v => v.id === card.vehicleTypeId);
+      return vt ? vt.name.replace(/[^a-z0-9äöüÄÖÜ\-]/gi,'_') : '';
+    };
+    const fmt = document.getElementById('proFormat').value;
+
     for(let i=0;i<pCards.length;i++){
       document.getElementById('statusTxt').textContent=`Rendere ${i+1}/${pCards.length}…`;
       const cv=document.createElement('canvas'); cv.width=totalW; cv.height=totalH;
       const ctx=cv.getContext('2d');
-      // Hintergrund (Bleed-Bereich)
       ctx.fillStyle=bg; ctx.fillRect(0,0,totalW,totalH);
-      // Karte zentriert auf Bleed-Canvas
       const cc=await renderCardCanvas(pCards[i]);
       ctx.drawImage(cc, bleedpx, bleedpx, cardW, cardH);
-      // Safe Zone gestrichelt (optional visuell)
       if(safe>0 && showCrop){
         const spx=mm2px(safe,dpi);
         ctx.save(); ctx.setLineDash([4,3]); ctx.strokeStyle='rgba(0,100,200,.3)'; ctx.lineWidth=1;
         ctx.strokeRect(bleedpx+spx,bleedpx+spx,cardW-spx*2,cardH-spx*2);
         ctx.setLineDash([]); ctx.restore();
       }
-      // Schnittmarken
       if(showCrop) drawProCropMarks(ctx, bleedpx, bleedpx, cardW, cardH, mm2px(3,dpi), 1.5, bleed>0);
-      // Passerkreuze
       if(showReg){
         const rr2=mm2px(4,dpi);
         [[totalW/2, rr2],[totalW/2,totalH-rr2],[rr2,totalH/2],[totalW-rr2,totalH/2]].forEach(([cx,cy])=>drawRegistrationMark(ctx,cx,cy,rr2));
       }
-      const a=document.createElement('a');
-      a.href=cv.toDataURL('image/png');
-      const fmt=document.getElementById('proFormat').value;
-      a.download=`PROFI_${fmt}_${dpi}dpi_${pCards[i].serial.replace('#','')}_${pCards[i].name.replace(/[^a-z0-9äöüÄÖÜ]/gi,'_')}.png`;
-      a.click();
-      await new Promise(r=>setTimeout(r,100));
+      const filename=`PROFI_${fmt}_${dpi}dpi_${pCards[i].serial.replace('#','')}_${pCards[i].name.replace(/[^a-z0-9äöüÄÖÜ]/gi,'_')}.png`;
+      if(useZip){
+        const blob = await fzCanvasToBlob(cv);
+        const folder = getVehicleType(pCards[i]);
+        zip.file(folder ? `${folder}/${filename}` : filename, blob);
+      } else {
+        const a=document.createElement('a'); a.href=cv.toDataURL('image/png'); a.download=filename; a.click();
+        await new Promise(r=>setTimeout(r,100));
+      }
+    }
+    if(useZip){
+      document.getElementById('statusTxt').textContent='ZIP erstellen…';
+      const blob = await zip.generateAsync({type:'blob'});
+      fzDownloadBlob(blob, `PROFI_${fmt}_${dpi}dpi.zip`);
     }
   } else {
     // Bogen-Export

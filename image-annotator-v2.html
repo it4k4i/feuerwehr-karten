@@ -159,6 +159,12 @@ input[type=range]{width:100%;accent-color:var(--accent);}
     <span id="ann-save-txt">—</span>
   </span>
   <button id="ann-clear-btn" onclick="annClearAutosave()" title="Autosave löschen" style="display:none;margin-left:6px;padding:2px 7px;background:rgba(220,80,80,.12);border:0.5px solid rgba(220,80,80,.3);border-radius:4px;color:rgba(220,120,120,.8);font-size:10px;cursor:pointer;font-family:inherit;transition:all .15s;">✕</button>
+  <a id="ann-issue-btn" href="https://github.com/issues/new" target="_blank" rel="noopener"
+     style="margin-left:8px;padding:3px 9px;background:rgba(255,255,255,.04);border:0.5px solid rgba(255,255,255,.12);border-radius:5px;color:rgba(255,255,255,.35);font-size:10px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:all .15s;"
+     onmouseover="this.style.borderColor='rgba(255,255,255,.3)';this.style.color='rgba(255,255,255,.7)'"
+     onmouseout="this.style.borderColor='rgba(255,255,255,.12)';this.style.color='rgba(255,255,255,.35)'">
+    🐛 <span id="ann-issue-txt">Bug melden</span>
+  </a>
   <button class="ann-lang" id="ann-lang-btn" onclick="annToggleLang()">🌐 EN</button>
 </div>
 
@@ -257,14 +263,8 @@ input[type=range]{width:100%;accent-color:var(--accent);}
         onmousedown="svgDown(event)"
         onmousemove="svgMove(event)"
         onmouseup="svgUp(event)">
-        <defs>
-          <marker id="mh-red" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#e84040"/></marker>
-          <marker id="mh-orange" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#e8845a"/></marker>
-          <marker id="mh-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#4a8fe8"/></marker>
-          <marker id="mh-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#4cae6e"/></marker>
-          <marker id="mh-black" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#1a1a18"/></marker>
-          <marker id="mh-white" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#ffffff"/></marker>
-          <marker id="mh-custom" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon id="mh-custom-poly" points="0 0,8 3,0 6" fill="#e84040"/></marker>
+        <defs id="svg-defs">
+          <!-- Dynamic per-annotation markers are created at render time -->
         </defs>
       </svg>
       <div id="drop-overlay">
@@ -285,6 +285,28 @@ input[type=range]{width:100%;accent-color:var(--accent);}
         <div class="prop-section">
           <div class="prop-section-title">Beschriftung</div>
           <input type="text" class="prop-input" id="prop-label" placeholder="z. B. Ein/Aus-Knopf" oninput="updateSelLabel(this.value)">
+        </div>
+        <!-- Font section: only visible for text type -->
+        <div class="prop-section" id="font-section" style="display:none">
+          <div class="prop-section-title">Schrift</div>
+          <select class="prop-input" id="prop-font-family" onchange="updateSelFont()" style="margin-bottom:8px;">
+            <option value="Helvetica Neue,Helvetica,sans-serif">Helvetica (Standard)</option>
+            <option value="Arial,sans-serif">Arial</option>
+            <option value="Georgia,serif">Georgia</option>
+            <option value="'Courier New',monospace">Courier New</option>
+            <option value="'Times New Roman',Times,serif">Times New Roman</option>
+            <option value="Impact,fantasy">Impact</option>
+          </select>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+            <span style="font-size:11px;color:var(--text2);flex-shrink:0;">Größe</span>
+            <input type="range" min="8" max="72" value="14" id="prop-font-size" oninput="updateSelFont()" style="flex:1;accent-color:var(--accent);">
+            <span id="prop-font-size-val" style="font-size:11px;color:var(--text2);width:28px;text-align:right;">14</span>
+          </div>
+          <div style="display:flex;gap:4px;">
+            <button class="btn" id="prop-bold" onclick="toggleSelFontStyle('bold')" title="Fett (Strg+B)" style="flex:1;font-weight:700;">B</button>
+            <button class="btn" id="prop-italic" onclick="toggleSelFontStyle('italic')" title="Kursiv (Strg+I)" style="flex:1;font-style:italic;">I</button>
+            <button class="btn" id="prop-underline" onclick="toggleSelFontStyle('underline')" title="Unterstrichen (Strg+U)" style="flex:1;text-decoration:underline;">U</button>
+          </div>
         </div>
         <div class="prop-section">
           <div class="prop-section-title">Farbe</div>
@@ -345,7 +367,8 @@ let selectedId = null;
 
 // Draw state
 let drawing = false, drawStart = null, drawPreview = null;
-let dragging = false, dragPrev = null;
+// Drag state: 'body' = whole annotation, 'p1' = start endpoint, 'p2' = end endpoint
+let dragging = false, dragPrev = null, dragMode = 'body';
 
 // Label popup state
 let pendingLabelAnn = null;
@@ -545,9 +568,26 @@ function svgDown(e) {
   }
 
   if (tool === 'select') {
+    // Check for endpoint handle hit first (only for selected annotation)
+    if (selectedId !== null) {
+      const ann = curAnns().find(a => a.id === selectedId);
+      if (ann) {
+        const HANDLE_R = 8;
+        const dx1 = pt.x - ann.x1, dy1 = pt.y - ann.y1;
+        const dx2 = pt.x - ann.x2, dy2 = pt.y - ann.y2;
+        if (Math.sqrt(dx1*dx1+dy1*dy1) <= HANDLE_R) {
+          dragging = true; dragPrev = pt; dragMode = 'p1';
+          e.stopPropagation(); return;
+        }
+        if (Math.sqrt(dx2*dx2+dy2*dy2) <= HANDLE_R) {
+          dragging = true; dragPrev = pt; dragMode = 'p2';
+          e.stopPropagation(); return;
+        }
+      }
+    }
     const hit = hitTest(pt);
     if (hit) {
-      selectedId = hit.id; dragging = true; dragPrev = pt;
+      selectedId = hit.id; dragging = true; dragPrev = pt; dragMode = 'body';
       updatePropsPanel(); renderAll(); updateAnnList();
     } else {
       selectedId = null; updatePropsPanel(); renderAll();
@@ -574,8 +614,17 @@ function svgMove(e) {
     const ann = curAnns().find(a => a.id === selectedId); if (!ann) return;
     const dx = pt.x - dragPrev.x, dy = pt.y - dragPrev.y;
     dragPrev = pt;
-    ann.x1+=dx; ann.y1+=dy; ann.x2+=dx; ann.y2+=dy;
-    if (ann.tx !== undefined) { ann.tx+=dx; ann.ty+=dy; }
+    if (dragMode === 'p1') {
+      ann.x1 += dx; ann.y1 += dy;
+      // Move label anchor if stored
+      if (ann.tx !== undefined && ann.ty !== undefined) { ann.tx += dx; ann.ty += dy; }
+    } else if (dragMode === 'p2') {
+      ann.x2 += dx; ann.y2 += dy;
+    } else {
+      // Move whole annotation
+      ann.x1+=dx; ann.y1+=dy; ann.x2+=dx; ann.y2+=dy;
+      if (ann.tx !== undefined) { ann.tx+=dx; ann.ty+=dy; }
+    }
     renderAll(); return;
   }
   if (!drawing || !drawStart) return;
@@ -594,7 +643,14 @@ function svgUp(e) {
   const dx = Math.abs(pt.x - drawStart.x), dy = Math.abs(pt.y - drawStart.y);
   if (dx < 4 && dy < 4) { drawStart = null; return; }
 
-  const ann = { id: idCounter++, type: tool, x1: drawStart.x, y1: drawStart.y, x2: pt.x, y2: pt.y, color, strokeW, label: '' };
+  const ann = {
+    id: idCounter++, type: tool,
+    x1: drawStart.x, y1: drawStart.y, x2: pt.x, y2: pt.y,
+    color, strokeW, label: '',
+    // font defaults (only used by text type)
+    fontFamily: 'Helvetica Neue,Helvetica,sans-serif',
+    fontSize: 14, bold: false, italic: false, underline: false
+  };
   curPage().annotations.push(ann);
   selectedId = ann.id;
   drawStart = null;
@@ -644,7 +700,13 @@ document.getElementById('lp-input').addEventListener('keydown', e => {
 // TEXT ANNOTATION
 // ═══════════════════════════════════════════════════════
 function addTextAnn(pt) {
-  const ann = { id: idCounter++, type: 'text', x1: pt.x, y1: pt.y, x2: pt.x+120, y2: pt.y+26, color, strokeW, label: '' };
+  const ann = {
+    id: idCounter++, type: 'text',
+    x1: pt.x, y1: pt.y, x2: pt.x+120, y2: pt.y+26,
+    color, strokeW, label: '',
+    fontFamily: 'Helvetica Neue,Helvetica,sans-serif',
+    fontSize: 14, bold: false, italic: false, underline: false
+  };
   curPage().annotations.push(ann);
   selectedId = ann.id;
   renderAll(); updatePropsPanel(); updateAnnList();
@@ -659,10 +721,13 @@ function startTextEdit(ann) {
   const sr = sheet.getBoundingClientRect();
   const sx = sr.left + ann.x1 / sheetW * sr.width;
   const sy = sr.top  + ann.y1 / sheetH * sr.height;
-  const fs = Math.max(11, sheetW * 0.022);
+  const fs = ann.fontSize || Math.max(11, sheetW * 0.022);
   te.style.left = sx + 'px'; te.style.top = sy + 'px';
   te.style.display = 'block';
   ta.style.fontSize = fs + 'px';
+  ta.style.fontWeight = ann.bold ? '700' : '400';
+  ta.style.fontStyle = ann.italic ? 'italic' : 'normal';
+  ta.style.textDecoration = ann.underline ? 'underline' : 'none';
   ta.value = ann.label;
   ta.style.width = '140px';
   setTimeout(() => { ta.focus(); ta.select(); }, 30);
@@ -688,8 +753,9 @@ function taKeydown(e) {
 function mkPreview(type, p1, p2) {
   const mk = (tag,a) => { const el=document.createElementNS(NS,tag); for(const[k,v] of Object.entries(a)) el.setAttribute(k,v); return el; };
   if (type==='arrow') {
+    const mid = ensureMarker(color, strokeW);
     const g=document.createElementNS(NS,'g');
-    g.appendChild(mk('line',{x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y,stroke:color,'stroke-width':strokeW,'marker-end':`url(#${markerId(color)})`,'stroke-linecap':'round','opacity':'0.6'}));
+    g.appendChild(mk('line',{x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y,stroke:color,'stroke-width':strokeW,'marker-end':`url(#${mid})`,'stroke-linecap':'round','opacity':'0.6'}));
     return g;
   }
   if (type==='line') return mk('line',{x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y,stroke:color,'stroke-width':strokeW,'stroke-linecap':'round','opacity':'0.6'});
@@ -698,11 +764,32 @@ function mkPreview(type, p1, p2) {
   return null;
 }
 
-function markerId(col) {
-  const m={'#e84040':'mh-red','#e8845a':'mh-orange','#4a8fe8':'mh-blue','#4cae6e':'mh-green','#1a1a18':'mh-black','#ffffff':'mh-white'};
-  if (m[col]) return m[col];
-  document.getElementById('mh-custom-poly').setAttribute('fill', col);
-  return 'mh-custom';
+// ═══════════════════════════════════════════════════════
+// DYNAMIC ARROWHEAD MARKERS (scale with stroke width)
+// ═══════════════════════════════════════════════════════
+function ensureMarker(col, sw) {
+  // Create a unique marker per color+strokeWidth combination
+  const safeCol = col.replace('#','');
+  const id = `mh-${safeCol}-${sw}`;
+  if (document.getElementById(id)) return id;
+  const defs = document.getElementById('svg-defs');
+  const marker = document.createElementNS(NS, 'marker');
+  // markerUnits=strokeWidth means the marker size is multiplied by the stroke width
+  // We use a small base size so the head looks proportional
+  const mw = 6, mh = 5;
+  marker.setAttribute('id', id);
+  marker.setAttribute('markerWidth', mw);
+  marker.setAttribute('markerHeight', mh);
+  marker.setAttribute('refX', mw);
+  marker.setAttribute('refY', mh / 2);
+  marker.setAttribute('orient', 'auto');
+  marker.setAttribute('markerUnits', 'strokeWidth');
+  const poly = document.createElementNS(NS, 'polygon');
+  poly.setAttribute('points', `0 0,${mw} ${mh/2},0 ${mh}`);
+  poly.setAttribute('fill', col);
+  marker.appendChild(poly);
+  defs.appendChild(marker);
+  return id;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -717,14 +804,12 @@ function renderAll() {
     g.style.cursor = tool==='select' ? 'move' : 'default';
 
     const mk=(tag,a)=>{ const el=document.createElementNS(NS,tag); for(const[k,v] of Object.entries(a)) el.setAttribute(k,v); return el; };
-    const mid = markerId(ann.color);
+    const isSelected = ann.id === selectedId;
 
     // Shape
     if (ann.type==='arrow') {
+      const mid = ensureMarker(ann.color, ann.strokeW);
       g.appendChild(mk('line',{x1:ann.x1,y1:ann.y1,x2:ann.x2,y2:ann.y2,stroke:ann.color,'stroke-width':ann.strokeW,'marker-end':`url(#${mid})`,'stroke-linecap':'round'}));
-      if (ann.color !== '#e84040' && ann.color !== '#e8845a' && ann.color !== '#4a8fe8' && ann.color !== '#4cae6e' && ann.color !== '#1a1a18' && ann.color !== '#ffffff') {
-        document.getElementById('mh-custom-poly').setAttribute('fill', ann.color);
-      }
     } else if (ann.type==='line') {
       g.appendChild(mk('line',{x1:ann.x1,y1:ann.y1,x2:ann.x2,y2:ann.y2,stroke:ann.color,'stroke-width':ann.strokeW,'stroke-linecap':'round'}));
     } else if (ann.type==='rect') {
@@ -734,18 +819,27 @@ function renderAll() {
       const cx=(ann.x1+ann.x2)/2,cy=(ann.y1+ann.y2)/2,rx=Math.abs(ann.x2-ann.x1)/2,ry=Math.abs(ann.y2-ann.y1)/2;
       g.appendChild(mk('ellipse',{cx,cy,rx,ry,stroke:ann.color,'stroke-width':ann.strokeW,fill:'none'}));
     } else if (ann.type==='text') {
-      const fs=Math.max(11, sheetW*0.022);
-      const t=mk('text',{x:ann.x1,y:ann.y1+fs,'font-family':'Helvetica Neue,Helvetica,sans-serif','font-size':fs,'font-weight':'500',fill:ann.color});
+      const ff = ann.fontFamily || 'Helvetica Neue,Helvetica,sans-serif';
+      const fs = ann.fontSize || Math.max(11, sheetW*0.022);
+      const fw = ann.bold ? '700' : '400';
+      const fi = ann.italic ? 'italic' : 'normal';
+      const t = mk('text', {
+        x: ann.x1, y: ann.y1 + fs,
+        'font-family': ff,
+        'font-size': fs,
+        'font-weight': fw,
+        'font-style': fi,
+        fill: ann.color
+      });
+      if (ann.underline) t.setAttribute('text-decoration', 'underline');
       t.textContent = ann.label || '(Text)';
       g.appendChild(t);
     }
 
     // Label badge (for non-text types)
     if (ann.label && ann.type !== 'text') {
-      // Place label at arrow tip (x2,y2) with slight offset, or near shape center
       let lx, ly;
       if (ann.type === 'arrow') {
-        // place label near the START of arrow (the non-tip end = x1,y1), in the margin area
         lx = ann.x1; ly = ann.y1;
       } else {
         lx = (ann.x1+ann.x2)/2; ly = Math.max(ann.y1,ann.y2)+18;
@@ -758,16 +852,25 @@ function renderAll() {
     }
 
     // Selection handles
-    if (ann.id===selectedId) {
+    if (isSelected) {
       const bx=Math.min(ann.x1,ann.x2)-7,by=Math.min(ann.y1,ann.y2)-7,bw=Math.abs(ann.x2-ann.x1)+14,bh=Math.abs(ann.y2-ann.y1)+14;
       g.insertBefore(mk('rect',{x:bx,y:by,width:bw,height:bh,rx:4,fill:'none',stroke:ann.color,'stroke-width':1,'stroke-dasharray':'5 3',opacity:'0.5','pointer-events':'none'}), g.firstChild);
-      [{x:ann.x1,y:ann.y1},{x:ann.x2,y:ann.y2}].forEach(h=>{
-        g.appendChild(mk('circle',{cx:h.x,cy:h.y,r:5,fill:'white',stroke:ann.color,'stroke-width':1.5,'pointer-events':'none'}));
+      // Endpoint handles (draggable points for all annotation types)
+      [{x:ann.x1,y:ann.y1,label:'p1'},{x:ann.x2,y:ann.y2,label:'p2'}].forEach(h=>{
+        const handle = mk('circle',{cx:h.x,cy:h.y,r:6,fill:'white',stroke:ann.color,'stroke-width':2,'pointer-events':'all',cursor:'grab'});
+        handle.dataset.handle = h.label;
+        handle.addEventListener('mousedown', ev => {
+          if (tool === 'select') {
+            ev.stopPropagation();
+            dragging = true; dragPrev = svgPt(ev); dragMode = h.label;
+          }
+        });
+        g.appendChild(handle);
       });
     }
 
     g.addEventListener('mousedown', e => {
-      if (tool==='select') { e.stopPropagation(); selectedId=ann.id; dragging=true; dragPrev=svgPt(e); updatePropsPanel(); renderAll(); updateAnnList(); }
+      if (tool==='select') { e.stopPropagation(); selectedId=ann.id; dragging=true; dragPrev=svgPt(e); dragMode='body'; updatePropsPanel(); renderAll(); updateAnnList(); }
     });
     g.addEventListener('dblclick', e => {
       if (tool==='select') { e.stopPropagation(); openInlineEdit(ann, e); }
@@ -815,10 +918,40 @@ function updatePropsPanel() {
   document.getElementById('prop-sw').value=ann.strokeW;
   document.getElementById('prop-sw-val').textContent=ann.strokeW+'px';
   document.getElementById('prop-color-pick').value=ann.color;
+  // Font section: only for text annotations
+  const fontSec = document.getElementById('font-section');
+  if (ann.type === 'text') {
+    fontSec.style.display = 'block';
+    document.getElementById('prop-font-family').value = ann.fontFamily || 'Helvetica Neue,Helvetica,sans-serif';
+    const fs = ann.fontSize || 14;
+    document.getElementById('prop-font-size').value = fs;
+    document.getElementById('prop-font-size-val').textContent = fs;
+    document.getElementById('prop-bold').classList.toggle('active', !!ann.bold);
+    document.getElementById('prop-italic').classList.toggle('active', !!ann.italic);
+    document.getElementById('prop-underline').classList.toggle('active', !!ann.underline);
+  } else {
+    fontSec.style.display = 'none';
+  }
 }
 function updateSelLabel(v) { const a=curAnns().find(a=>a.id===selectedId); if(a){a.label=v; renderAll(); updateAnnList();} }
 function updateSelColor(c) { const a=curAnns().find(a=>a.id===selectedId); if(a){a.color=c; document.getElementById('prop-color-pick').value=c; renderAll();} }
 function updateSelStroke(v) { const a=curAnns().find(a=>a.id===selectedId); if(a){a.strokeW=+v; document.getElementById('prop-sw-val').textContent=v+'px'; renderAll();} }
+function updateSelFont() {
+  const a = curAnns().find(a=>a.id===selectedId);
+  if (!a || a.type !== 'text') return;
+  a.fontFamily = document.getElementById('prop-font-family').value;
+  const fs = parseInt(document.getElementById('prop-font-size').value);
+  a.fontSize = fs;
+  document.getElementById('prop-font-size-val').textContent = fs;
+  renderAll();
+}
+function toggleSelFontStyle(style) {
+  const a = curAnns().find(a=>a.id===selectedId);
+  if (!a || a.type !== 'text') return;
+  a[style] = !a[style];
+  document.getElementById('prop-'+style).classList.toggle('active', a[style]);
+  renderAll();
+}
 function deleteSel() { const p=curPage(); if(!p) return; p.annotations=p.annotations.filter(a=>a.id!==selectedId); selectedId=null; renderAll(); updatePropsPanel(); updateAnnList(); }
 function duplicateSel() { const a=curAnns().find(a=>a.id===selectedId); if(!a) return; const c={...a,id:idCounter++,x1:a.x1+20,y1:a.y1+20,x2:a.x2+20,y2:a.y2+20}; curPage().annotations.push(c); selectedId=c.id; renderAll(); updatePropsPanel(); updateAnnList(); }
 
@@ -937,6 +1070,13 @@ document.addEventListener('keydown', e => {
   if (k==='t') setTool('text');
   if (k==='s'||k==='Escape') { setTool('select'); closeLabelPopup(); }
   if ((e.ctrlKey||e.metaKey)&&k==='d') { e.preventDefault(); duplicateSel(); }
+  // Font shortcuts only when text annotation is selected
+  const ann = curAnns().find(a=>a.id===selectedId);
+  if (ann && ann.type === 'text') {
+    if ((e.ctrlKey||e.metaKey)&&k==='b') { e.preventDefault(); toggleSelFontStyle('bold'); }
+    if ((e.ctrlKey||e.metaKey)&&k==='i') { e.preventDefault(); toggleSelFontStyle('italic'); }
+    if ((e.ctrlKey||e.metaKey)&&k==='u') { e.preventDefault(); toggleSelFontStyle('underline'); }
+  }
 });
 
 // Init
@@ -951,6 +1091,7 @@ const ANN_T = {
     langBtn:'🌐 EN',
     homeText:'Startseite',
     crumb:'Bild-Annotator',
+    issueTxt:'Bug melden',
     // topbar
     btnOpen:'+ Bild öffnen',
     lblTool:'Werkzeug',
@@ -1009,6 +1150,7 @@ const ANN_T = {
     langBtn:'🌐 DE',
     homeText:'Home',
     crumb:'Image Annotator',
+    issueTxt:'Report Bug',
     btnOpen:'+ Open Image',
     lblTool:'Tool',
     toolArrow:'↗ Arrow', toolLine:'— Line', toolRect:'▭ Rect',
@@ -1065,6 +1207,7 @@ function applyAnnLang(){
   const lb=document.getElementById('ann-lang-btn'); if(lb) lb.textContent=T.langBtn;
   const ht=document.getElementById('ann-home-txt'); if(ht) ht.textContent=T.homeText;
   const ct=document.getElementById('ann-crumb-txt'); if(ct) ct.textContent=T.crumb;
+  const it=document.getElementById('ann-issue-txt'); if(it) it.textContent=T.issueTxt||'Bug melden';
   // Topbar buttons
   const btnOpen=document.querySelector('button.btn.primary[onclick="triggerFileOpen()"]');
   if(btnOpen) btnOpen.textContent=T.btnOpen;
