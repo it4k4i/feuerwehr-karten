@@ -1,0 +1,3240 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="Erstelle professionelle Pokémon-style Gerätekunde-Karten für die Feuerwehr. Kostenlos, ohne Anmeldung, direkt im Browser.">
+  <meta name="keywords" content="Feuerwehr, Gerätekunde, Karten, Generator, Übung">
+  <meta property="og:title" content="Feuerwehr Gerätekunde Karten Generator">
+  <meta property="og:description" content="Erstelle professionelle Gerätekunde-Karten für die Feuerwehr.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feuerwehr Gerätekunde Karten Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Libre+Franklin:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#16181c;--panel:#1e2128;--panel2:#252830;
+  --border:#2e3240;--text:#e8eaf0;--text2:#8892aa;
+  --accent:#e63946;--yellow:#ffd600;
+}
+body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-serif;min-height:100vh;}
+/* ---- layout ---- */
+.screen-ui{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+.hdr{background:linear-gradient(90deg,#0d0f14,#1a1d26 40%,#0d0f14);border-bottom:2px solid #2e3240;padding:12px 24px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.hdr-logo{width:36px;height:36px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;box-shadow:0 0 12px rgba(230,57,70,.4);}
+.hdr h1{font-family:'Oswald',sans-serif;font-weight:700;font-size:1.5rem;letter-spacing:2px;background:linear-gradient(90deg,#fff 30%,var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hdr p{font-size:.6rem;color:var(--text2);letter-spacing:2px;margin-top:1px;}
+.hdr-counter{margin-left:auto;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;padding:6px 12px;text-align:center;flex-shrink:0;}
+.hdr-counter .hdr-cnt-num{font-family:'Oswald',sans-serif;font-weight:700;font-size:1.1rem;color:var(--yellow);line-height:1;}
+.hdr-counter .hdr-cnt-lbl{font-size:.5rem;color:var(--text2);letter-spacing:1.5px;text-transform:uppercase;display:block;margin-top:1px;}
+.body{display:grid;grid-template-columns:300px 1fr;flex:1;min-height:0;overflow:hidden;}
+/* ---- sidebar ---- */
+.sidebar{background:var(--panel);border-right:1px solid var(--border);overflow-y:scroll;overflow-x:hidden;display:flex;flex-direction:column;height:100%;min-height:0;direction:rtl;}
+.sidebar>*{direction:ltr;}
+.sb-section{border-bottom:1px solid var(--border);}
+.sb-section:last-child{border-bottom:none;}
+.sb-title{font-size:.6rem;font-weight:900;letter-spacing:2.5px;text-transform:uppercase;color:var(--text2);display:flex;align-items:center;gap:6px;padding:12px 16px;cursor:pointer;user-select:none;transition:background .15s;}
+.sb-title:hover{background:rgba(255,255,255,.03);}
+.sb-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.sb-title .sb-chevron{margin-left:4px;font-size:.65rem;transition:transform .2s;flex-shrink:0;}
+.sb-title.collapsed .sb-chevron{transform:rotate(-90deg);}
+.sb-body{padding:0 16px 16px;}
+.fg{margin-bottom:10px;}
+.fg label{display:block;font-size:.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text2);margin-bottom:4px;}
+.fg input[type=text]{width:100%;background:#12141a;border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:'Libre Franklin',sans-serif;font-size:.85rem;padding:7px 10px;outline:none;transition:border-color .15s;}
+.fg input[type=text]:focus{border-color:var(--accent);}
+.cat-list{display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto;}
+.cat-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;border:1px solid transparent;transition:all .15s;}
+.cat-item:hover{background:rgba(255,255,255,.04);}
+.cat-item.selected{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.06);}
+.cat-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;border:2px solid rgba(255,255,255,.25);}
+.cat-lbl{font-size:.78rem;font-weight:600;flex:1;}
+.cat-edit-btn{background:none;border:none;color:var(--text2);cursor:pointer;font-size:.7rem;padding:2px 4px;border-radius:3px;opacity:0;transition:opacity .15s;}
+.cat-item:hover .cat-edit-btn{opacity:1;}
+.btn-add-cat{width:100%;padding:6px;background:transparent;border:1px dashed var(--border);border-radius:5px;color:var(--text2);font-family:'Libre Franklin',sans-serif;font-size:.72rem;cursor:pointer;margin-top:6px;transition:all .15s;}
+.btn-add-cat:hover{border-color:var(--accent);color:var(--accent);}
+.upzone{border:1.5px dashed var(--border);border-radius:7px;padding:12px;text-align:center;cursor:pointer;transition:all .15s;background:#12141a;position:relative;overflow:hidden;min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;}
+.upzone:hover{border-color:var(--accent);background:rgba(230,57,70,.04);}
+.upzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upzone.has{border-color:var(--yellow);border-style:solid;}
+.upzone .ico{font-size:1.3rem;}
+.upzone p{font-size:.62rem;color:var(--text2);}
+.upzone img.prev{width:100%;max-height:80px;object-fit:cover;border-radius:4px;margin-top:6px;display:none;}
+.btn-primary{width:100%;padding:10px;background:var(--accent);border:none;border-radius:7px;color:#fff;font-family:'Oswald',sans-serif;font-size:1rem;letter-spacing:2px;cursor:pointer;transition:all .15s;box-shadow:0 3px 12px rgba(230,57,70,.3);}
+.btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px);}
+.btn-sec{width:100%;padding:8px;background:transparent;border:1.5px solid var(--yellow);border-radius:7px;color:var(--yellow);font-family:'Oswald',sans-serif;font-size:.95rem;letter-spacing:2px;cursor:pointer;transition:all .15s;}
+.btn-sec:hover{background:rgba(255,214,0,.08);}
+.btn-ghost{width:100%;padding:6px;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:.72rem;cursor:pointer;margin-top:6px;transition:all .15s;}
+.btn-ghost:hover{border-color:#555;color:var(--text);}
+.btn-save-load{width:100%;padding:8px;background:rgba(255,214,0,.08);border:1.5px solid var(--yellow);border-radius:7px;color:var(--yellow);font-family:'Libre Franklin',sans-serif;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:6px;}
+.btn-save-load:hover{background:rgba(255,214,0,.15);}
+.info-box{background:#12141a;border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:.6rem;color:var(--text2);line-height:1.7;}
+.info-box strong{color:#6a7a99;}
+.cnt{font-size:.62rem;color:var(--text2);text-align:center;margin-top:8px;}
+.cnt b{color:var(--yellow);}
+/* ---- preview ---- */
+.preview{padding:24px;overflow-y:scroll;overflow-x:hidden;background:var(--bg);height:100%;min-height:0;}
+.preview-hdr{margin-bottom:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.preview-hdr h2{font-family:'Oswald',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--text2);margin-right:auto;}
+.cgrid{display:flex;flex-wrap:wrap;gap:16px;}
+.empty-state{width:100%;padding:60px 20px;text-align:center;color:#2e3240;font-style:italic;font-size:.9rem;}
+.empty-state .eico{font-size:3rem;display:block;margin-bottom:10px;opacity:.4;}
+/* toolbar buttons */
+.tb-btn{padding:5px 10px;background:transparent;border:1px solid var(--border);border-radius:5px;color:var(--text2);font-size:.65rem;cursor:pointer;font-family:'Libre Franklin',sans-serif;transition:all .15s;white-space:nowrap;}
+.tb-btn:hover{border-color:#fff;color:#fff;}
+.tb-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(230,57,70,.08);}
+.tb-select{padding:4px 8px;background:#12141a;border:1px solid var(--border);border-radius:5px;color:var(--text2);font-size:.65rem;font-family:'Libre Franklin',sans-serif;outline:none;cursor:pointer;}
+.tb-select:focus{border-color:var(--accent);}
+/* bleed indicator on cards in preview */
+.pcard.has-bleed::before{
+  content:'';position:absolute;
+  inset:calc(-1 * var(--bleed-px));
+  border:var(--bleed-px) solid rgba(255,100,100,.35);
+  border-radius:12px;pointer-events:none;z-index:3;
+}
+.pcard.has-bleed::after{
+  content:attr(data-bleed);position:absolute;
+  top:calc(-1 * var(--bleed-px) - 1px);left:2px;
+  font-size:7px;color:rgba(255,120,120,.8);font-family:monospace;
+  pointer-events:none;z-index:4;
+}
+.pcard-print{position:relative;flex-shrink:0;border-radius:8px;overflow:hidden;transition:transform .2s;cursor:default;}
+.pcard-print:hover{transform:translateY(-4px) scale(1.03);z-index:2;}
+.pcard-print img{display:block;border-radius:8px;}
+.pcard-print .card-actions{position:absolute;top:4px;right:4px;}
+/* landscape card — displayed as portrait (content not rotated, just aspect ratio differs) */
+.pcard.landscape{overflow:hidden;}
+.pcard{width:var(--preview-w,160px);position:relative;flex-shrink:0;transition:transform .2s;cursor:default;border-radius:10px;}
+.pcard:hover{transform:translateY(-5px) scale(1.04);z-index:2;}
+.pcard .fw-card{width:var(--preview-w,160px);border-radius:10px;border:3px solid #000;overflow:hidden;aspect-ratio:var(--preview-ratio,63/88);display:flex;flex-direction:column;}
+.pcard .card-shell{padding:5px;height:100%;border-radius:8px;display:flex;flex-direction:column;}
+.pcard .card-inner{border-radius:6px;overflow:hidden;display:flex;flex-direction:column;flex:1;border:1px solid rgba(0,0,0,.12);}
+.pcard .card-namebar{padding:6px 7px 3px;overflow:hidden;}
+.pcard .card-name{font-family:'Oswald',sans-serif;font-weight:700;white-space:nowrap;line-height:1.1;width:100%;letter-spacing:0;}
+.pcard .card-imgbox{margin:0 5px 0;border-radius:4px;overflow:hidden;position:relative;width:calc(100% - 10px);aspect-ratio:1/1;flex-shrink:0;border-width:1.5px;border-style:solid;background:#fff;}
+.pcard .card-imgbox canvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
+.pcard .card-imgbox .no-img{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.5rem;}
+.pcard .card-cat-wrap{flex:1;display:flex;align-items:center;padding:0 5px;}
+.pcard .card-cat{padding:2px 6px;border-radius:3px;font-family:'Libre Franklin',sans-serif;font-weight:900;letter-spacing:1px;text-transform:uppercase;display:inline-block;}
+.pcard .card-bot{padding:3px 6px 5px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.pcard .card-serial{font-family:'Libre Franklin',sans-serif;font-size:.42rem;}
+.pcard .card-icon{font-size:.6rem;}
+.card-actions{position:absolute;top:4px;right:4px;display:flex;flex-direction:column;gap:3px;opacity:0;transition:opacity .15s;}
+.pcard:hover .card-actions{opacity:1;}
+.card-act-btn{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.6rem;border:1px solid;background:rgba(0,0,0,.65);}
+.btn-edit-card{color:#90caf9;border-color:rgba(100,180,255,.6);}
+.btn-del-card{color:#ff8a80;border-color:rgba(255,80,80,.6);}
+/* ---- modals ---- */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:100;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:22px;width:360px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+.modal h3{font-family:'Oswald',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--text);margin-bottom:16px;}
+.modal .fg{margin-bottom:10px;}
+.color-row{display:flex;gap:14px;margin-bottom:10px;flex-wrap:wrap;}
+.color-field{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.color-field label{font-size:.58rem;color:var(--text2);letter-spacing:1px;text-transform:uppercase;}
+.color-field input[type=color]{width:40px;height:40px;border-radius:8px;border:2px solid var(--border);cursor:pointer;padding:2px;}
+.color-field .hex-input{width:68px;font-size:.58rem;font-family:'Libre Franklin',sans-serif;background:#12141a;border:1px solid var(--border);border-radius:4px;color:var(--text);padding:2px 5px;outline:none;text-align:center;letter-spacing:.5px;}
+.color-field .hex-input:focus{border-color:var(--accent);}
+.color-field .hex-input.invalid{border-color:#e63946;color:#ff8a80;}
+.cat-prev-strip{height:28px;border-radius:5px;border:2px solid #000;overflow:hidden;display:flex;margin-bottom:12px;}
+.cps-outer{flex:1;padding:3px;display:flex;}
+.cps-inner{flex:1;border-radius:3px;display:flex;align-items:center;padding:0 6px;}
+.cps-name{font-family:'Oswald',sans-serif;font-size:.9rem;letter-spacing:1px;}
+.modal-btns{display:flex;gap:8px;margin-top:4px;}
+.mbtn{flex:1;padding:8px;border-radius:6px;font-family:'Libre Franklin',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;border:none;transition:all .15s;}
+.mbtn.save{background:var(--accent);color:#fff;}
+.mbtn.cancel{background:var(--border);color:var(--text2);}
+.mbtn.danger{background:#2a1a1a;color:#ff8a80;border:1px solid #4a2020;}
+/* radio chips */
+.radio-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:5px;border:1px solid var(--border);cursor:pointer;font-size:.7rem;color:var(--text2);transition:all .15s;background:#12141a;}
+.radio-chip:hover{border-color:#555;color:var(--text);}
+.radio-chip input{display:none;}
+.radio-chip:has(input:checked){border-color:var(--accent);background:rgba(230,57,70,.15);color:var(--text);}
+/* gradient custom options */
+.gradient-options{margin-top:8px;padding:10px;background:#12141a;border-radius:6px;border:1px solid var(--border);display:none;flex-direction:column;gap:8px;}
+.gradient-options.show{display:flex;}
+.grad-row{display:flex;align-items:center;gap:8px;}
+.grad-row label{font-size:.62rem;color:var(--text2);width:70px;flex-shrink:0;}
+.grad-row input[type=color]{width:32px;height:32px;border-radius:6px;border:1.5px solid var(--border);cursor:pointer;padding:1px;flex-shrink:0;}
+.grad-row input[type=range]{flex:1;accent-color:var(--accent);}
+.grad-row span{font-size:.65rem;color:var(--yellow);width:28px;text-align:right;flex-shrink:0;}
+/* bulk modal */
+.tabs{display:flex;gap:0;margin-bottom:14px;border-radius:6px;overflow:hidden;border:1px solid var(--border);}
+.tab-btn{flex:1;padding:7px;background:transparent;border:none;color:var(--text2);font-family:'Libre Franklin',sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.5px;}
+.tab-btn.active{background:var(--accent);color:#fff;}
+.tab-panel{display:none;}.tab-panel.active{display:block;}
+.bulk-drop{border:2px dashed var(--border);border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:all .15s;background:#12141a;position:relative;overflow:hidden;min-height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;}
+.bulk-drop:hover{border-color:var(--accent);}
+.bulk-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.bulk-drop .ico{font-size:1.6rem;}
+.bulk-drop p{font-size:.65rem;color:var(--text2);}
+.bulk-file-list{margin-top:10px;display:flex;flex-direction:column;gap:5px;max-height:180px;overflow-y:auto;}
+.bulk-file-item{display:flex;align-items:center;gap:8px;background:#12141a;border-radius:5px;padding:5px 8px;font-size:.72rem;}
+.bulk-file-thumb{width:28px;height:28px;border-radius:3px;object-fit:cover;flex-shrink:0;background:#222;}
+.bulk-file-name{flex:1;overflow:hidden;}
+.bulk-file-name input{background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'Libre Franklin',sans-serif;font-size:.72rem;width:100%;outline:none;padding:1px 0;}
+.bulk-file-name input:focus{border-bottom-color:var(--accent);}
+.bulk-file-rm{background:none;border:none;color:#666;cursor:pointer;font-size:.8rem;flex-shrink:0;}
+.bulk-file-rm:hover{color:#ff8a80;}
+.bulk-textarea{width:100%;background:#12141a;border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Libre Franklin',sans-serif;font-size:.8rem;padding:8px 10px;outline:none;resize:vertical;min-height:120px;line-height:1.6;}
+.bulk-textarea:focus{border-color:var(--accent);}
+.bulk-hint{font-size:.6rem;color:var(--text2);margin-top:4px;line-height:1.6;}
+.bulk-cat-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.bulk-cat-row label{font-size:.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text2);}
+.bulk-cat-sel{background:#12141a;border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:'Libre Franklin',sans-serif;font-size:.8rem;padding:5px 8px;outline:none;flex:1;}
+.bulk-summary{font-size:.68rem;color:var(--yellow);margin-top:8px;min-height:18px;}
+/* status */
+.status-bar{position:fixed;bottom:16px;right:16px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:.75rem;color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,.5);display:none;z-index:200;display:flex;align-items:center;gap:10px;}
+.status-bar.show{display:flex;}
+.status-spinner{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+/* warning modal */
+.warn-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:500;}
+
+/* ---- PRÄFIX SYSTEM ---- */
+.prefix-list{display:flex;flex-direction:column;gap:4px;}
+.prefix-item{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;cursor:pointer;border:1.5px solid transparent;transition:all .12s;}
+.prefix-item:hover{background:rgba(255,255,255,.04);}
+.prefix-item.sel{border-color:var(--accent);background:rgba(230,57,70,.1);}
+.prefix-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;background:var(--accent);}
+.prefix-lbl{font-size:.82rem;font-weight:700;flex:1;font-family:'Oswald',sans-serif;letter-spacing:1px;}
+.prefix-edit-btn{background:none;border:none;color:var(--text2);cursor:pointer;font-size:.7rem;padding:2px 4px;border-radius:3px;opacity:0;transition:opacity .15s;}
+.prefix-item:hover .prefix-edit-btn{opacity:1;}
+
+/* ---- EXPORT WIZARD ---- */
+.modal-split{display:flex;gap:0;width:900px;max-width:97vw;max-height:92vh;overflow:hidden;padding:0;position:relative;}
+.ms-left{flex:0 0 400px;max-width:400px;overflow-y:auto;padding:20px;border-right:1px solid var(--border);display:flex;flex-direction:column;}
+.ms-right{flex:1;min-width:0;padding:16px;background:#0d0f14;display:flex;flex-direction:column;gap:8px;overflow:hidden;}
+.ms-preview-wrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:8px;background:#12141a;border:1px solid var(--border);}
+.ms-preview-wrap canvas{width:100%;height:100%;border-radius:6px;display:block;object-fit:contain;}
+.ms-prev-info{font-size:.58rem;color:var(--text2);text-align:center;flex-shrink:0;line-height:1.6;}
+.modal-close-x{position:absolute;top:12px;right:14px;width:28px;height:28px;border-radius:50%;background:rgba(230,57,70,.15);border:1.5px solid rgba(230,57,70,.5);color:#ff6b6b;font-size:.85rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;z-index:10;flex-shrink:0;}
+.modal-close-x:hover{background:var(--accent);border-color:var(--accent);color:#fff;}
+.wz-step{flex:1;padding:7px 6px;background:#12141a;border:none;color:var(--text2);font-family:'Libre Franklin',sans-serif;font-size:.65rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;user-select:none;}
+.wz-step:hover{background:rgba(255,255,255,.04);}
+.wz-step.active{background:rgba(230,57,70,.12);color:var(--accent);}
+.wz-step.done{background:rgba(52,211,153,.08);color:#34d399;}
+.wz-num{width:20px;height:20px;border-radius:50%;background:var(--border);color:var(--text2);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:900;flex-shrink:0;transition:all .15s;}
+.wz-step.active .wz-num{background:var(--accent);color:#fff;}
+.wz-step.done .wz-num{background:#34d399;color:#000;}
+.wz-sep{padding:0 4px;color:var(--border);font-size:.8rem;flex-shrink:0;user-select:none;background:#12141a;}
+.wz-lbl{font-size:.62rem;}
+.wz-fmt-card{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:7px;border:1.5px solid var(--border);cursor:pointer;background:#12141a;transition:all .15s;user-select:none;}
+.wz-fmt-card:hover{border-color:#4a5568;background:rgba(255,255,255,.03);}
+.wz-fmt-card.sel{border-color:var(--accent);background:rgba(230,57,70,.08);}
+.wz-fmt-ico{font-size:1.4rem;flex-shrink:0;}
+.wz-fmt-info .wz-fmt-name{font-size:.78rem;font-weight:700;color:var(--text);}
+.wz-fmt-info .wz-fmt-sub{font-size:.58rem;color:var(--text2);margin-top:1px;}
+.wz-settings-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.wz-settings-header span:first-child{font-size:1.2rem;}
+.wz-settings-header span:last-child{font-family:'Oswald',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text);}
+.wz-setting-group{background:#12141a;border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;}
+.wz-setting-group:last-of-type{margin-bottom:0;}
+.wz-group-title{font-size:.56rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);margin-bottom:8px;}
+.wz-row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.wz-row2 .fg{margin-bottom:0;}
+.wz-info-box{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:5px;padding:7px 9px;font-size:.62rem;color:var(--text2);line-height:1.8;margin-top:8px;white-space:pre-line;}
+.wz-tip{font-size:.6rem;color:#60a5fa;background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.18);border-radius:5px;padding:7px 9px;line-height:1.6;margin-top:8px;}
+.warn-box{background:var(--panel2);border:2px solid var(--accent);border-radius:14px;padding:28px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.7);}
+.warn-box .warn-icon{font-size:3rem;margin-bottom:12px;}
+.warn-box h2{font-family:'Oswald',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--text);margin-bottom:10px;}
+.warn-box p{font-size:.78rem;color:var(--text2);line-height:1.7;margin-bottom:18px;}
+.warn-box .warn-check{display:flex;align-items:center;gap:8px;justify-content:center;margin-bottom:18px;font-size:.7rem;color:var(--text2);cursor:pointer;}
+.warn-box .warn-check input{width:14px;height:14px;accent-color:var(--accent);}
+.warn-btn{padding:10px 28px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-family:'Oswald',sans-serif;font-size:.95rem;letter-spacing:2px;cursor:pointer;}
+.warn-btn:hover{filter:brightness(1.1);}
+</style>
+</head>
+<body>
+<div class="screen-ui">
+  <div class="hdr">
+    <div class="hdr-logo">🔥</div>
+    <div><h1>FEUERWEHR KARTEN</h1><p data-i18n="subtitle">Gerätekunde · Pokémon Edition</p></div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+      <button onclick="toggleLang()" id="langBtn" style="background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text2);font-size:.7rem;cursor:pointer;font-family:'Libre Franklin',sans-serif;transition:all .15s;" onmouseover="this.style.borderColor='#fff';this.style.color='#fff'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">🌐 EN</button>
+      <div class="hdr-counter">
+        <span class="hdr-cnt-num" id="hdrCnt">0</span>
+        <span class="hdr-cnt-lbl" data-i18n="cards">Karten</span>
+      </div>
+    </div>
+  </div>
+  <div class="body">
+    <div class="sidebar">
+
+      <!-- NEW CARD -->
+      <div class="sb-section">
+        <div class="sb-title" onclick="toggleSection(this)">🃏 <span data-i18n="secNewCard">Neue Karte</span><span class="sb-chevron">▾</span></div>
+        <div class="sb-body">
+          <div class="fg"><label data-i18n="deviceName">Gerätename</label><input type="text" id="devName" data-i18n-placeholder="deviceNamePh" placeholder="z.B. B-Schlauch" /></div>
+          <div class="fg">
+            <label>Fahrzeug-Präfix</label>
+            <div class="prefix-list" id="prefixListNew"></div>
+          </div>
+          <div class="fg"><label data-i18n="category">Kategorie</label><div class="cat-list" id="catList"></div></div>
+          <div class="fg" style="margin-top:10px;">
+            <label data-i18n="photo">Foto</label>
+            <div class="upzone" id="upZone"><input type="file" id="upInput" accept="image/*" /><div class="ico">📷</div><p data-i18n="uploadPhoto">Foto hochladen</p><img class="prev" id="upPrev" /></div>
+          </div>
+          <button class="btn-primary" onclick="addCard()" style="margin-top:10px;" data-i18n="addCard">+ KARTE HINZUFÜGEN</button>
+          <button class="btn-ghost" onclick="openBulkModal()" style="margin-top:6px;" data-i18n="addMultiple">📦 MEHRERE AUF EINMAL</button>
+        </div>
+      </div>
+
+      <!-- CATEGORIES -->
+      <div class="sb-section">
+        <div class="sb-title" onclick="toggleSection(this)">🎨 <span data-i18n="secCategories">Kategorien</span><span class="sb-chevron">▾</span></div>
+        <div class="sb-body">
+          <div id="catMgmtList" class="cat-list" style="max-height:none;"></div>
+          <button class="btn-add-cat" onclick="openCatModal(null)" data-i18n="addCategory">+ Neue Kategorie</button>
+        </div>
+      </div>
+
+      <!-- PRÄFIXE -->
+      <div class="sb-section">
+        <div class="sb-title" onclick="toggleSection(this)">🚒 Fahrzeug-Präfixe<span class="sb-chevron">▾</span></div>
+        <div class="sb-body">
+          <p style="font-size:.6rem;color:var(--text2);margin-bottom:8px;line-height:1.5;">Präfix pro Karte wählbar (z.B. LF-, HLF-, TLF-).</p>
+          <div id="prefixMgmtList" class="prefix-list" style="max-height:none;"></div>
+          <button class="btn-add-cat" onclick="openPrefixModal(null)" style="margin-top:6px;">+ Neuer Präfix</button>
+        </div>
+      </div>
+
+      <!-- BACK -->
+      <div class="sb-section">
+        <div class="sb-title" onclick="toggleSection(this)">🔄 <span data-i18n="secBackside">Rückseite</span><span class="sb-chevron">▾</span></div>
+        <div class="sb-body">
+          <p style="font-size:.62rem;color:var(--text2);margin-bottom:8px;" data-i18n="backsideHint">Standard: Feuerwehr-Design. Eigenes Bild ersetzt es.</p>
+          <div class="upzone" id="bgZone"><input type="file" id="bgInput" accept="image/*" /><div class="ico">🖼</div><p data-i18n="uploadBackside">Eigenes Rückseitenbild</p><img class="prev" id="bgPrev" /></div>
+          <button class="btn-ghost" onclick="clearBg()" data-i18n="resetBackside">✕ Standard-Rückseite</button>
+          <div class="fg" style="margin-top:10px;">
+            <label data-i18n="imageScale">Bild-Skalierung</label>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;">
+              <label class="radio-chip"><input type="radio" name="bgScale" value="fit" checked onchange="globalSettings.bgScale=this.value;"/><span data-i18n="scaleFit">↔ Einpassen</span></label>
+              <label class="radio-chip"><input type="radio" name="bgScale" value="cover" onchange="globalSettings.bgScale=this.value;"/><span data-i18n="scaleCover">⬛ Füllen</span></label>
+              <label class="radio-chip"><input type="radio" name="bgScale" value="stretch" onchange="globalSettings.bgScale=this.value;"/><span data-i18n="scaleStretch">⤢ Strecken</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GLOBAL SETTINGS -->
+      <div class="sb-section">
+        <div class="sb-title" onclick="toggleSection(this)">⚙ <span data-i18n="secGlobal">Globale Einstellungen</span><span class="sb-chevron">▾</span></div>
+        <div class="sb-body">
+          <div class="fg">
+            <label data-i18n="catSizeGlobal">Kategorie-Größe (global)</label>
+            <div class="grad-row" style="margin-bottom:0;">
+              <input type="range" id="gCatSize" min="12" max="60" value="28" style="flex:1;accent-color:var(--accent);" oninput="globalSettings.catSize=parseInt(this.value);document.getElementById('gCatSizeVal').textContent=this.value;render();" />
+              <span id="gCatSizeVal" style="font-size:.65rem;color:var(--yellow);width:28px;text-align:right;">28</span>
+            </div>
+            <p style="font-size:.58rem;color:var(--text2);margin-top:4px;" data-i18n="catSizeHint">Gilt für alle Kategorien ohne eigene Größe.</p>
+          </div>
+          <div class="fg">
+            <label data-i18n="serialNumber">Seriennummer</label>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <label class="toggle"><input type="checkbox" id="gSerialShow" checked onchange="globalSettings.serialShow=this.checked;render();"/><span class="toggle-slider"></span></label>
+              <span style="font-size:.7rem;color:var(--text2);" data-i18n="showNumber">Nummer anzeigen</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="color" id="gSerialColor" value="#bbbbbb" style="width:32px;height:32px;border-radius:6px;border:1.5px solid var(--border);cursor:pointer;padding:2px;background:#12141a;" oninput="globalSettings.serialColor=this.value;document.getElementById('gSerialColorHex').value=this.value;render();" />
+              <input class="hex-input" id="gSerialColorHex" value="#bbbbbb" maxlength="7" style="width:64px;" oninput="applyHexToColor('gSerialColor','gSerialColorHex',v=>{globalSettings.serialColor=v;render();})" />
+              <span style="font-size:.62rem;color:var(--text2);" data-i18n="color">Farbe</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SAVE / LOAD -->
+      <div class="sb-section">
+        <div class="sb-title" onclick="toggleSection(this)">💾 <span data-i18n="saveLoad">Speichern &amp; Laden</span><span class="sb-chevron">▾</span></div>
+        <div class="sb-body">
+          <div id="autosaveStatus" style="font-size:.6rem;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:5px;">
+            <span id="autosaveDot" style="width:7px;height:7px;border-radius:50%;background:#444;flex-shrink:0;"></span>
+            <span id="autosaveText" data-i18n="autosaveIdle">Browser-Autosave: —</span>
+          </div>
+          <button class="btn-save-load" onclick="saveProject()">💾 <span data-i18n="saveJson">Als JSON speichern</span> <span style="font-size:.6rem;opacity:.7;" data-i18n="saveJsonHint">(Bilder eingebettet)</span></button>
+          <button class="btn-save-load" onclick="saveProjectZip()">📦 <span data-i18n="saveZip">Als ZIP speichern</span> <span style="font-size:.6rem;opacity:.7;" data-i18n="saveZipHint">(Bilder separat, kleiner)</span></button>
+          <button class="btn-save-load" onclick="document.getElementById('loadInput').click()">📂 <span data-i18n="loadProject">Projekt laden</span> <span style="font-size:.6rem;opacity:.7;">(.json oder .zip)</span></button>
+          <button class="btn-ghost" onclick="clearBrowserSave()" style="margin-top:4px;">🗑 <span data-i18n="clearAutosave">Browser-Autosave löschen</span></button>
+          <input type="file" id="loadInput" accept=".json,.zip" style="display:none;" onchange="loadProject(this)" />
+          <p style="font-size:.58rem;color:var(--text2);margin-top:6px;line-height:1.5;" data-i18n="saveHint">JSON: alles in einer Datei. ZIP: JSON + Bilder als separate Dateien, deutlich kleiner. Der Browser speichert automatisch beim Arbeiten.</p>
+        </div>
+      </div>
+
+      <!-- EXPORT WIZARD -->
+      <div class="sb-section">
+        <div class="sb-title" onclick="toggleSection(this)">🏭 Druck &amp; Export<span class="sb-chevron">▾</span></div>
+        <div class="sb-body">
+          <button class="btn-primary" onclick="openExportWizard()" style="margin-bottom:8px;background:linear-gradient(90deg,var(--accent),#b71c1c);">🧙 Export-Wizard starten</button>
+          <button class="btn-ghost" onclick="quickExportPNG()">💾 Alle als PNG (Schnell)</button>
+          <button class="btn-ghost" onclick="clearAll()" style="margin-top:4px;color:#ff8a80;border-color:#4a2020;">🗑 Alle Karten löschen</button>
+          <p class="cnt" style="margin-top:8px;"><span>Karten</span>: <b id="cnt">0</b></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="preview">
+      <div class="preview-hdr">
+        <h2 data-i18n="preview">VORSCHAU</h2>
+        <button class="tb-btn active" id="btnViewDom" onclick="setViewMode('dom')" data-i18n="viewCards">🃏 Karten</button>
+        <button class="tb-btn" id="btnViewPrint" onclick="setViewMode('print')" data-i18n="viewPrint">🖨 Druckvorschau</button>
+        <select class="tb-select" id="sortSelect" onchange="setSortOrder(this.value)" title="Sortierung">
+          <option value="serial" data-i18n="sortSerial">🔢 FW-Nummer</option>
+          <option value="name" data-i18n="sortName">🔤 Name A–Z</option>
+          <option value="category" data-i18n="sortCat">🎨 Kategorie</option>
+        </select>
+        <button class="tb-btn" id="flipToggleBtn" onclick="toggleFlipAll()" data-i18n="showBack">🔄 Rückseite</button>
+      </div>
+      <div class="cgrid" id="cgrid">
+        <div class="empty-state" id="emptyMsg"><span class="eico">🚒</span>Noch keine Karten – links erstellen!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXPORT WIZARD MODAL -->
+<div class="modal-overlay" id="exportWizardOv">
+  <div class="modal modal-split" style="height:88vh;max-height:740px;">
+    <button class="modal-close-x" onclick="closeExportWizard()">✕</button>
+    <div class="ms-left">
+      <div style="display:flex;align-items:center;gap:0;margin-bottom:16px;border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+        <div class="wz-step" id="wzs1" onclick="goWzStep(1)"><span class="wz-num">1</span><span class="wz-lbl">Format</span></div>
+        <div class="wz-sep">›</div>
+        <div class="wz-step" id="wzs2" onclick="goWzStep(2)"><span class="wz-num">2</span><span class="wz-lbl">Einstellungen</span></div>
+        <div class="wz-sep">›</div>
+        <div class="wz-step" id="wzs3" onclick="goWzStep(3)"><span class="wz-num">3</span><span class="wz-lbl">Auswahl</span></div>
+      </div>
+      <!-- SCHRITT 1 -->
+      <div id="wzp1">
+        <div style="font-size:.58rem;color:var(--text2);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Welches Format?</div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <div style="font-size:.52rem;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin:4px 0 2px;">📄 Papier / Heimdruck</div>
+          <div class="wz-fmt-card" data-fmt="print" onclick="pickWzFmt(this,'print')"><span class="wz-fmt-ico">🖨️</span><div class="wz-fmt-info"><div class="wz-fmt-name">Direktdruck</div><div class="wz-fmt-sub">Beidseitig drucken · Duplex-Modus wählbar</div></div></div>
+          <div class="wz-fmt-card" data-fmt="standard" onclick="pickWzFmt(this,'standard')"><span class="wz-fmt-ico">📄</span><div class="wz-fmt-info"><div class="wz-fmt-name">Normalpapier</div><div class="wz-fmt-sub">A4/A5/Letter · Mehrere Karten pro Seite</div></div></div>
+          <div class="wz-fmt-card" data-fmt="cardboard" onclick="pickWzFmt(this,'cardboard')"><span class="wz-fmt-ico">🃏</span><div class="wz-fmt-info"><div class="wz-fmt-name">Karton-/Kartendruck</div><div class="wz-fmt-sub">Doppelseitig · Mit Rückseite · Ausschneiden</div></div></div>
+          <div style="font-size:.52rem;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin:6px 0 2px;">⭐ Profi / Druckerei</div>
+          <div class="wz-fmt-card" data-fmt="pokemon_pro" onclick="pickWzFmt(this,'pokemon_pro')"><span class="wz-fmt-ico">⚡</span><div class="wz-fmt-info"><div class="wz-fmt-name">Trading Card (Standard)</div><div class="wz-fmt-sub">63 × 88 mm · Hochformat · TCG-Größe</div></div></div>
+          <div class="wz-fmt-card" data-fmt="cr80" onclick="pickWzFmt(this,'cr80')"><span class="wz-fmt-ico">💳</span><div class="wz-fmt-info"><div class="wz-fmt-name">CR80 Plastikkarte</div><div class="wz-fmt-sub">85,6 × 54 mm · ISO 7810 ID-1</div></div></div>
+          <div class="wz-fmt-card" data-fmt="a6_pro" onclick="pickWzFmt(this,'a6_pro')"><span class="wz-fmt-ico">📋</span><div class="wz-fmt-info"><div class="wz-fmt-name">A6 Karte</div><div class="wz-fmt-sub">105 × 148 mm · Großformat</div></div></div>
+          <div class="wz-fmt-card" data-fmt="custom_pro" onclick="pickWzFmt(this,'custom_pro')"><span class="wz-fmt-ico">✏️</span><div class="wz-fmt-info"><div class="wz-fmt-name">Benutzerdefiniert</div><div class="wz-fmt-sub">Eigene Maße in mm</div></div></div>
+          <div style="font-size:.52rem;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin:6px 0 2px;">🏷️ Sticker</div>
+          <div class="wz-fmt-card" data-fmt="stk_card" onclick="pickWzFmt(this,'stk_card')"><span class="wz-fmt-ico">🏷️</span><div class="wz-fmt-info"><div class="wz-fmt-name">Sticker Kartengröße</div><div class="wz-fmt-sub">63 × 88 mm · Mit Bleed · Schnittmarken</div></div></div>
+          <div class="wz-fmt-card" data-fmt="stk_square" onclick="pickWzFmt(this,'stk_square')"><span class="wz-fmt-ico">🟦</span><div class="wz-fmt-info"><div class="wz-fmt-name">Sticker Quadratisch</div><div class="wz-fmt-sub">90 × 90 mm</div></div></div>
+          <div class="wz-fmt-card" data-fmt="stk_custom" onclick="pickWzFmt(this,'stk_custom')"><span class="wz-fmt-ico">📐</span><div class="wz-fmt-info"><div class="wz-fmt-name">Sticker Eigene Größe</div><div class="wz-fmt-sub">Frei wählbare mm-Größe</div></div></div>
+        </div>
+        <div style="margin-top:14px;display:flex;justify-content:flex-end;"><button class="mbtn save" onclick="goWzStep(2)" style="width:auto;padding:8px 20px;">Weiter ›</button></div>
+      </div>
+      <!-- SCHRITT 2 -->
+      <div id="wzp2" style="display:none;">
+        <div class="wz-settings-header"><span id="wzSettingsIcon">📄</span><span id="wzSettingsTitle">Einstellungen</span></div>
+        <!-- Direktdruck -->
+        <div id="wz-settings-print" style="display:none;">
+          <div class="wz-setting-group">
+            <div class="wz-group-title">📐 Seitenformat</div>
+            <div class="wz-row2">
+              <div class="fg"><label>Papierformat</label><select id="wzPrtPaper"><option value="a4">A4 (210×297)</option><option value="a5">A5 (148×210)</option><option value="letter">Letter (216×279)</option><option value="a3">A3 (297×420)</option></select></div>
+              <div class="fg"><label>Ausrichtung</label><select id="wzPrtOrient"><option value="portrait">↕ Hochformat</option><option value="landscape">↔ Querformat</option></select></div>
+            </div>
+            <div class="wz-row2">
+              <div class="fg"><label>Seitenrand (mm)</label><input type="number" id="wzPrtMargin" value="10" min="0" max="30" /></div>
+              <div class="fg"><label>Abstand (mm)</label><input type="number" id="wzPrtGap" value="3" min="0" max="20" /></div>
+            </div>
+            <div class="fg"><label>Karten pro Zeile</label><select id="wzPrtCols"><option value="auto">Automatisch</option><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option></select></div>
+          </div>
+          <div class="wz-setting-group">
+            <div class="wz-group-title">🖨️ Duplex-Modus</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <label class="radio-chip" style="justify-content:flex-start;gap:8px;padding:7px 10px;">
+                <input type="radio" name="wzDuplex" value="longEdge" checked style="display:inline;width:13px;height:13px;accent-color:var(--accent);flex-shrink:0;" />
+                <span style="display:flex;flex-direction:column;gap:1px;"><b style="font-size:.7rem;">Lange Kante</b><span style="font-size:.58rem;color:var(--text2);">Hochformat · Buch-Umblättern (Standard)</span></span>
+              </label>
+              <label class="radio-chip" style="justify-content:flex-start;gap:8px;padding:7px 10px;">
+                <input type="radio" name="wzDuplex" value="shortEdge" style="display:inline;width:13px;height:13px;accent-color:var(--accent);flex-shrink:0;" />
+                <span style="display:flex;flex-direction:column;gap:1px;"><b style="font-size:.7rem;">Kurze Kante</b><span style="font-size:.58rem;color:var(--text2);">Hochformat · Block-Umblättern</span></span>
+              </label>
+              <label class="radio-chip" style="justify-content:flex-start;gap:8px;padding:7px 10px;">
+                <input type="radio" name="wzDuplex" value="manual" style="display:inline;width:13px;height:13px;accent-color:var(--accent);flex-shrink:0;" />
+                <span style="display:flex;flex-direction:column;gap:1px;"><b style="font-size:.7rem;">Manuell</b><span style="font-size:.58rem;color:var(--text2);">Blatt selbst wenden</span></span>
+              </label>
+              <label class="radio-chip" style="justify-content:flex-start;gap:8px;padding:7px 10px;">
+                <input type="radio" name="wzDuplex" value="single" style="display:inline;width:13px;height:13px;accent-color:var(--accent);flex-shrink:0;" />
+                <span style="display:flex;flex-direction:column;gap:1px;"><b style="font-size:.7rem;">Ohne Rückseite</b><span style="font-size:.58rem;color:var(--text2);">Nur Vorderseiten drucken</span></span>
+              </label>
+            </div>
+          </div>
+          <div class="wz-setting-group">
+            <div class="wz-group-title">⚙️ Optionen</div>
+            <div class="wz-row2">
+              <div class="fg"><label>Schnittmarken</label><select id="wzPrtCrop"><option value="0">Keine</option><option value="1">Ja</option></select></div>
+              <div class="fg"><label>Hintergrund</label><input type="color" id="wzPrtBg" value="#ffffff" style="width:100%;height:32px;border-radius:5px;border:1px solid var(--border);cursor:pointer;" /></div>
+            </div>
+          </div>
+          <div class="wz-tip">💡 Druckertreiber auf <strong>Beidseitig</strong> stellen, dann Modus wählen.<br>Nicht sicher? Erst 1 Seite testen.</div>
+        </div>
+        <!-- Papier -->
+        <div id="wz-settings-paper" style="display:none;">
+          <div class="wz-setting-group">
+            <div class="wz-group-title">📐 Seitenformat</div>
+            <div class="wz-row2">
+              <div class="fg"><label>Papierformat</label><select id="wzPaper"><option value="a4">A4 (210×297)</option><option value="a5">A5 (148×210)</option><option value="letter">Letter (216×279)</option><option value="a3">A3 (297×420)</option></select></div>
+              <div class="fg"><label>Ausrichtung</label><select id="wzOrient"><option value="portrait">↕ Hochformat</option><option value="landscape">↔ Querformat</option></select></div>
+            </div>
+            <div class="wz-row2">
+              <div class="fg"><label>Seitenrand (mm)</label><input type="number" id="wzMargin" value="10" min="0" max="30" /></div>
+              <div class="fg"><label>Abstand (mm)</label><input type="number" id="wzGap" value="3" min="0" max="20" /></div>
+            </div>
+            <div class="fg"><label>Karten pro Zeile</label><select id="wzCols"><option value="auto">Automatisch</option><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5</option></select></div>
+          </div>
+          <div class="wz-setting-group">
+            <div class="wz-group-title">🖨️ Druckoptionen</div>
+            <div class="wz-row2">
+              <div class="fg"><label>Schnittmarken</label><select id="wzCropStd"><option value="0">Keine</option><option value="1">Ja</option></select></div>
+              <div class="fg"><label>Hintergrund</label><input type="color" id="wzPaperBg" value="#ffffff" style="width:100%;height:32px;border-radius:5px;border:1px solid var(--border);cursor:pointer;" /></div>
+            </div>
+          </div>
+        </div>
+        <!-- Karton -->
+        <div id="wz-settings-cardboard" style="display:none;">
+          <div class="wz-setting-group">
+            <div class="wz-group-title">📐 Seitenformat</div>
+            <div class="wz-row2">
+              <div class="fg"><label>Papierformat</label><select id="wzCbPaper"><option value="a4">A4</option><option value="a5">A5</option><option value="a3">A3</option><option value="letter">Letter</option></select></div>
+              <div class="fg"><label>Ausrichtung</label><select id="wzCbOrient"><option value="portrait">↕ Hochformat</option><option value="landscape">↔ Querformat</option></select></div>
+            </div>
+            <div class="wz-row2">
+              <div class="fg"><label>Karten/Zeile</label><select id="wzCbCols"><option value="auto">Auto</option><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option></select></div>
+              <div class="fg"><label>Abstand (mm)</label><input type="number" id="wzCbGap" value="3" min="0" max="15" /></div>
+            </div>
+          </div>
+          <div class="wz-setting-group">
+            <div class="wz-group-title">🎨 Rückseite</div>
+            <div class="wz-row2">
+              <div class="fg"><label>Hintergrund</label><input type="color" id="wzCbBack" value="#cc0000" style="width:100%;height:30px;border-radius:5px;border:1px solid var(--border);cursor:pointer;" /></div>
+              <div class="fg"><label>Muster</label><select id="wzCbPattern"><option value="solid">Einfarbig</option><option value="gradient">Verlauf</option><option value="hatch">Schraffur</option><option value="logo">Logo</option></select></div>
+            </div>
+            <div class="fg" style="margin-top:6px;"><label>Schnittmarken</label><select id="wzCbCrop"><option value="1" selected>Ja</option><option value="0">Nein</option></select></div>
+          </div>
+        </div>
+        <!-- Profi -->
+        <div id="wz-settings-pro" style="display:none;">
+          <div id="wzProCustom" style="display:none;" class="wz-setting-group">
+            <div class="wz-group-title">📏 Benutzerdefinierte Maße</div>
+            <div class="wz-row2">
+              <div class="fg"><label>Breite (mm)</label><input type="number" id="wzProW" value="63" min="10" max="300" step="0.5" /></div>
+              <div class="fg"><label>Höhe (mm)</label><input type="number" id="wzProH" value="88" min="10" max="300" step="0.5" /></div>
+            </div>
+          </div>
+          <div class="wz-setting-group">
+            <div class="wz-group-title">⚙️ Ausgabe</div>
+            <div class="wz-row2">
+              <div class="fg"><label>DPI</label><select id="wzProDPI" onchange="wzUpdateProInfo()"><option value="150">150 DPI</option><option value="300" selected>300 DPI</option><option value="600">600 DPI</option></select></div>
+              <div class="fg"><label>Ausrichtung</label><select id="wzProOrient" onchange="wzUpdateProInfo()"><option value="portrait">↕ Hochformat</option><option value="landscape">↔ Querformat</option></select></div>
+            </div>
+            <div class="fg"><label>Export-Art</label><select id="wzProType" onchange="wzUpdateProInfo()"><option value="single">Einzeldateien (1 PNG/Karte)</option><option value="sheet_a4">A4-Bogen</option><option value="sheet_a3">A3-Bogen</option></select></div>
+          </div>
+          <div class="wz-setting-group">
+            <div class="wz-group-title">✂️ Beschnitt</div>
+            <div class="wz-row2">
+              <div class="fg"><label>Bleed (mm)</label><select id="wzProBleed" onchange="wzUpdateProInfo()"><option value="0">Kein</option><option value="1">1 mm</option><option value="2" selected>2 mm</option><option value="3">3 mm</option><option value="5">5 mm</option></select></div>
+              <div class="fg"><label>Safe Zone (mm)</label><select id="wzProSafe"><option value="0">Keine</option><option value="2" selected>2 mm</option><option value="3">3 mm</option></select></div>
+            </div>
+            <div class="wz-row2">
+              <div class="fg"><label>Schnittmarken</label><select id="wzProCrop"><option value="1" selected>Ja</option><option value="0">Nein</option></select></div>
+              <div class="fg"><label>Passerkreuze</label><select id="wzProReg"><option value="0" selected>Nein</option><option value="1">Ja</option></select></div>
+            </div>
+          </div>
+          <div class="wz-setting-group">
+            <div class="wz-group-title">🎨 Farbe</div>
+            <div class="wz-row2">
+              <div class="fg"><label>Hintergrund</label><input type="color" id="wzProBg" value="#ffffff" style="width:100%;height:30px;border-radius:5px;border:1px solid var(--border);cursor:pointer;" /></div>
+              <div class="fg"><label>Farbprofil</label><select id="wzProColor"><option value="rgb">RGB (Inkjet)</option><option value="cmyk">CMYK (Hinweis)</option></select></div>
+            </div>
+          </div>
+          <div id="wzProInfo" class="wz-info-box"></div>
+        </div>
+        <!-- Sticker -->
+        <div id="wz-settings-sticker" style="display:none;">
+          <div id="wzStkCustom" style="display:none;" class="wz-setting-group">
+            <div class="wz-group-title">📏 Benutzerdefinierte Maße</div>
+            <div class="wz-row2">
+              <div class="fg"><label>Breite (mm)</label><input type="number" id="wzStkW" value="63" min="10" max="300" step="0.5" /></div>
+              <div class="fg"><label>Höhe (mm)</label><input type="number" id="wzStkH" value="88" min="10" max="300" step="0.5" /></div>
+            </div>
+          </div>
+          <div class="wz-setting-group">
+            <div class="wz-group-title">⚙️ Ausgabe</div>
+            <div class="wz-row2">
+              <div class="fg"><label>DPI</label><select id="wzStkDPI" onchange="wzUpdateStkInfo()"><option value="150">150 DPI</option><option value="300" selected>300 DPI</option><option value="600">600 DPI</option></select></div>
+              <div class="fg"><label>Export-Art</label><select id="wzStkType" onchange="wzUpdateStkInfo()"><option value="single">Einzeldateien</option><option value="sheet_a4">A4-Bogen</option><option value="sheet_a3">A3-Bogen</option></select></div>
+            </div>
+          </div>
+          <div class="wz-setting-group">
+            <div class="wz-group-title">✂️ Beschnitt</div>
+            <div class="wz-row2">
+              <div class="fg"><label>Bleed</label><select id="wzStkBleed" onchange="wzUpdateStkInfo()"><option value="0">Kein</option><option value="1">1 mm</option><option value="2" selected>2 mm</option><option value="3">3 mm</option><option value="5">5 mm</option></select></div>
+              <div class="fg"><label>Schnittlinien</label><select id="wzStkCrop"><option value="1" selected>Ja</option><option value="0">Nein</option></select></div>
+            </div>
+          </div>
+          <div class="wz-setting-group">
+            <div class="wz-group-title">🎨 Hintergrund</div>
+            <div class="fg"><label>Farbe</label><input type="color" id="wzStkBg" value="#ffffff" style="width:100%;height:30px;border-radius:5px;border:1px solid var(--border);cursor:pointer;" /></div>
+          </div>
+          <div id="wzStkInfo" class="wz-info-box"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:14px;">
+          <button class="mbtn cancel" onclick="goWzStep(1)" style="width:auto;padding:8px 16px;">‹ Zurück</button>
+          <button class="mbtn save" onclick="goWzStep(3)" style="padding:8px 20px;">Weiter ›</button>
+        </div>
+      </div>
+      <!-- SCHRITT 3 -->
+      <div id="wzp3" style="display:none;">
+        <div style="font-size:.58rem;color:var(--text2);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Welche Karten exportieren?</div>
+        <div class="fg"><label>Kategorie</label><select id="wzFCat" onchange="wzUpdateSel();wzBuildPreview()"><option value="">Alle Kategorien</option></select></div>
+        <div class="fg"><label>Fahrzeug-Präfix</label><select id="wzFPrefix" onchange="wzUpdateSel();wzBuildPreview()"><option value="">Alle Präfixe</option></select></div>
+        <div id="wzSelSummary" style="background:#12141a;border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:.65rem;color:var(--text2);line-height:1.8;margin-bottom:10px;">—</div>
+        <div style="display:flex;gap:8px;margin-top:auto;">
+          <button class="mbtn cancel" onclick="goWzStep(2)" style="width:auto;padding:8px 16px;">‹ Zurück</button>
+          <button class="mbtn save" onclick="doWizardExport()" id="wzExportBtn" style="flex:1;background:linear-gradient(90deg,var(--accent),#b71c1c);font-size:.85rem;">⬇️ EXPORTIEREN</button>
+        </div>
+      </div>
+    </div><!-- end ms-left -->
+    <div class="ms-right">
+      <div style="font-family:'Oswald',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text2);">LIVE-VORSCHAU</div>
+      <div class="ms-preview-wrap" id="wzPreviewWrap"><canvas id="wzPreviewCanvas"></canvas></div>
+      <div class="ms-prev-info" id="wzPreviewInfo">—</div>
+      <div style="display:flex;align-items:center;gap:6px;padding:4px 8px;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.2);border-radius:6px;">
+        <div id="wzPrevDot" style="width:6px;height:6px;border-radius:50%;background:#34d399;flex-shrink:0;transition:all .3s;"></div>
+        <span style="font-size:.58rem;color:#34d399;" id="wzPrevStatus">Vorschau automatisch</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRÄFIX MODAL -->
+<div class="modal-overlay" id="prefixModal">
+  <div class="modal" style="width:340px;">
+    <h3 id="prefixModalTitle">PRÄFIX</h3>
+    <div class="fg"><label>Kürzel (z.B. LF-, HLF-, TLF-)</label><input type="text" id="mPrefixVal" placeholder="HLF-" maxlength="12" /></div>
+    <div class="fg"><label>Beschreibung (optional)</label><input type="text" id="mPrefixLabel" placeholder="Hilfeleistungslöschfahrzeug" /></div>
+    <div class="modal-btns">
+      <button class="mbtn cancel" onclick="closePrefixModal()">Abbrechen</button>
+      <button id="mPrefixDel" class="mbtn danger" onclick="deleteCurPrefix()" style="display:none;">Löschen</button>
+      <button class="mbtn save" onclick="savePrefix()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORY MODAL -->
+<div class="modal-overlay" id="catModal">
+  <div class="modal">
+    <h3 id="catModalTitle">KATEGORIE</h3>
+    <div class="fg"><label>Name</label><input type="text" id="mCatName" placeholder="z.B. Löschgerät" /></div>
+    <div class="color-row">
+      <div class="color-field"><label>Hauptfarbe</label><input type="color" id="mColor1" value="#c62828"/><input class="hex-input" id="mColor1Hex" value="#c62828" maxlength="7"/></div>
+      <div class="color-field"><label>Verlauf</label><input type="color" id="mColor2" value="#ef5350"/><input class="hex-input" id="mColor2Hex" value="#ef5350" maxlength="7"/></div>
+      <div class="color-field"><label>Beschriftung</label><input type="color" id="mTextColor" value="#ffffff"/><input class="hex-input" id="mTextColorHex" value="#ffffff" maxlength="7"/></div>
+      <div class="color-field"><label>Gerätename</label><input type="color" id="mNameColor" value="#111111"/><input class="hex-input" id="mNameColorHex" value="#111111" maxlength="7"/></div>
+    </div>
+    <!-- Alignment -->
+    <div style="margin-bottom:10px;">
+      <div style="font-size:.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text2);margin-bottom:6px;">Gerätename Ausrichtung</div>
+      <div style="display:flex;gap:6px;">
+        <label class="radio-chip"><input type="radio" name="nameAlign" value="left" id="mNameLeft" checked/><span>⬅ Links</span></label>
+        <label class="radio-chip"><input type="radio" name="nameAlign" value="center" id="mNameCenter"/><span>↔ Mitte</span></label>
+        <label class="radio-chip"><input type="radio" name="nameAlign" value="right" id="mNameRight"/><span>➡ Rechts</span></label>
+      </div>
+    </div>
+    <div style="margin-bottom:10px;">
+      <div style="font-size:.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text2);margin-bottom:6px;">Kategorie-Label Ausrichtung</div>
+      <div style="display:flex;gap:6px;">
+        <label class="radio-chip"><input type="radio" name="catAlign" value="left" id="mCatLeft" checked/><span>⬅ Links</span></label>
+        <label class="radio-chip"><input type="radio" name="catAlign" value="center" id="mCatCenter"/><span>↔ Mitte</span></label>
+        <label class="radio-chip"><input type="radio" name="catAlign" value="right" id="mCatRight"/><span>➡ Rechts</span></label>
+      </div>
+    </div>
+    <!-- Inner mode -->
+    <div style="margin-bottom:10px;">
+      <div style="font-size:.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text2);margin-bottom:6px;">Innenfläche</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <label class="radio-chip"><input type="radio" name="innerMode" value="white" id="mInnerWhite" checked/><span>⬜ Weiß</span></label>
+        <label class="radio-chip"><input type="radio" name="innerMode" value="dark" id="mInnerDark"/><span>⬛ Dunkel</span></label>
+        <label class="radio-chip"><input type="radio" name="innerMode" value="gradient" id="mInnerGrad"/><span>🎨 Verlauf</span></label>
+      </div>
+      <!-- Gradient options (shown when gradient selected) -->
+      <div class="gradient-options" id="gradOptions">
+        <div class="grad-row">
+          <label>Farbe</label>
+          <input type="color" id="mGradColor" value="#c62828" title="Verlaufsfarbe" />
+          <input class="hex-input" id="mGradColorHex" value="#c62828" maxlength="7" style="width:60px;" />
+          <span style="font-size:.6rem;color:var(--text2);flex:1;">Eigene Farbe (leer = Kategoriefarbe)</span>
+          <input type="checkbox" id="mGradUseCustom" style="width:14px;height:14px;cursor:pointer;accent-color:var(--accent);" />
+        </div>
+        <div class="grad-row">
+          <label>Intensität</label>
+          <input type="range" id="mGradIntensity" min="2" max="100" value="10" />
+          <span id="mGradIntensityVal">10%</span>
+        </div>
+      </div>
+    </div>
+    <div class="grad-row" style="margin-bottom:10px;">
+      <label style="font-size:.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text2);width:auto;margin-right:8px;">Kategorie-Größe</label>
+      <input type="range" id="mCatSize" min="12" max="60" value="22" style="flex:1;accent-color:var(--accent);" />
+      <span id="mCatSizeVal" style="font-size:.65rem;color:var(--yellow);width:28px;text-align:right;">22</span>
+    </div>
+    <div class="cat-prev-strip"><div class="cps-outer" id="cpsOuter"><div class="cps-inner" id="cpsInner"><span class="cps-name" id="cpsName">Vorschau</span></div></div></div>
+    <div class="modal-btns">
+      <button class="mbtn save" onclick="saveCat()">SPEICHERN</button>
+      <button class="mbtn danger" id="mCatDel" onclick="deleteCat()">LÖSCHEN</button>
+      <button class="mbtn cancel" onclick="closeCatModal()">ABBRECHEN</button>
+    </div>
+  </div>
+</div>
+
+<!-- CARD EDIT MODAL -->
+<div class="modal-overlay" id="cardModal">
+  <div class="modal">
+    <h3>KARTE BEARBEITEN</h3>
+    <div class="fg"><label>Gerätename</label><input type="text" id="eName" placeholder="Name"/></div>
+    <div class="fg"><label>Kategorie</label><div class="cat-list" id="eCatList"></div></div>
+    <div class="fg" style="margin-top:10px;">
+      <label>Foto</label>
+      <div class="upzone" id="eUpZone"><input type="file" id="eUpInput" accept="image/*" /><div class="ico">📷</div><p>Neues Foto (leer lassen = unverändert)</p><img class="prev" id="eUpPrev" /></div>
+      <button class="btn-ghost" onclick="clearEditImg()" style="margin-top:4px;">✕ Foto entfernen</button>
+    </div>
+    <div class="modal-btns"><button class="mbtn save" onclick="saveCard()">SPEICHERN</button><button class="mbtn cancel" onclick="closeCardModal()">ABBRECHEN</button></div>
+  </div>
+</div>
+
+<!-- BULK MODAL -->
+<div class="modal-overlay" id="bulkModal">
+  <div class="modal" style="width:420px;max-width:96vw;">
+    <h3>MEHRERE KARTEN HINZUFÜGEN</h3>
+    <div class="bulk-cat-row"><label>Standard-Kategorie</label><select class="bulk-cat-sel" id="bulkCatSel"></select></div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('photos')">📷 Fotos</button>
+      <button class="tab-btn" onclick="switchTab('list')">📋 Liste</button>
+      <button class="tab-btn" onclick="switchTab('csv')">📊 CSV</button>
+    </div>
+    <div class="tab-panel active" id="tab-photos">
+      <div class="bulk-drop" id="bulkDropZone"><input type="file" id="bulkFileInput" accept="image/*" multiple /><div class="ico">🖼</div><p>Mehrere Fotos auswählen<br><span style="color:#555;">Dateiname = Gerätename</span></p></div>
+      <div class="bulk-file-list" id="bulkFileList"></div>
+      <p class="bulk-summary" id="bulkPhotoSummary"></p>
+    </div>
+    <div class="tab-panel" id="tab-list">
+      <textarea class="bulk-textarea" id="bulkListText" placeholder="Eine Karte pro Zeile:&#10;B-Schlauch&#10;C-Schlauch&#10;&#10;Mit Kategorie:&#10;Atemschutzgerät :: PSA"></textarea>
+      <p class="bulk-hint">Format: <b style="color:var(--text);">Name</b> oder <b style="color:var(--text);">Name :: Kategorie</b></p>
+      <p class="bulk-summary" id="bulkListSummary"></p>
+    </div>
+    <div class="tab-panel" id="tab-csv">
+      <div class="bulk-drop" style="margin-bottom:8px;">
+        <input type="file" id="csvFileInput" accept=".csv,.txt" />
+        <div class="ico">📊</div>
+        <p>CSV-Datei auswählen</p>
+      </div>
+      <p class="bulk-hint" style="margin-bottom:8px;">
+        Spalten: <b style="color:var(--text);">Kategorie, Gerätename, Bild (optional)</b><br>
+        Erste Zeile kann Kopfzeile sein (wird erkannt).<br>
+        Trennzeichen: Komma oder Semikolon.<br>
+        Bild: Bilddatei hier hochladen ↓ (Dateinamen müssen übereinstimmen)
+      </p>
+      <div class="bulk-drop" id="csvImgZone">
+        <input type="file" id="csvImgInput" accept="image/*" multiple />
+        <div class="ico">🖼</div>
+        <p>Bilder für CSV hochladen (optional)<br><span style="color:#555;">Dateinamen müssen CSV-Einträgen entsprechen</span></p>
+      </div>
+      <div class="bulk-file-list" id="csvPreviewList" style="max-height:140px;"></div>
+      <p class="bulk-summary" id="csvSummary"></p>
+    </div>
+    <div class="modal-btns" style="margin-top:14px;">
+      <button class="mbtn save" onclick="addBulkCards()">ALLE HINZUFÜGEN</button>
+      <button class="mbtn cancel" onclick="closeBulkModal()">ABBRECHEN</button>
+    </div>
+  </div>
+</div>
+
+<!-- WARNING MODAL -->
+<div class="warn-overlay" id="warnOverlay" style="display:none;">
+  <div class="warn-box">
+    <div class="warn-icon">⚠️</div>
+    <h2 data-i18n="warnTitle">WICHTIGER HINWEIS</h2>
+    <p data-i18n="warnText">Diese App speichert deine Daten <strong>nur im Browser</strong>.<br>
+    Beim Löschen des Browser-Caches oder auf einem anderen Gerät sind deine Karten weg.<br><br>
+    <strong>Speichere dein Projekt regelmäßig</strong> als JSON oder ZIP auf deinem Computer!</p>
+    <label class="warn-check">
+      <input type="checkbox" id="warnDontShow" />
+      <span data-i18n="warnDontShow">Nicht mehr anzeigen</span>
+    </label>
+    <button class="warn-btn" onclick="closeWarning()" data-i18n="warnOk">VERSTANDEN</button>
+  </div>
+</div>
+
+<div class="status-bar" id="statusBar"><div class="status-spinner"></div><span id="statusText">Wird vorbereitet…</span></div>
+
+<script>
+/* ============================================================  STATE  ============================================================ */
+let categories=[
+  {id:'c1',name:'Löschgerät',   color1:'#c62828',color2:'#ef5350',textColor:'#fff',innerMode:'white'},
+  {id:'c2',name:'Rettungsgerät',color1:'#e65100',color2:'#ff9800',textColor:'#fff',innerMode:'white'},
+  {id:'c3',name:'PSA',          color1:'#1565c0',color2:'#42a5f5',textColor:'#fff',innerMode:'white'},
+  {id:'c4',name:'Werkzeug',     color1:'#2e7d32',color2:'#66bb6a',textColor:'#fff',innerMode:'white'},
+  {id:'c5',name:'Kommunikation',color1:'#6a1b9a',color2:'#ab47bc',textColor:'#fff',innerMode:'white'},
+  {id:'c6',name:'Fahrzeug',     color1:'#37474f',color2:'#78909c',textColor:'#fff',innerMode:'white'},
+];
+let prefixes=[
+  {id:'p1',value:'FW-', label:'Feuerwehr'},
+  {id:'p2',value:'LF-', label:'Löschfahrzeug'},
+  {id:'p3',value:'HLF-',label:'Hilfeleistungslöschfahrzeug'},
+  {id:'p4',value:'TLF-',label:'Tanklöschfahrzeug'},
+];
+let cards=[];
+let curImg=null, bgImg=null, selCatId='c1', selPrefixId='p1', editingCatId=null, editingCardId=null, editCardImg=undefined;
+let editingPrefixId=null;
+let globalSettings={catSize:28, serialColor:'#bbbbbb', bgScale:'fit', serialShow:true};
+
+/* ============================================================  HELPERS  ============================================================ */
+function getCat(id){return categories.find(c=>c.id===id)||categories[0];}
+function getPrefix(id){return prefixes.find(p=>p.id===id)||prefixes[0]||{id:'p0',value:'FW-',label:''};}
+function getSelPrefix(){return getPrefix(selPrefixId);}
+function catGrad(cat){return `linear-gradient(135deg,${cat.color1},${cat.color2})`;}
+function hexRgb(hex){
+  hex=hex.replace('#','');
+  if(hex.length===3) hex=hex.split('').map(x=>x+x).join('');
+  return{r:parseInt(hex.slice(0,2),16),g:parseInt(hex.slice(2,4),16),b:parseInt(hex.slice(4,6),16)};
+}
+function darken(hex,f=0.15){
+  const {r,g,b}=hexRgb(hex);
+  return `rgb(${Math.round(r*f)},${Math.round(g*f)},${Math.round(b*f)})`;
+}
+// mix a color with white at given opacity (0-1)
+function mixWithWhite(hex,opacity){
+  const {r,g,b}=hexRgb(hex);
+  // blend onto white: result = white*(1-a) + color*a
+  const ro=Math.round(255*(1-opacity)+r*opacity);
+  const go=Math.round(255*(1-opacity)+g*opacity);
+  const bo=Math.round(255*(1-opacity)+b*opacity);
+  return `rgb(${ro},${go},${bo})`;
+}
+
+function innerBg(cat){
+  const m=cat.innerMode||'white';
+  if(m==='dark') return darken(cat.color1,0.18);
+  if(m==='gradient'){
+    const col=cat.gradUseCustom&&cat.gradColor?cat.gradColor:cat.color1;
+    const opa=(cat.gradIntensity||10)/100;
+    const c1=mixWithWhite(col,opa);
+    const c2=mixWithWhite(col,opa*0.4);
+    return `linear-gradient(160deg,${c1} 0%,${c2} 100%)`;
+  }
+  return '#fffef8';
+}
+function innerTxt(cat){return (cat.innerMode||'white')==='dark'?'#e8eaf0':'#111';}
+function serialCol(cat){
+  // cat-level override possible in future; for now use global
+  return globalSettings.serialColor||'#bbbbbb';
+}
+function botBorder(cat){return (cat.innerMode||'white')==='dark'?'rgba(255,255,255,.08)':'rgba(0,0,0,.07)';}
+// effective cat size: cat-level if set, else global
+function effCatSize(cat){return cat.catSize||globalSettings.catSize||28;}
+
+function innerBgCanvas(cat,ctx,x,y,w,h){
+  const m=cat.innerMode||'white';
+  if(m==='dark') return darken(cat.color1,0.18);
+  if(m==='gradient'){
+    const col=cat.gradUseCustom&&cat.gradColor?cat.gradColor:cat.color1;
+    const opa=(cat.gradIntensity||10)/100;
+    const c1=mixWithWhite(col,opa);
+    const c2=mixWithWhite(col,opa*0.4);
+    const g2=ctx.createLinearGradient(x,y,x+w,y+h);
+    g2.addColorStop(0,c1); g2.addColorStop(1,c2);
+    return g2;
+  }
+  return '#fffef8';
+}
+
+/* ============================================================  IMAGE  ============================================================ */
+function toSquare(src,size,cb){
+  const img=new Image();
+  img.onload=()=>{
+    try{
+      const c=document.createElement('canvas'); c.width=size; c.height=size;
+      const ctx=c.getContext('2d'); ctx.fillStyle='#fff'; ctx.fillRect(0,0,size,size);
+      const r=Math.min(size/img.width,size/img.height);
+      ctx.drawImage(img,(size-img.width*r)/2,(size-img.height*r)/2,img.width*r,img.height*r);
+      cb(c);
+    }catch(e){cb(null);}
+  };
+  img.onerror=()=>cb(null);
+  img.src=src;
+}
+function fillCanvas(imgSrc,cv,size){
+  if(!imgSrc)return;
+  toSquare(imgSrc,size,sq=>{if(sq){cv.width=sq.width;cv.height=sq.height;cv.getContext('2d').drawImage(sq,0,0);}});
+}
+
+/* ============================================================  FIT TEXT  ============================================================ */
+function fitText(el,max,min){
+  let s=max; el.style.fontSize=s+'px';
+  while(el.scrollWidth>el.offsetWidth+1&&s>min){s-=.5;el.style.fontSize=s+'px';}
+}
+
+/* ============================================================  SCREEN CARD  ============================================================ */
+function buildCard(card){
+  const cat=getCat(card.catId);
+  const ib=innerBg(cat),it=cat.nameColor||innerTxt(cat),sc=serialCol(cat),bb=botBorder(cat);
+  const nameAlign=cat.nameAlign||'left';
+  const catAlign=cat.catAlign||'left';
+  const bleedMM=getBleedMM();
+  const {w:pvW, h:pvH, sz, isLandscape} = getPreviewSize();
+  const scale = pvW / 160;
+  const catFsScreen = Math.round(effCatSize(cat)*0.26*scale*10)/10+'px';
+  const bleedPxPreview = bleedMM>0 ? Math.round(bleedMM*pvW/sz.w) : 0;
+  const showSerial = globalSettings.serialShow !== false;
+
+  const wrap=document.createElement('div');
+  wrap.className='pcard'+(isLandscape?' landscape':'')+(bleedMM>0?' has-bleed':'');
+  wrap.dataset.id=card.id;
+
+  if(isLandscape){
+    // Just set wrapper to portrait shape — fw-card fills it normally like any portrait card
+    wrap.style.width = pvW+'px';
+    wrap.style.height = pvH+'px';
+    // Remove any --fw vars since we don't rotate
+    wrap.style.removeProperty('--fw-w');
+    wrap.style.removeProperty('--fw-h');
+  }
+
+  if(bleedMM>0){
+    wrap.style.setProperty('--bleed-px',bleedPxPreview+'px');
+    wrap.setAttribute('data-bleed',bleedMM+'mm bleed');
+    wrap.style.margin=bleedPxPreview+'px';
+  }
+
+  wrap.innerHTML=`
+    <div class="fw-card">
+      <div class="card-shell" style="background:${catGrad(cat)};">
+        <div class="card-inner" style="background:${ib};">
+          <div class="card-namebar" style="justify-content:${nameAlign==='right'?'flex-end':nameAlign==='center'?'center':'flex-start'};"><div class="card-name" id="nm-${card.id}" style="color:${it};text-align:${nameAlign};">${card.name}</div></div>
+          <div class="card-imgbox" style="border-color:${cat.color1}40;">
+            ${card.img?`<canvas id="cv-${card.id}"></canvas>`:`<div class="no-img" style="background:${ib};">🚒</div>`}
+          </div>
+          <div class="card-cat-wrap" style="justify-content:${catAlign==='right'?'flex-end':catAlign==='center'?'center':'flex-start'};">
+            <div class="card-cat" style="background:${catGrad(cat)};color:${cat.textColor};font-size:${catFsScreen};">${cat.name}</div>
+          </div>
+          ${showSerial?`<div class="card-bot" style="border-top:1px solid ${bb};"><span class="card-serial" style="color:${sc};font-size:${Math.round(.42*scale*10)/10}rem;">${card.serial}</span><span class="card-icon" style="font-size:${Math.round(.6*scale*10)/10}rem;">🔥</span></div>`:''}
+        </div>
+      </div>
+    </div>
+    <div class="card-actions">
+      <button class="card-act-btn btn-edit-card" onclick="event.stopPropagation();openCardModal(${card.id})" title="Bearbeiten">✎</button>
+      <button class="card-act-btn btn-del-card" onclick="event.stopPropagation();deleteCard(${card.id})" title="Löschen">✕</button>
+    </div>`;
+  return wrap;
+}
+function afterInsert(card){
+  const {w:pvW}=getPreviewSize();
+  const maxFs=Math.round(17*pvW/160), minFs=Math.max(Math.round(8*pvW/160),5);
+  const nm=document.getElementById('nm-'+card.id); if(nm)fitText(nm,Math.max(maxFs,8),minFs);
+  if(card.img){const cv=document.getElementById('cv-'+card.id);if(cv)fillCanvas(card.img,cv,300);}
+}
+function updateSerialNumbers(){
+  // Serials are now per-card based on chosen prefix — no global reassignment
+}
+
+function render(){
+  document.getElementById('cnt').textContent=cards.length;
+  const pgcnt=document.getElementById('pgcnt');if(pgcnt) pgcnt.textContent=Math.ceil(cards.length/9)||0;
+  document.getElementById('hdrCnt').textContent=cards.length;
+  const grid=document.getElementById('cgrid');
+  const {w:pvW, h:pvH, ratio:pvRatio, sz, isLandscape} = getPreviewSize();
+  grid.style.setProperty('--preview-w', pvW+'px');
+  grid.style.setProperty('--preview-ratio', pvRatio);
+  grid.querySelectorAll('.pcard,.pcard-print').forEach(e=>e.remove());
+  document.getElementById('emptyMsg').style.display=cards.length?'none':'block';
+
+  const sorted=getSortedCards();
+
+  if(viewMode==='print'){
+    // Print preview: render each card via canvas, show as img
+    sorted.forEach(card=>{
+      const wrap=document.createElement('div');
+      wrap.className='pcard-print';
+      wrap.dataset.id=card.id;
+      const img=document.createElement('img');
+      img.style.cssText='width:160px;height:auto;border-radius:8px;display:block;';
+      img.src=printViewCache[card.id]||'';
+      wrap.appendChild(img);
+      // action buttons
+      const acts=document.createElement('div');
+      acts.className='card-actions';
+      acts.innerHTML=`<button class="card-act-btn btn-edit-card" onclick="event.stopPropagation();openCardModal(${card.id})" title="Bearbeiten">✎</button><button class="card-act-btn btn-del-card" onclick="event.stopPropagation();deleteCard(${card.id})" title="Löschen">✕</button>`;
+      wrap.appendChild(acts);
+      grid.appendChild(wrap);
+      // render canvas async
+      if(!printViewCache[card.id]){
+        drawCardOnCanvas(card).then(c=>{
+          printViewCache[card.id]=c.toDataURL('image/png');
+          img.src=printViewCache[card.id];
+        }).catch(()=>{});
+      }
+    });
+  } else {
+    // DOM card view
+    sorted.forEach(card=>{
+      const el=buildCard(card);
+      grid.appendChild(el);
+      requestAnimationFrame(()=>afterInsert(card));
+    });
+  }
+
+  // re-apply flip if active
+  if(showingBack&&backPreviewURL) requestAnimationFrame(updateFlipDisplay);
+}
+
+// Invalidate print cache when card changes
+function invalidatePrintCache(id){ if(id) delete printViewCache[id]; else printViewCache={}; }
+
+/* ============================================================  CANVAS CARD RENDERER  ============================================================ */
+const PW=630,PH=880; // default (pokémon) — overridden per export
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);
+  ctx.closePath();
+}
+
+async function drawCardOnCanvas(card, cw, ch){
+  if(!cw||!ch){ cw=PW; ch=PH; }
+  const isLandscape = cw > ch;
+
+  // For landscape: render as portrait first, then rotate canvas 90deg
+  if(isLandscape){
+    const portrait = await drawCardOnCanvas(card, ch, cw); // render as portrait (ch×cw)
+    // Create landscape canvas and rotate
+    const lc = document.createElement('canvas'); lc.width=cw; lc.height=ch;
+    const lctx = lc.getContext('2d');
+    lctx.translate(cw/2, ch/2);
+    lctx.rotate(-Math.PI/2);
+    lctx.drawImage(portrait, -ch/2, -cw/2, ch, cw);
+    return lc;
+  }
+  const cat=getCat(card.catId);
+  const c=document.createElement('canvas'); c.width=cw; c.height=ch;
+  const ctx=c.getContext('2d');
+  // Scale factor relative to reference PW/PH
+  const sx=cw/PW, sy=ch/PH;
+  const s=Math.min(sx,sy); // uniform scale for text/fonts
+  const PAD=Math.round(22*sx),R=Math.round(36*s),shellPad=Math.round(6*s);
+
+  // outer black border
+  roundRect(ctx,0,0,cw,ch,R); ctx.fillStyle='#000'; ctx.fill();
+  // shell gradient
+  roundRect(ctx,shellPad,shellPad,cw-shellPad*2,ch-shellPad*2,R-Math.round(4*s));
+  ctx.save(); ctx.clip();
+  const grd=ctx.createLinearGradient(0,0,cw,ch);
+  grd.addColorStop(0,cat.color1); grd.addColorStop(1,cat.color2);
+  ctx.fillStyle=grd; ctx.fillRect(0,0,cw,ch); ctx.restore();
+
+  // inner area
+  const iX=shellPad+PAD,iY=shellPad+PAD,iW=cw-shellPad*2-PAD*2,iH=ch-shellPad*2-PAD*2;
+  roundRect(ctx,iX,iY,iW,iH,Math.round(18*s));
+  ctx.fillStyle=innerBgCanvas(cat,ctx,iX,iY,iW,iH); ctx.fill();
+  ctx.strokeStyle='rgba(0,0,0,0.12)'; ctx.lineWidth=1; ctx.stroke();
+
+  // name
+  const nameH=Math.round(110*sy);
+  const nameColor=cat.nameColor||innerTxt(cat);
+  const nameAlign=cat.nameAlign||'left';
+  let fs=Math.round(72*s); ctx.font=`700 ${fs}px "Oswald",sans-serif`;
+  while(ctx.measureText(card.name).width>iW-24&&fs>Math.round(28*s)){fs--;ctx.font=`700 ${fs}px "Oswald",sans-serif`;}
+  ctx.fillStyle=nameColor; ctx.textBaseline='middle';
+  if(nameAlign==='center'){ctx.textAlign='center';ctx.fillText(card.name,iX+iW/2,iY+nameH/2);ctx.textAlign='left';}
+  else if(nameAlign==='right'){ctx.textAlign='right';ctx.fillText(card.name,iX+iW-12,iY+nameH/2);ctx.textAlign='left';}
+  else{ctx.fillText(card.name,iX+12,iY+nameH/2);}
+
+  // image box
+  const imgPad=Math.round(10*sx),imgX=iX+imgPad,imgY=iY+nameH+Math.round(18*sy),imgSize=iW-imgPad*2;
+  const imgR=Math.round(14*s);
+  roundRect(ctx,imgX,imgY,imgSize,imgSize,imgR); ctx.fillStyle='#fff'; ctx.fill();
+  ctx.strokeStyle=cat.color1+'40'; ctx.lineWidth=3; ctx.stroke();
+  if(card.img){
+    await new Promise(res=>{
+      toSquare(card.img,imgSize*2,sq=>{
+        if(sq){ctx.save();roundRect(ctx,imgX,imgY,imgSize,imgSize,imgR);ctx.clip();ctx.drawImage(sq,imgX,imgY,imgSize,imgSize);ctx.restore();}
+        res();
+      });
+    });
+  } else {
+    ctx.font=`${imgSize*0.4}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillStyle='#ccc';
+    ctx.fillText('🚒',imgX+imgSize/2,imgY+imgSize/2); ctx.textAlign='left';
+  }
+
+  // category badge
+  const catAlignProp=cat.catAlign||'left';
+  const catFontSize=Math.round(effCatSize(cat)*s);
+  const catH=catFontSize+Math.round(24*s);
+  const catPadX=Math.round(20*sx);
+  const botLineY=iY+iH-Math.round(50*sy);
+  const catAreaTop=imgY+imgSize;
+  const catAreaH=botLineY-catAreaTop;
+  const catY=catAreaTop+(catAreaH-catH)/2;
+  ctx.font=`900 ${catFontSize}px "Libre Franklin",sans-serif`;
+  const catW=ctx.measureText(cat.name.toUpperCase()).width+catPadX*2;
+  const catBgX=catAlignProp==='center'?iX+(iW-catW)/2:catAlignProp==='right'?iX+iW-12-catW:iX+12;
+  roundRect(ctx,catBgX,catY,catW,catH,Math.round(8*s));
+  const cg2=ctx.createLinearGradient(catBgX,0,catBgX+catW,0);
+  cg2.addColorStop(0,cat.color1); cg2.addColorStop(1,cat.color2);
+  ctx.fillStyle=cg2; ctx.fill();
+  ctx.fillStyle=cat.textColor||'#fff'; ctx.textBaseline='middle';
+  ctx.fillText(cat.name.toUpperCase(),catBgX+catPadX,catY+catH/2);
+
+  // bottom bar
+  const showSerial=globalSettings.serialShow!==false;
+  ctx.strokeStyle=botBorder(cat); ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(iX+8,botLineY); ctx.lineTo(iX+iW-8,botLineY); ctx.stroke();
+  if(showSerial){
+    ctx.font=`400 ${Math.round(18*s)}px "Libre Franklin",sans-serif`;
+    ctx.fillStyle=serialCol(cat); ctx.textBaseline='middle';
+    ctx.fillText(card.serial,iX+12,botLineY+Math.round(25*sy));
+  }
+  ctx.font=`${Math.round(24*s)}px serif`; ctx.textAlign='right';
+  ctx.fillText('🔥',iX+iW-12,botLineY+Math.round(25*sy)); ctx.textAlign='left';
+  return c;
+}
+
+async function drawBackOnCanvas(){
+  const c=document.createElement('canvas'); c.width=PW; c.height=PH;
+  const ctx=c.getContext('2d');
+  if(bgImg){
+    await new Promise(res=>{
+      const img=new Image();
+      img.onload=()=>{
+        try{
+          roundRect(ctx,0,0,PW,PH,36); ctx.save(); ctx.clip();
+          ctx.fillStyle='#000'; ctx.fillRect(0,0,PW,PH);
+          const scale=globalSettings.bgScale||'fit';
+          let dx,dy,dw,dh;
+          if(scale==='stretch'){
+            dx=0;dy=0;dw=PW;dh=PH;
+          } else if(scale==='cover'){
+            const r=Math.max(PW/img.width,PH/img.height);
+            dw=img.width*r; dh=img.height*r;
+            dx=(PW-dw)/2; dy=(PH-dh)/2;
+          } else { // fit
+            const r=Math.min(PW/img.width,PH/img.height);
+            dw=img.width*r; dh=img.height*r;
+            dx=(PW-dw)/2; dy=(PH-dh)/2;
+          }
+          ctx.drawImage(img,dx,dy,dw,dh);
+          ctx.restore();
+        }catch(e){}
+        res();
+      };
+      img.onerror=()=>res(); img.src=bgImg;
+    });
+  } else {
+    roundRect(ctx,0,0,PW,PH,36); ctx.save(); ctx.clip();
+    const bg=ctx.createLinearGradient(0,0,PW,PH);
+    bg.addColorStop(0,'#7f0000'); bg.addColorStop(.4,'#c62828'); bg.addColorStop(.7,'#8b0000'); bg.addColorStop(1,'#4a0000');
+    ctx.fillStyle=bg; ctx.fillRect(0,0,PW,PH);
+    const glow=ctx.createRadialGradient(PW/2,0,0,PW/2,0,PH*.6);
+    glow.addColorStop(0,'rgba(255,200,0,.18)'); glow.addColorStop(1,'transparent');
+    ctx.fillStyle=glow; ctx.fillRect(0,0,PW,PH); ctx.restore();
+    const bp=12,br=30;
+    roundRect(ctx,bp,bp,PW-bp*2,PH-bp*2,br); ctx.strokeStyle='rgba(255,215,0,.5)'; ctx.lineWidth=3; ctx.stroke();
+    roundRect(ctx,bp+9,bp+9,PW-bp*2-18,PH-bp*2-18,br-4); ctx.strokeStyle='rgba(255,215,0,.2)'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.font=`${PW*.22}px serif`; ctx.textAlign='center'; ctx.textBaseline='alphabetic'; ctx.fillText('🔥',PW/2,PH*.38);
+    ctx.font=`700 ${PW*.1}px "Oswald",sans-serif`; ctx.fillStyle='#FFD600';
+    ctx.shadowColor='rgba(255,100,0,.7)'; ctx.shadowBlur=20;
+    ctx.fillText('FEUERWEHR',PW/2,PH*.52); ctx.fillText('GERÄTEKUNDE',PW/2,PH*.63); ctx.shadowBlur=0;
+    ctx.strokeStyle='rgba(255,215,0,.4)'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(PW*.2,PH*.68); ctx.lineTo(PW*.8,PH*.68); ctx.stroke();
+    ctx.font=`600 ${PW*.038}px "Libre Franklin",sans-serif`; ctx.fillStyle='rgba(255,215,0,.6)';
+    ctx.fillText('GERÄTEKUNDE EDITION',PW/2,PH*.74);
+    ctx.font=`${PW*.1}px serif`; ctx.fillText('🚒 🪣 ⛑️',PW/2,PH*.85); ctx.textAlign='left';
+  }
+  return c;
+}
+
+/* ============================================================  PRINT (new: window.open approach)  ============================================================ */
+function setStatus(text){
+  document.getElementById('statusText').textContent=text;
+  document.getElementById('statusBar').classList.add('show');
+}
+function hideStatus(){document.getElementById('statusBar').classList.remove('show');}
+
+async function doPrint(){
+  if(!cards.length){alert('Keine Karten vorhanden!');return;}
+  const btn=document.getElementById('btnPrint');
+  if(btn) btn.disabled=true;
+  setStatus('Schriften laden…');
+
+  try{await document.fonts.load('700 48px "Oswald"');}catch(e){}
+  try{await document.fonts.load('900 22px "Libre Franklin"');}catch(e){}
+
+  setStatus('Rückseite rendern…');
+  const backCanvas=await drawBackOnCanvas();
+  const backURL=backCanvas.toDataURL('image/png');
+
+  // Build array of page image pairs
+  const pages=[];
+  for(let p=0;p<Math.ceil(cards.length/9);p++){
+    const slice=cards.slice(p*9,p*9+9);
+    const frontURLs=[];
+    for(let i=0;i<slice.length;i++){
+      setStatus(`Karte ${p*9+i+1} / ${cards.length} rendern…`);
+      try{
+        const cv=await drawCardOnCanvas(slice[i]);
+        frontURLs.push(cv.toDataURL('image/png'));
+      }catch(e){frontURLs.push(null);}
+    }
+    pages.push({frontURLs,slice});
+  }
+
+  setStatus('Druckfenster öffnen…');
+
+  // Determine back-page cell order based on duplex mode
+  // Grid positions (0-indexed, row-major):
+  //   Front:  [0][1][2]
+  //           [3][4][5]
+  //           [6][7][8]
+  //
+  // Lange Kante  = flip left↔right (mirror horizontal):
+  //   Back:   [2][1][0]
+  //           [5][4][3]
+  //           [8][7][6]
+  //
+  // Kurze Kante  = flip top↔bottom (mirror vertical):
+  //   Back:   [6][7][8]
+  //           [3][4][5]
+  //           [0][1][2]
+  //
+  // Manuell = no transformation (same order):
+  //   Back:   [0][1][2]
+  //           [3][4][5]
+  //           [6][7][8]
+  const duplexMode=document.querySelector('input[name="duplexMode"]:checked')?.value||'longEdge';
+  const MIRRORED = duplexMode==='longEdge'  ? [2,1,0, 5,4,3, 8,7,6]
+                 : duplexMode==='shortEdge' ? [6,7,8, 3,4,5, 0,1,2]
+                 :                            [0,1,2, 3,4,5, 6,7,8];
+  let pagesHtml='';
+  pages.forEach(({frontURLs,slice})=>{
+    // front
+    let frontCells='';
+    for(let i=0;i<9;i++){
+      if(i<frontURLs.length&&frontURLs[i])
+        frontCells+=`<div class="cell"><img src="${frontURLs[i]}"></div>`;
+      else
+        frontCells+=`<div class="cell empty"></div>`;
+    }
+    // back mirrored
+    let backCells='';
+    MIRRORED.forEach(idx=>{
+      if(idx<slice.length)
+        backCells+=`<div class="cell"><img src="${backURL}"></div>`;
+      else
+        backCells+=`<div class="cell empty"></div>`;
+    });
+    pagesHtml+=`<div class="page">${frontCells}</div><div class="page">${backCells}</div>`;
+  });
+
+  const duplexLabel = duplexMode==='longEdge' ? 'Lange Kante' : duplexMode==='shortEdge' ? 'Kurze Kante' : 'Manuell';
+  // A4 = 210×297mm, canvas ratio 630:880
+  // Card: width=62mm, height=62*(880/630)=86.54mm
+  // Grid: 3×62 + 2×1.5 = 189mm wide  → pad left/right = (210-189)/2 = 10.5mm
+  //       3×86.54 + 2×1.5 = 262.62mm → pad top/bottom = (297-262.62)/2 = 17.19mm
+  const printHtml=`<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<title>Feuerwehr Karten</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+/* Remove all browser headers/footers */
+@page{
+  size:A4 portrait;
+  margin:0;
+}
+html,body{
+  width:210mm;
+  background:#fff;
+}
+body{
+  /* Center the grid using padding instead of @page margin */
+  padding:17.19mm 10.5mm;
+}
+.page{
+  width:189mm;
+  height:262.62mm;
+  display:grid;
+  grid-template-columns:repeat(3,62mm);
+  grid-template-rows:repeat(3,86.54mm);
+  gap:1.5mm;
+  page-break-after:always;
+  break-after:page;
+}
+.page:last-child{page-break-after:auto;break-after:auto;}
+.cell{width:62mm;height:86.54mm;overflow:hidden;}
+.cell img{width:100%;height:100%;display:block;}
+.cell.empty{border:.3mm dashed #ddd;}
+</style>
+</head><body>${pagesHtml}</body></html>`;
+
+  // Use hidden iframe — bypasses popup blocker entirely
+  let iframe=document.getElementById('printFrame');
+  if(!iframe){
+    iframe=document.createElement('iframe');
+    iframe.id='printFrame';
+    iframe.style.cssText='position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none;';
+    document.body.appendChild(iframe);
+  }
+
+  iframe.onload=function(){
+    try{
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    }catch(e){
+      // Last resort: download the file
+      const blob=new Blob([printHtml],{type:'text/html'});
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download=`feuerwehr-karten-druck-${duplexLabel}.html`;
+      a.click();
+      setTimeout(()=>URL.revokeObjectURL(a.href),10000);
+    }
+    hideStatus();
+    if(btn) btn.disabled=false;
+  };
+
+  const blob=new Blob([printHtml],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  iframe.src=url;
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+}
+
+/* ============================================================  SAVE / LOAD  ============================================================ */
+
+// ---- Helper: load JSZip ----
+async function ensureJSZip(){
+  if(window.JSZip) return window.JSZip;
+  return new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+    s.onload=()=>res(window.JSZip); s.onerror=()=>rej(new Error('JSZip nicht geladen'));
+    document.head.appendChild(s);
+  });
+}
+
+// ---- Save as JSON (bilder eingebettet, wie bisher) ----
+function saveProject(){
+  const data={
+    version:2,
+    categories, prefixes,
+    cards: cards.map(c=>({...c})),
+    bgImg: bgImg||null,
+    globalSettings,
+    savedAt: new Date().toISOString(),
+  };
+  const blob=new Blob([JSON.stringify(data)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`feuerwehr-karten-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),10000);
+}
+
+// ---- Save as ZIP (JSON ohne Bilder + Bilder als separate Dateien) ----
+async function saveProjectZip(){
+  setStatus('ZIP wird erstellt…');
+  let JSZip;
+  try{ JSZip = await ensureJSZip(); }
+  catch(e){ hideStatus(); alert('ZIP-Export benötigt Internetverbindung für JSZip.'); return; }
+
+  const zip = new JSZip();
+  const imgFolder = zip.folder('bilder');
+
+  // Strip images from cards, store filename references instead
+  const cardsStripped = cards.map(c=>{
+    if(!c.img) return {...c, img:null};
+    const ext = c.img.startsWith('data:image/png') ? 'png' : 'jpg';
+    const filename = `${c.serial}-${c.name.replace(/[^a-zA-Z0-9äöüÄÖÜß\-_ ]/g,'').trim()}.${ext}`;
+    // Store image in zip
+    const base64 = c.img.split(',')[1];
+    imgFolder.file(filename, base64, {base64:true});
+    return {...c, img: filename}; // only filename in JSON
+  });
+
+  // Handle background image
+  let bgImgFile = null;
+  if(bgImg){
+    const ext = bgImg.startsWith('data:image/png') ? 'png' : 'jpg';
+    bgImgFile = `rueckseite.${ext}`;
+    const base64 = bgImg.split(',')[1];
+    zip.file(`bilder/${bgImgFile}`, base64, {base64:true});
+  }
+
+  const data = {
+    version: 3,
+    format: 'zip', // marker so loader knows images are separate files
+    categories,
+    cards: cardsStripped,
+    bgImg: bgImgFile,
+    globalSettings,
+    savedAt: new Date().toISOString(),
+  };
+  zip.file('projekt.json', JSON.stringify(data, null, 2));
+
+  const blob = await zip.generateAsync({type:'blob', compression:'DEFLATE', compressionOptions:{level:6}});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `feuerwehr-karten-${new Date().toISOString().slice(0,10)}.zip`;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),10000);
+  hideStatus();
+}
+
+// Default values used when a saved field is missing or invalid
+const CAT_DEFAULTS = {color1:'#888',color2:'#aaa',textColor:'#fff',nameColor:'#111',
+  nameAlign:'left',catAlign:'left',innerMode:'white',gradColor:'#888',
+  gradUseCustom:false,gradIntensity:10,catSize:28};
+const CARD_DEFAULTS = {name:'Unbekannt',catId:null,img:null,serial:'FW-000',prefixId:null};
+const GLOBAL_DEFAULTS = {catSize:28,serialColor:'#bbbbbb',bgScale:'fit',serialShow:true};
+const PREFIX_DEFAULTS = [
+  {id:'p1',value:'FW-', label:'Feuerwehr'},
+  {id:'p2',value:'LF-', label:'Löschfahrzeug'},
+  {id:'p3',value:'HLF-',label:'Hilfeleistungslöschfahrzeug'},
+  {id:'p4',value:'TLF-',label:'Tanklöschfahrzeug'},
+];
+
+function sanitizeCategory(cat){
+  if(!cat||typeof cat!=='object') return null;
+  return Object.assign({}, CAT_DEFAULTS, cat,
+    {id: cat.id||('c'+Date.now()+Math.random()),
+     name: cat.name||'Kategorie'});
+}
+function sanitizeCard(card, idx){
+  if(!card||typeof card!=='object') return null;
+  return Object.assign({}, CARD_DEFAULTS, card,
+    {id: card.id||Date.now()+Math.random(),
+     serial: card.serial||'FW-'+String(idx+1).padStart(3,'0')});
+}
+
+// ---- Apply loaded data to app state ----
+function applyProjectData(data, imageMap, silent=false){
+  // imageMap: { filename → dataURL } — for ZIP loads
+  let warnings=[];
+
+  // ── Kategorien ──
+  if(Array.isArray(data.categories)&&data.categories.length>0){
+    categories = data.categories.map(sanitizeCategory).filter(Boolean);
+  } else {
+    warnings.push('Kategorien fehlten → Standard verwendet');
+    // bestehende Default-Kategorien behalten
+  }
+
+  // ── Präfixe (seit v4; migriere ältere Formate) ──
+  if(Array.isArray(data.prefixes)&&data.prefixes.length>0){
+    prefixes = data.prefixes.map(p=>({id:p.id||('p'+Date.now()+Math.random()),value:p.value||'FW-',label:p.label||''}));
+  } else {
+    // Alte Versionen: globalSettings.serialPrefix als Präfix übernehmen
+    const legacyPrefix = data.globalSettings?.serialPrefix;
+    if(legacyPrefix && legacyPrefix.trim()){
+      const already = PREFIX_DEFAULTS.find(p=>p.value===legacyPrefix);
+      if(already){
+        prefixes = JSON.parse(JSON.stringify(PREFIX_DEFAULTS));
+        selPrefixId = already.id;
+      } else {
+        prefixes = [{id:'p_legacy',value:legacyPrefix,label:'(migriert)'},...PREFIX_DEFAULTS];
+        selPrefixId = 'p_legacy';
+      }
+      warnings.push(`Präfix "${legacyPrefix}" aus altem Format migriert`);
+    } else {
+      prefixes = JSON.parse(JSON.stringify(PREFIX_DEFAULTS));
+    }
+  }
+  if(!selPrefixId||!prefixes.find(p=>p.id===selPrefixId)) selPrefixId=prefixes[0]?.id||null;
+
+  // ── Karten ──
+  if(Array.isArray(data.cards)){
+    cards = data.cards.map((c,i)=>{
+      const card = sanitizeCard(c,i);
+      // Bild auflösen: ZIP-Format = Dateiname statt data-URL
+      if(card.img && !card.img.startsWith('data:') && imageMap){
+        card.img = imageMap[card.img] || null;
+      }
+      // Alte Versionen: kein prefixId → aus Serial ableiten
+      if(!card.prefixId){
+        const serial = card.serial||'';
+        const matched = prefixes.find(p=>serial.startsWith(p.value));
+        card.prefixId = matched ? matched.id : (prefixes[0]?.id||null);
+      }
+      return card;
+    }).filter(Boolean);
+    // Kaputte catId/prefixId reparieren
+    cards.forEach(c=>{
+      if(!categories.find(cat=>cat.id===c.catId)) c.catId=categories[0]?.id||null;
+      if(!prefixes.find(p=>p.id===c.prefixId)) c.prefixId=prefixes[0]?.id||null;
+    });
+  } else {
+    cards=[];
+    warnings.push('Keine Karten gefunden');
+  }
+
+  // ── Rückseitenbild ──
+  if(data.bgImg!==undefined){
+    let bg = data.bgImg||null;
+    if(bg && !bg.startsWith('data:') && imageMap) bg = imageMap[bg]||null;
+    bgImg = bg;
+    const bgPrevEl=document.getElementById('bgPrev');
+    if(bgPrevEl){
+      if(bgImg){bgPrevEl.src=bgImg;bgPrevEl.style.display='block';document.getElementById('bgZone')?.classList.add('has');}
+      else{bgPrevEl.style.display='none';document.getElementById('bgZone')?.classList.remove('has');}
+    }
+  }
+
+  // ── Globale Einstellungen ──
+  const gs=(data.globalSettings&&typeof data.globalSettings==='object')?data.globalSettings:{};
+  globalSettings=Object.assign({},GLOBAL_DEFAULTS,gs);
+  delete globalSettings.serialPrefix; // in neuem Format nicht mehr relevant
+
+  // UI defensiv aktualisieren — Elemente könnten fehlen
+  const safeSet=(id,val)=>{ const el=document.getElementById(id); if(el) el.value=val; };
+  const safeText=(id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=val; };
+  safeSet('gCatSize', globalSettings.catSize);
+  safeText('gCatSizeVal', globalSettings.catSize);
+  safeSet('gSerialColor', globalSettings.serialColor);
+  safeSet('gSerialColorHex', globalSettings.serialColor);
+  const bgScaleEl=document.querySelector(`input[name="bgScale"][value="${globalSettings.bgScale}"]`);
+  if(bgScaleEl) bgScaleEl.checked=true;
+  const ssEl=document.getElementById('gSerialShow'); if(ssEl) ssEl.checked=globalSettings.serialShow!==false;
+
+  if(!selCatId||!categories.find(c=>c.id===selCatId)) selCatId=categories[0]?.id||null;
+  invalidatePrintCache();
+  renderCatList(); renderCatMgmt(); renderPrefixListNew(); renderPrefixMgmt(); render();
+  scheduleAutosave();
+  const warnStr=warnings.length?`\n\n⚠ Hinweise:\n${warnings.join('\n')}` : '';
+  if(!silent) alert(`✅ ${cards.length} Karten geladen!${warnStr}`);
+}
+
+// ---- Load project — auto-detects JSON or ZIP ----
+function loadProject(input){
+  const f=input.files[0]; if(!f)return;
+  input.value='';
+
+  const isZip = f.name.endsWith('.zip') || f.type==='application/zip';
+
+  if(isZip){
+    loadProjectZip(f);
+  } else {
+    // JSON
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      try{
+        const data=JSON.parse(ev.target.result);
+        applyProjectData(data, null);
+      }catch(e){
+        alert('Fehler beim Laden: '+e.message+'\nDie Datei scheint kein gültiges Projektformat zu sein.');
+      }
+    };
+    reader.readAsText(f);
+  }
+}
+
+async function loadProjectZip(file){
+  setStatus('ZIP wird geladen…');
+  let JSZip;
+  try{ JSZip = await ensureJSZip(); }
+  catch(e){ hideStatus(); alert('ZIP-Laden benötigt Internetverbindung für JSZip.'); return; }
+
+  try{
+    const zip = await JSZip.loadAsync(file);
+
+    // Read projekt.json
+    const jsonFile = zip.file('projekt.json');
+    if(!jsonFile) throw new Error('projekt.json nicht im ZIP gefunden');
+    const jsonText = await jsonFile.async('string');
+    const data = JSON.parse(jsonText);
+
+    // Read all images from bilder/ folder → { filename → dataURL }
+    const imageMap = {};
+    const imageFiles = Object.keys(zip.files).filter(name=>name.startsWith('bilder/')&&!zip.files[name].dir);
+    await Promise.all(imageFiles.map(async path=>{
+      const filename = path.replace('bilder/','');
+      const base64 = await zip.files[path].async('base64');
+      const ext = filename.split('.').pop().toLowerCase();
+      const mime = ext==='png'?'image/png':'image/jpeg';
+      imageMap[filename] = `data:${mime};base64,${base64}`;
+    }));
+
+    hideStatus();
+    applyProjectData(data, imageMap);
+  }catch(e){
+    hideStatus();
+    alert('Fehler beim Laden des ZIPs: '+e.message);
+  }
+}
+
+/* ============================================================  UPLOADS  ============================================================ */
+document.getElementById('upInput').addEventListener('change',function(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{curImg=ev.target.result;const p=document.getElementById('upPrev');p.src=curImg;p.style.display='block';document.getElementById('upZone').classList.add('has');};
+  r.readAsDataURL(f);
+});
+document.getElementById('bgInput').addEventListener('change',function(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{bgImg=ev.target.result;const p=document.getElementById('bgPrev');p.src=bgImg;p.style.display='block';document.getElementById('bgZone').classList.add('has');scheduleAutosave();};
+  r.readAsDataURL(f);
+});
+function clearBg(){bgImg=null;document.getElementById('bgPrev').style.display='none';document.getElementById('bgZone').classList.remove('has');}
+
+/* ============================================================  ADD / DELETE CARDS  ============================================================ */
+function addCard(){
+  const name=document.getElementById('devName').value.trim();
+  if(!name){alert('Bitte Gerätename eingeben!');return;}
+  if(!selCatId){alert('Bitte Kategorie wählen!');return;}
+  const pfx=getSelPrefix();
+  const num=String(cards.filter(c=>c.prefixId===selPrefixId).length+1).padStart(3,'0');
+  cards.push({id:Date.now(),name,catId:selCatId,img:curImg,serial:pfx.value+num,prefixId:selPrefixId});
+  document.getElementById('devName').value='';
+  document.getElementById('upPrev').style.display='none';
+  document.getElementById('upZone').classList.remove('has');
+  curImg=null; scheduleAutosave(); render();
+}
+function deleteCard(id){if(!confirm('Karte löschen?'))return;cards=cards.filter(c=>c.id!==id);invalidatePrintCache(id);scheduleAutosave();render();}
+function clearAll(){if(cards.length&&confirm('Alle Karten löschen?')){cards=[];invalidatePrintCache();scheduleAutosave();render();}}
+
+/* ============================================================  CARD EDIT MODAL  ============================================================ */
+function openCardModal(id){
+  editingCardId=id; editCardImg=undefined;
+  const card=cards.find(c=>c.id===id); if(!card)return;
+  document.getElementById('eName').value=card.name;
+  renderEditCatList(card.catId);
+  const ep=document.getElementById('eUpPrev');
+  if(card.img){ep.src=card.img;ep.style.display='block';document.getElementById('eUpZone').classList.add('has');}
+  else{ep.style.display='none';ep.src='';document.getElementById('eUpZone').classList.remove('has');}
+  document.getElementById('cardModal').classList.add('open');
+}
+function closeCardModal(){document.getElementById('cardModal').classList.remove('open');}
+function renderEditCatList(selectedId){
+  const el=document.getElementById('eCatList'); el.innerHTML='';
+  categories.forEach(cat=>{
+    const d=document.createElement('div');
+    d.className='cat-item'+(cat.id===selectedId?' selected':'');
+    d.dataset.catid=cat.id;
+    d.onclick=()=>{el.querySelectorAll('.cat-item').forEach(x=>x.classList.remove('selected'));d.classList.add('selected');};
+    d.innerHTML=`<div class="cat-dot" style="background:${cat.color1};border-color:${cat.color2};"></div><span class="cat-lbl">${cat.name}</span>`;
+    el.appendChild(d);
+  });
+}
+document.getElementById('eUpInput').addEventListener('change',function(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{editCardImg=ev.target.result;const p=document.getElementById('eUpPrev');p.src=editCardImg;p.style.display='block';document.getElementById('eUpZone').classList.add('has');};
+  r.readAsDataURL(f);
+});
+function clearEditImg(){editCardImg=null;document.getElementById('eUpPrev').style.display='none';document.getElementById('eUpZone').classList.remove('has');}
+function saveCard(){
+  const name=document.getElementById('eName').value.trim();
+  if(!name){alert('Bitte Namen eingeben');return;}
+  const selItem=document.getElementById('eCatList').querySelector('.selected');
+  const catId=selItem?selItem.dataset.catid:categories[0].id;
+  const idx=cards.findIndex(c=>c.id===editingCardId); if(idx<0)return;
+  cards[idx].name=name; cards[idx].catId=catId;
+  if(editCardImg!==undefined) cards[idx].img=editCardImg;
+  invalidatePrintCache(editingCardId);
+  scheduleAutosave();
+  closeCardModal(); render();
+}
+
+/* ============================================================  CATEGORY MODAL  ============================================================ */
+function renderCatList(){
+  const el=document.getElementById('catList'); el.innerHTML='';
+  categories.forEach(cat=>{
+    const d=document.createElement('div');
+    d.className='cat-item'+(cat.id===selCatId?' selected':'');
+    d.onclick=()=>{selCatId=cat.id;renderCatList();};
+    d.innerHTML=`<div class="cat-dot" style="background:${cat.color1};border-color:${cat.color2};"></div><span class="cat-lbl" style="color:${cat.id===selCatId?cat.color2:'var(--text)'};">${cat.name}</span>`;
+    el.appendChild(d);
+  });
+}
+function renderCatMgmt(){
+  const el=document.getElementById('catMgmtList'); el.innerHTML='';
+  categories.forEach(cat=>{
+    const d=document.createElement('div'); d.className='cat-item';
+    d.innerHTML=`<div class="cat-dot" style="background:${cat.color1};border-color:${cat.color2};"></div><span class="cat-lbl">${cat.name}</span><button class="cat-edit-btn" onclick="openCatModal('${cat.id}')">✎</button>`;
+    el.appendChild(d);
+  });
+}
+
+/* ============================================================  PREFIX FUNCTIONS  ============================================================ */
+function renderPrefixListNew(){
+  const el=document.getElementById('prefixListNew'); if(!el) return;
+  el.innerHTML='';
+  prefixes.forEach(pfx=>{
+    const d=document.createElement('div');
+    d.className='prefix-item'+(pfx.id===selPrefixId?' sel':'');
+    d.onclick=()=>{selPrefixId=pfx.id;renderPrefixListNew();};
+    d.innerHTML=`<div class="prefix-dot"></div><span class="prefix-lbl">${pfx.value}</span><span style="font-size:.62rem;color:var(--text2);flex:1;">${pfx.label||''}</span>`;
+    el.appendChild(d);
+  });
+}
+function renderPrefixMgmt(){
+  const el=document.getElementById('prefixMgmtList'); if(!el) return;
+  el.innerHTML='';
+  prefixes.forEach(pfx=>{
+    const d=document.createElement('div'); d.className='prefix-item';
+    d.innerHTML=`<div class="prefix-dot"></div><span class="prefix-lbl">${pfx.value}</span><span style="font-size:.62rem;color:var(--text2);flex:1;">${pfx.label||''}</span><button class="prefix-edit-btn" onclick="openPrefixModal('${pfx.id}')">✎</button>`;
+    el.appendChild(d);
+  });
+}
+function openPrefixModal(id){
+  editingPrefixId=id;
+  document.getElementById('prefixModalTitle').textContent=id?'PRÄFIX BEARBEITEN':'NEUER PRÄFIX';
+  document.getElementById('mPrefixDel').style.display=id?'block':'none';
+  if(id){const pfx=getPrefix(id);document.getElementById('mPrefixVal').value=pfx.value;document.getElementById('mPrefixLabel').value=pfx.label||'';}
+  else{document.getElementById('mPrefixVal').value='';document.getElementById('mPrefixLabel').value='';}
+  document.getElementById('prefixModal').classList.add('open');
+}
+function closePrefixModal(){document.getElementById('prefixModal').classList.remove('open');editingPrefixId=null;}
+function savePrefix(){
+  const val=document.getElementById('mPrefixVal').value.trim();
+  if(!val){alert('Bitte Kürzel eingeben!');return;}
+  const label=document.getElementById('mPrefixLabel').value.trim();
+  if(editingPrefixId){
+    const pfx=prefixes.find(p=>p.id===editingPrefixId);
+    if(pfx){pfx.value=val;pfx.label=label;}
+    // Update serials of cards using this prefix
+    cards.forEach(c=>{if(c.prefixId===editingPrefixId) c.serial=val+c.serial.replace(/^[^0-9]*/,'');});
+  } else {
+    prefixes.push({id:'p'+Date.now(),value:val,label});
+  }
+  closePrefixModal(); renderPrefixListNew(); renderPrefixMgmt(); render(); scheduleAutosave();
+}
+function deleteCurPrefix(){
+  if(!editingPrefixId) return;
+  if(prefixes.length<=1){alert('Mindestens ein Präfix muss vorhanden sein!');return;}
+  if(!confirm('Präfix löschen? Karten mit diesem Präfix behalten ihre Seriennummer.')) return;
+  prefixes=prefixes.filter(p=>p.id!==editingPrefixId);
+  if(selPrefixId===editingPrefixId) selPrefixId=prefixes[0].id;
+  closePrefixModal(); renderPrefixListNew(); renderPrefixMgmt();
+}
+
+function openCatModal(id){
+  editingCatId=id;
+  document.getElementById('catModalTitle').textContent=id?'KATEGORIE BEARBEITEN':'NEUE KATEGORIE';
+  document.getElementById('mCatDel').style.display=id?'block':'none';
+  if(id){
+    const cat=getCat(id);
+    document.getElementById('mCatName').value=cat.name;
+    document.getElementById('mColor1').value=cat.color1;
+    document.getElementById('mColor2').value=cat.color2;
+    document.getElementById('mTextColor').value=cat.textColor||'#fff';
+    document.getElementById('mNameColor').value=cat.nameColor||'#111111';
+    // sync hex fields
+    document.getElementById('mColor1Hex').value=cat.color1;
+    document.getElementById('mColor2Hex').value=cat.color2;
+    document.getElementById('mTextColorHex').value=cat.textColor||'#fff';
+    document.getElementById('mNameColorHex').value=cat.nameColor||'#111111';
+    ['mColor1Hex','mColor2Hex','mTextColorHex','mNameColorHex','mGradColorHex'].forEach(id=>document.getElementById(id).classList.remove('invalid'));
+    const mode=cat.innerMode||(cat.darkInner?'dark':'white');
+    document.querySelector(`input[name="innerMode"][value="${mode}"]`).checked=true;
+    document.querySelector(`input[name="nameAlign"][value="${cat.nameAlign||'left'}"]`).checked=true;
+    document.querySelector(`input[name="catAlign"][value="${cat.catAlign||'left'}"]`).checked=true;
+    // gradient extras
+    const gc=cat.gradColor||cat.color1;
+    document.getElementById('mGradColor').value=gc;
+    document.getElementById('mGradColorHex').value=gc;
+    document.getElementById('mGradUseCustom').checked=!!cat.gradUseCustom;
+    document.getElementById('mGradIntensity').value=cat.gradIntensity||10;
+    document.getElementById('mGradIntensityVal').textContent=(cat.gradIntensity||10)+'%';
+    document.getElementById('mCatSize').value=cat.catSize||28;
+    document.getElementById('mCatSizeVal').textContent=cat.catSize||28;
+  } else {
+    document.getElementById('mCatName').value='';
+    document.getElementById('mColor1').value='#888888';
+    document.getElementById('mColor2').value='#aaaaaa';
+    document.getElementById('mTextColor').value='#ffffff';
+    document.getElementById('mNameColor').value='#111111';
+    document.getElementById('mColor1Hex').value='#888888';
+    document.getElementById('mColor2Hex').value='#aaaaaa';
+    document.getElementById('mTextColorHex').value='#ffffff';
+    document.getElementById('mNameColorHex').value='#111111';
+    document.getElementById('mGradColorHex').value='#888888';
+    ['mColor1Hex','mColor2Hex','mTextColorHex','mNameColorHex','mGradColorHex'].forEach(id=>document.getElementById(id).classList.remove('invalid'));
+    document.getElementById('mInnerWhite').checked=true;
+    document.getElementById('mNameLeft').checked=true;
+    document.getElementById('mCatLeft').checked=true;
+    document.getElementById('mGradColor').value='#888888';
+    document.getElementById('mGradUseCustom').checked=false;
+    document.getElementById('mGradIntensity').value=10;
+    document.getElementById('mGradIntensityVal').textContent='10%';
+    document.getElementById('mCatSize').value=28;
+    document.getElementById('mCatSizeVal').textContent='28';
+  }
+  updateGradOptions();
+  updateCatPreview();
+  document.getElementById('catModal').classList.add('open');
+}
+function closeCatModal(){document.getElementById('catModal').classList.remove('open');}
+
+function updateGradOptions(){
+  const mode=document.querySelector('input[name="innerMode"]:checked')?.value||'white';
+  document.getElementById('gradOptions').classList.toggle('show',mode==='gradient');
+}
+
+function updateCatPreview(){
+  const c1=document.getElementById('mColor1').value,c2=document.getElementById('mColor2').value;
+  const nameColor=document.getElementById('mNameColor').value;
+  const mode=document.querySelector('input[name="innerMode"]:checked')?.value||'white';
+  const useCustom=document.getElementById('mGradUseCustom').checked;
+  const gradColor=document.getElementById('mGradColor').value;
+  const intensity=parseInt(document.getElementById('mGradIntensity').value)||10;
+  const col=(mode==='gradient'&&useCustom)?gradColor:c1;
+  const opa=intensity/100;
+  const ib=mode==='dark'?darken(c1,0.18)
+    :mode==='gradient'?`linear-gradient(160deg,${mixWithWhite(col,opa)},${mixWithWhite(col,opa*0.4)})`
+    :'#fffef8';
+  const nameAlignVal=document.querySelector('input[name="nameAlign"]:checked')?.value||'left';
+  const catSizeVal=parseInt(document.getElementById('mCatSize').value)||28;
+  const catFsPreview=Math.round(catSizeVal*0.26*10)/10+'px';
+  document.getElementById('cpsOuter').style.background=`linear-gradient(135deg,${c1},${c2})`;
+  document.getElementById('cpsInner').style.background=ib;
+  document.getElementById('cpsName').style.color=nameColor;
+  document.getElementById('cpsName').style.textAlign=nameAlignVal;
+  document.getElementById('cpsName').style.width='100%';
+  document.getElementById('cpsName').style.fontSize=catFsPreview;
+  document.getElementById('cpsName').textContent=document.getElementById('mCatName').value||'Vorschau';
+}
+
+['mCatName','mColor1','mColor2','mTextColor','mGradColor','mNameColor'].forEach(id=>
+  document.getElementById(id).addEventListener('input',updateCatPreview));
+document.querySelectorAll('input[name="innerMode"]').forEach(r=>r.addEventListener('change',()=>{updateGradOptions();updateCatPreview();}));
+document.querySelectorAll('input[name="nameAlign"],input[name="catAlign"]').forEach(r=>r.addEventListener('change',updateCatPreview));
+document.getElementById('mGradUseCustom').addEventListener('change',updateCatPreview);
+document.getElementById('mGradIntensity').addEventListener('input',function(){
+  document.getElementById('mGradIntensityVal').textContent=this.value+'%';
+  updateCatPreview();
+});
+document.getElementById('mCatSize').addEventListener('input',function(){
+  document.getElementById('mCatSizeVal').textContent=this.value;
+  updateCatPreview();
+});
+document.getElementById('catModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCatModal();});
+document.getElementById('cardModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCardModal();});
+
+function saveCat(){
+  const name=document.getElementById('mCatName').value.trim();
+  if(!name){alert('Bitte Name eingeben');return;}
+  const cat={
+    id:editingCatId||('c'+Date.now()),
+    name,
+    color1:document.getElementById('mColor1').value,
+    color2:document.getElementById('mColor2').value,
+    textColor:document.getElementById('mTextColor').value,
+    nameColor:document.getElementById('mNameColor').value,
+    nameAlign:document.querySelector('input[name="nameAlign"]:checked')?.value||'left',
+    catAlign:document.querySelector('input[name="catAlign"]:checked')?.value||'left',
+    innerMode:document.querySelector('input[name="innerMode"]:checked')?.value||'white',
+    gradColor:document.getElementById('mGradColor').value,
+    gradUseCustom:document.getElementById('mGradUseCustom').checked,
+    gradIntensity:parseInt(document.getElementById('mGradIntensity').value)||10,
+    catSize:parseInt(document.getElementById('mCatSize').value)||28,
+  };
+  if(editingCatId){const i=categories.findIndex(c=>c.id===editingCatId);if(i>=0)categories[i]=cat;}
+  else{categories.push(cat);selCatId=cat.id;}
+  invalidatePrintCache();
+  scheduleAutosave();
+  closeCatModal();renderCatList();renderCatMgmt();render();
+}
+function deleteCat(){
+  if(!editingCatId||!confirm('Kategorie löschen?'))return;
+  categories=categories.filter(c=>c.id!==editingCatId);
+  if(selCatId===editingCatId)selCatId=categories[0]?.id||null;
+  closeCatModal();renderCatList();renderCatMgmt();render();
+}
+
+/* ============================================================  BULK IMPORT  ============================================================ */
+let bulkTab='photos', bulkFiles=[];
+function openBulkModal(){
+  const sel=document.getElementById('bulkCatSel'); sel.innerHTML='';
+  categories.forEach(cat=>{const o=document.createElement('option');o.value=cat.id;o.textContent=cat.name;if(cat.id===selCatId)o.selected=true;sel.appendChild(o);});
+  bulkFiles=[]; csvRows=[]; csvImages={};
+  document.getElementById('bulkFileList').innerHTML='';
+  document.getElementById('bulkPhotoSummary').textContent='';
+  document.getElementById('bulkListText').value='';
+  document.getElementById('bulkListSummary').textContent='';
+  document.getElementById('csvPreviewList').innerHTML='';
+  document.getElementById('csvSummary').textContent='';
+  switchTab('photos');
+  document.getElementById('bulkModal').classList.add('open');
+}
+function closeBulkModal(){document.getElementById('bulkModal').classList.remove('open');}
+document.getElementById('bulkModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeBulkModal();});
+function switchTab(tab){
+  bulkTab=tab;
+  const tabs=['photos','list','csv'];
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',tabs[i]===tab));
+  tabs.forEach(t=>document.getElementById('tab-'+t).classList.toggle('active',t===tab));
+}
+function stripExt(name){return name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');}
+document.getElementById('bulkFileInput').addEventListener('change',function(e){
+  const files=Array.from(e.target.files); let loaded=0;
+  files.forEach(file=>{
+    const r=new FileReader();
+    r.onload=ev=>{bulkFiles.push({name:stripExt(file.name),dataURL:ev.target.result});loaded++;if(loaded===files.length)renderBulkFileList();};
+    r.readAsDataURL(file);
+  });
+  e.target.value='';
+});
+function renderBulkFileList(){
+  const list=document.getElementById('bulkFileList'); list.innerHTML='';
+  bulkFiles.forEach((f,i)=>{
+    const row=document.createElement('div'); row.className='bulk-file-item';
+    row.innerHTML=`<img class="bulk-file-thumb" src="${f.dataURL}"/><div class="bulk-file-name"><input type="text" value="${f.name}" onchange="bulkFiles[${i}].name=this.value" /></div><button class="bulk-file-rm" onclick="bulkFiles.splice(${i},1);renderBulkFileList()">✕</button>`;
+    list.appendChild(row);
+  });
+  document.getElementById('bulkPhotoSummary').textContent=bulkFiles.length?`${bulkFiles.length} Foto${bulkFiles.length>1?'s':''} bereit`:'';
+}
+document.getElementById('bulkListText').addEventListener('input',function(){
+  const n=this.value.split('\n').filter(l=>l.trim()).length;
+  document.getElementById('bulkListSummary').textContent=n?`${n} Karte${n>1?'n':''} erkannt`:'';
+});
+function addBulkCards(){
+  const defCatId=document.getElementById('bulkCatSel').value;
+  if(bulkTab==='photos'){
+    if(!bulkFiles.length){alert('Keine Fotos ausgewählt!');return;}
+    bulkFiles.forEach(f=>{
+      const pfx=getSelPrefix();
+      const num=String(cards.filter(c=>c.prefixId===selPrefixId).length+1).padStart(3,'0');
+      cards.push({id:Date.now()+Math.random(),name:f.name.trim()||'Unbenannt',catId:defCatId,img:f.dataURL,serial:pfx.value+num,prefixId:selPrefixId});
+    });
+  } else if(bulkTab==='list'){
+    const lines=document.getElementById('bulkListText').value.split('\n').filter(l=>l.trim());
+    if(!lines.length){alert('Keine Einträge!');return;}
+    lines.forEach(line=>{
+      const parts=line.split('::'); const name=parts[0].trim(); if(!name)return;
+      let catId=defCatId;
+      if(parts[1]){const match=categories.find(c=>c.name.toLowerCase()===parts[1].trim().toLowerCase());if(match)catId=match.id;}
+      const pfx=getSelPrefix();
+      const num=String(cards.filter(c=>c.prefixId===selPrefixId).length+1).padStart(3,'0');
+      cards.push({id:Date.now()+Math.random(),name,catId,img:null,serial:pfx.value+num,prefixId:selPrefixId});
+    });
+  } else if(bulkTab==='csv'){
+    if(!csvRows.length){alert('Keine CSV-Daten geladen!');return;}
+    csvRows.forEach(row=>{
+      const name=row.name||'Unbenannt';
+      let catId=defCatId;
+      if(row.kategorie){const match=categories.find(c=>c.name.toLowerCase()===row.kategorie.toLowerCase());if(match)catId=match.id;}
+      const img=row.bild?csvImages[row.bild]||null:null;
+      const pfx=getSelPrefix();
+      const num=String(cards.filter(c=>c.prefixId===selPrefixId).length+1).padStart(3,'0');
+      cards.push({id:Date.now()+Math.random(),name,catId,img,serial:pfx.value+num,prefixId:selPrefixId});
+    });
+  }
+  closeBulkModal(); scheduleAutosave(); render();
+}
+
+/* ============================================================  CSV IMPORT  ============================================================ */
+let csvRows=[];
+let csvImages={}; // filename → dataURL
+
+function parseCSV(text){
+  const lines=text.split(/\r?\n/).filter(l=>l.trim());
+  if(!lines.length) return [];
+  // detect separator
+  const sep=lines[0].includes(';')?';':',';
+  const rows=lines.map(l=>{
+    // handle quoted fields
+    const cols=[];
+    let cur='',inQ=false;
+    for(let i=0;i<l.length;i++){
+      const ch=l[i];
+      if(ch==='"'){inQ=!inQ;}
+      else if(ch===sep&&!inQ){cols.push(cur.trim());cur='';}
+      else cur+=ch;
+    }
+    cols.push(cur.trim());
+    return cols;
+  });
+  // detect header: if first row looks like column names (no typical device names)
+  const headerKeywords=['kategorie','category','gerätename','name','bild','image','foto','photo'];
+  const firstRowLower=rows[0].map(c=>c.toLowerCase());
+  const isHeader=firstRowLower.some(c=>headerKeywords.includes(c));
+  let dataRows=isHeader?rows.slice(1):rows;
+  let colKat=0,colName=1,colBild=2;
+  if(isHeader){
+    firstRowLower.forEach((c,i)=>{
+      if(['kategorie','category'].includes(c)) colKat=i;
+      else if(['gerätename','name'].includes(c)) colName=i;
+      else if(['bild','image','foto','photo'].includes(c)) colBild=i;
+    });
+  }
+  return dataRows.map(cols=>({
+    kategorie:(cols[colKat]||'').trim(),
+    name:(cols[colName]||'').trim(),
+    bild:(cols[colBild]||'').trim(),
+  })).filter(r=>r.name);
+}
+
+document.getElementById('csvFileInput').addEventListener('change',function(e){
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    csvRows=parseCSV(ev.target.result);
+    renderCSVPreview();
+  };
+  r.readAsText(f,'UTF-8');
+  e.target.value='';
+});
+
+document.getElementById('csvImgInput').addEventListener('change',function(e){
+  const files=Array.from(e.target.files); let loaded=0;
+  files.forEach(file=>{
+    const r=new FileReader();
+    r.onload=ev=>{
+      // store by filename (with and without extension for flexible matching)
+      csvImages[file.name]=ev.target.result;
+      csvImages[stripExt(file.name)]=ev.target.result;
+      loaded++; if(loaded===files.length) renderCSVPreview();
+    };
+    r.readAsDataURL(file);
+  });
+  e.target.value='';
+});
+
+function renderCSVPreview(){
+  const list=document.getElementById('csvPreviewList'); list.innerHTML='';
+  csvRows.forEach((row,i)=>{
+    const imgKey=row.bild||(stripExt(row.bild||''));
+    const hasImg=!!(csvImages[row.bild]||csvImages[stripExt(row.bild||'')]);
+    const d=document.createElement('div'); d.className='bulk-file-item';
+    d.innerHTML=`
+      ${hasImg?`<img class="bulk-file-thumb" src="${csvImages[row.bild]||csvImages[stripExt(row.bild||'')]}" />`:'<div class="bulk-file-thumb" style="background:#2a2a2a;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#666;">—</div>'}
+      <div class="bulk-file-name" style="flex:1;overflow:hidden;">
+        <input type="text" value="${row.name}" onchange="csvRows[${i}].name=this.value;" style="width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'Libre Franklin',sans-serif;font-size:.72rem;outline:none;padding:1px 0;" />
+        <div style="font-size:.58rem;color:var(--text2);margin-top:2px;">${row.kategorie||'–'} ${row.bild?'· 🖼':'· keine Bild'}</div>
+      </div>`;
+    list.appendChild(d);
+  });
+  document.getElementById('csvSummary').textContent=
+    csvRows.length?`${csvRows.length} Karten erkannt, ${Object.keys(csvImages).length/2|0} Bilder geladen`:'';
+}
+
+/* ============================================================  COLLAPSIBLE SECTIONS  ============================================================ */
+function toggleSection(titleEl){
+  titleEl.classList.toggle('collapsed');
+  const body=titleEl.nextElementSibling;
+  if(body&&body.classList.contains('sb-body')){
+    body.style.display=titleEl.classList.contains('collapsed')?'none':'';
+  }
+}
+
+/* ============================================================  VIEW MODE & SORT  ============================================================ */
+let viewMode='dom'; // 'dom' | 'print'
+let sortOrder='serial';
+let printViewCache={}; // card.id → dataURL
+
+function setViewMode(mode){
+  viewMode=mode;
+  document.getElementById('btnViewDom').classList.toggle('active',mode==='dom');
+  document.getElementById('btnViewPrint').classList.toggle('active',mode==='print');
+  render();
+}
+
+function setSortOrder(order){
+  sortOrder=order;
+  render();
+}
+
+function getSortedCards(){
+  const sorted=[...cards];
+  if(sortOrder==='name') sorted.sort((a,b)=>a.name.localeCompare(b.name,'de'));
+  else if(sortOrder==='category'){
+    sorted.sort((a,b)=>{
+      const ca=getCat(a.catId).name, cb=getCat(b.catId).name;
+      return ca.localeCompare(cb,'de')||a.name.localeCompare(b.name,'de');
+    });
+  }
+  // serial = original order (no sort)
+  return sorted;
+}
+let showingBack=false;
+let backPreviewURL=null;
+
+function toggleFlipAll(){
+  showingBack=!showingBack;
+  const btn=document.getElementById('flipToggleBtn');
+  btn.textContent=showingBack?'🃏 Vorderseite':'🔄 Rückseite';
+  btn.classList.toggle('active',showingBack);
+  if(showingBack){
+    // render back once and show
+    drawBackOnCanvas().then(c=>{
+      backPreviewURL=c.toDataURL('image/png');
+      updateFlipDisplay();
+    });
+  } else {
+    backPreviewURL=null;
+    updateFlipDisplay();
+  }
+}
+
+function updateFlipDisplay(){
+  document.querySelectorAll('.pcard').forEach(el=>{
+    let back=el.querySelector('.card-back-overlay');
+    if(showingBack&&backPreviewURL){
+      if(!back){
+        back=document.createElement('div');
+        back.className='card-back-overlay';
+        back.style.cssText='position:absolute;inset:0;border-radius:10px;overflow:hidden;z-index:5;';
+        const img=document.createElement('img');
+        img.style.cssText='width:100%;height:100%;display:block;object-fit:cover;';
+        img.src=backPreviewURL;
+        back.appendChild(img);
+        el.appendChild(back);
+      }
+      back.style.display='block';
+    } else if(back){
+      back.style.display='none';
+    }
+  });
+}
+
+/* ============================================================  COLOR HEX INPUTS  ============================================================ */
+function isValidHex(v){return /^#[0-9A-Fa-f]{6}$/.test(v);}
+
+function applyHexToColor(colorId, hexId, onApply){
+  const hex=document.getElementById(hexId).value.trim();
+  const hexEl=document.getElementById(hexId);
+  // normalise: add # if missing
+  const val=hex.startsWith('#')?hex:'#'+hex;
+  if(isValidHex(val)){
+    hexEl.classList.remove('invalid');
+    document.getElementById(colorId).value=val;
+    if(onApply) onApply(val);
+  } else {
+    hexEl.classList.add('invalid');
+  }
+}
+
+function syncColorToHex(colorId, hexId, onApply){
+  const val=document.getElementById(colorId).value;
+  document.getElementById(hexId).value=val;
+  hexEl=document.getElementById(hexId);
+  hexEl.classList.remove('invalid');
+  if(onApply) onApply(val);
+}
+
+// Pairs: [colorInputId, hexInputId, onChangeFn]
+// Called after DOM ready — wires up bidirectional sync + preview update
+function initColorPairs(){
+  const catPairs=[
+    ['mColor1','mColor1Hex'],
+    ['mColor2','mColor2Hex'],
+    ['mTextColor','mTextColorHex'],
+    ['mNameColor','mNameColorHex'],
+    ['mGradColor','mGradColorHex'],
+  ];
+  catPairs.forEach(([cid,hid])=>{
+    const cEl=document.getElementById(cid);
+    const hEl=document.getElementById(hid);
+    if(!cEl||!hEl) return;
+    // color picker → hex field
+    cEl.addEventListener('input',()=>{
+      hEl.value=cEl.value;
+      hEl.classList.remove('invalid');
+      updateCatPreview();
+    });
+    // hex field → color picker
+    hEl.addEventListener('input',()=>{
+      let v=hEl.value.trim();
+      if(!v.startsWith('#')) v='#'+v;
+      if(isValidHex(v)){
+        hEl.classList.remove('invalid');
+        cEl.value=v;
+        updateCatPreview();
+      } else {
+        hEl.classList.add('invalid');
+      }
+    });
+  });
+}
+
+/* ============================================================  PROFESSIONAL EXPORT  ============================================================ */
+
+// 300 DPI at card size
+const CARD_DPI = 300;
+const MM_PER_INCH = 25.4;
+
+// Card size presets
+const CARD_PRESETS = {
+  pokemon: {w:63,  h:88,  label:'Pokémon'},
+  cr80:    {w:85.6,h:54,  label:'CR80'},
+  a6:      {w:105, h:148, label:'A6'},
+};
+
+function getExportCardSize(){
+  const preset = document.querySelector('input[name="cardSizePreset"]:checked')?.value || 'pokemon';
+  if(preset === 'custom'){
+    const w = parseFloat(document.getElementById('customW')?.value) || 63;
+    const h = parseFloat(document.getElementById('customH')?.value) || 88;
+    return {w, h, label:'Custom'};
+  }
+  return CARD_PRESETS[preset] || CARD_PRESETS.pokemon;
+}
+
+function updateCardSizeInputs(){
+  const preset = document.querySelector('input[name="cardSizePreset"]:checked')?.value;
+  const cf = document.getElementById('customSizeFields');
+  if(cf) cf.style.display = preset==='custom' ? 'block' : 'none';
+  invalidatePrintCache();
+  render();
+}
+
+function getPreviewSize(){
+  const sz = getExportCardSize();
+  const isLandscape = sz.w > sz.h;
+  const BASE_H = 222; // target preview height in px (like pokemon 160×222)
+  // For landscape: we rotate 90deg, so wrapper = h×w (tall), card inside = w×h rotated
+  const previewH = BASE_H;
+  const previewW = isLandscape
+    ? Math.round(BASE_H * sz.h / sz.w)  // wrapper width = proportional short side
+    : Math.round(BASE_H * sz.w / sz.h); // portrait: width proportional
+  const ratio = previewW + '/' + previewH;
+  return {w: previewW, h: previewH, ratio, sz, isLandscape};
+}
+
+function getBleedMM(){
+  return parseInt(document.querySelector('input[name="bleedMode"]:checked')?.value||'0')||0;
+}
+
+function mmToPx(mm){ return Math.round(mm / MM_PER_INCH * CARD_DPI); }
+
+async function drawCardHighRes(card, bleedMM, cardWMM, cardHMM){
+  cardWMM = cardWMM || 63;
+  cardHMM = cardHMM || 88;
+  const totalW = mmToPx(cardWMM + bleedMM*2);
+  const totalH = mmToPx(cardHMM + bleedMM*2);
+  const bleedPx = mmToPx(bleedMM);
+  const cardW = mmToPx(cardWMM);
+  const cardH = mmToPx(cardHMM);
+
+  const cat = getCat(card.catId);
+  const c = document.createElement('canvas');
+  c.width = totalW; c.height = totalH;
+  const ctx = c.getContext('2d');
+
+  // Bleed background (extend card gradient into bleed area)
+  if(bleedPx > 0){
+    const bg = ctx.createLinearGradient(0,0,totalW,totalH);
+    bg.addColorStop(0, cat.color1); bg.addColorStop(1, cat.color2);
+    ctx.fillStyle = bg; ctx.fillRect(0,0,totalW,totalH);
+  }
+
+  // Draw card at exact export dimensions
+  const srcCanvas = await drawCardOnCanvas(card, cardW, cardH);
+  ctx.drawImage(srcCanvas, bleedPx, bleedPx, cardW, cardH);
+
+  // Bleed mark lines (thin crop marks at corners if bleed > 0)
+  if(bleedPx > 0){
+    ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+    ctx.lineWidth = 1;
+    const marks = 8; // px length of crop mark
+    // top-left
+    ctx.beginPath(); ctx.moveTo(bleedPx,0); ctx.lineTo(bleedPx,marks); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,bleedPx); ctx.lineTo(marks,bleedPx); ctx.stroke();
+    // top-right
+    ctx.beginPath(); ctx.moveTo(totalW-bleedPx,0); ctx.lineTo(totalW-bleedPx,marks); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(totalW,bleedPx); ctx.lineTo(totalW-marks,bleedPx); ctx.stroke();
+    // bottom-left
+    ctx.beginPath(); ctx.moveTo(bleedPx,totalH); ctx.lineTo(bleedPx,totalH-marks); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,totalH-bleedPx); ctx.lineTo(marks,totalH-bleedPx); ctx.stroke();
+    // bottom-right
+    ctx.beginPath(); ctx.moveTo(totalW-bleedPx,totalH); ctx.lineTo(totalW-bleedPx,totalH-marks); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(totalW,totalH-bleedPx); ctx.lineTo(totalW-marks,totalH-bleedPx); ctx.stroke();
+  }
+
+  return c;
+}
+
+async function drawBackHighRes(bleedMM, cardWMM, cardHMM){
+  cardWMM = cardWMM || 63;
+  cardHMM = cardHMM || 88;
+  const totalW = mmToPx(cardWMM + bleedMM*2);
+  const totalH = mmToPx(cardHMM + bleedMM*2);
+  const bleedPx = mmToPx(bleedMM);
+  const cardW = mmToPx(cardWMM);
+  const cardH = mmToPx(cardHMM);
+
+  // Draw source back at card size
+  const srcCanvas = await drawBackOnCanvas();
+
+  const c = document.createElement('canvas');
+  c.width = totalW; c.height = totalH;
+  const ctx = c.getContext('2d');
+
+  // Bleed bg
+  if(bleedPx > 0){
+    if(bgImg){
+      ctx.fillStyle = '#000'; ctx.fillRect(0,0,totalW,totalH);
+    } else {
+      const bg = ctx.createLinearGradient(0,0,totalW,totalH);
+      bg.addColorStop(0,'#7f0000'); bg.addColorStop(1,'#4a0000');
+      ctx.fillStyle=bg; ctx.fillRect(0,0,totalW,totalH);
+    }
+  }
+
+  ctx.drawImage(srcCanvas, bleedPx, bleedPx, cardW, cardH);
+
+  if(bleedPx > 0){
+    ctx.strokeStyle='rgba(255,255,255,0.3)'; ctx.lineWidth=1;
+    const marks=8;
+    [[bleedPx,0,bleedPx,marks],[0,bleedPx,marks,bleedPx],
+     [totalW-bleedPx,0,totalW-bleedPx,marks],[totalW,bleedPx,totalW-marks,bleedPx],
+     [bleedPx,totalH,bleedPx,totalH-marks],[0,totalH-bleedPx,marks,totalH-bleedPx],
+     [totalW-bleedPx,totalH,totalW-bleedPx,totalH-marks],[totalW,totalH-bleedPx,totalW-marks,totalH-bleedPx]
+    ].forEach(([x1,y1,x2,y2])=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();});
+  }
+  return c;
+}
+
+function canvasToBlob(canvas, quality=0.95){
+  return new Promise(res=>canvas.toBlob(b=>res(b),'image/png',quality));
+}
+
+function downloadBlob(blob, filename){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=filename; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 10000);
+}
+
+async function loadJSZip(){
+  if(window.JSZip) return window.JSZip;
+  return new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+    s.onload=()=>res(window.JSZip);
+    s.onerror=()=>rej(new Error('JSZip konnte nicht geladen werden'));
+    document.head.appendChild(s);
+  });
+}
+
+/* ============================================================  QUICK EXPORT PNG  ============================================================ */
+async function quickExportPNG(){
+  if(!cards.length){alert('Keine Karten vorhanden!');return;}
+  setStatus('Exportiere…');
+  for(let i=0;i<cards.length;i++){
+    const cv=await drawCardOnCanvas(cards[i], 630, 880);
+    const a=document.createElement('a');
+    a.href=cv.toDataURL('image/png');
+    a.download=`${cards[i].serial.replace(/[^a-z0-9äöü\-]/gi,'_')}_${cards[i].name.replace(/[^a-z0-9äöü]/gi,'_')}.png`;
+    a.click();
+    document.getElementById('statusText').textContent=`Export ${i+1}/${cards.length}…`;
+    await new Promise(r=>setTimeout(r,80));
+  }
+  hideStatus();
+}
+
+/* ============================================================  EXPORT WIZARD  ============================================================ */
+let wzStep=1, wzFmt='standard', _wzPrevTimer=null;
+
+const WZ_FORMATS={
+  print:      {group:'print',  w:null,h:null,  name:'Direktdruck'},
+  standard:   {group:'paper',  w:null,h:null,  name:'Normalpapier'},
+  cardboard:  {group:'paper',  w:null,h:null,  name:'Karton-/Kartendruck'},
+  pokemon_pro:{group:'pro',    w:63,  h:88,    name:'Trading Card'},
+  cr80:       {group:'pro',    w:85.6,h:54,    name:'CR80 Plastikkarte'},
+  a6_pro:     {group:'pro',    w:105, h:148,   name:'A6 Karte'},
+  custom_pro: {group:'pro',    w:null,h:null,  name:'Benutzerdefiniert'},
+  stk_card:   {group:'sticker',w:63,  h:88,    name:'Sticker Kartengröße'},
+  stk_square: {group:'sticker',w:90,  h:90,    name:'Sticker Quadratisch'},
+  stk_custom: {group:'sticker',w:null,h:null,  name:'Sticker Eigene Größe'},
+};
+
+function mm2px(mm,dpi){return Math.round(mm/25.4*dpi);}
+
+function wzPreviewDebounced(delay=180){clearTimeout(_wzPrevTimer);_wzPrevTimer=setTimeout(wzBuildPreview,delay);}
+
+function openExportWizard(){
+  wzStep=1; wzFmt='standard';
+  // Kategorie-Filter befüllen
+  const fc=document.getElementById('wzFCat');
+  if(fc) fc.innerHTML='<option value="">Alle Kategorien</option>'+categories.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  // Präfix-Filter befüllen
+  const fp=document.getElementById('wzFPrefix');
+  if(fp) fp.innerHTML='<option value="">Alle Präfixe</option>'+prefixes.map(p=>`<option value="${p.id}">${p.value}${p.label?' – '+p.label:''}</option>`).join('');
+  document.querySelectorAll('.wz-fmt-card').forEach(e=>e.classList.remove('sel'));
+  const first=document.querySelector('.wz-fmt-card[data-fmt="standard"]');
+  if(first) first.classList.add('sel');
+  goWzStep(1);
+  wzUpdateSel();
+  document.getElementById('exportWizardOv').classList.add('open');
+  setTimeout(wzBuildPreview,80);
+}
+function closeExportWizard(){document.getElementById('exportWizardOv').classList.remove('open');}
+
+function pickWzFmt(el,fmt){
+  document.querySelectorAll('.wz-fmt-card').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+  wzFmt=fmt;
+  wzPreviewDebounced(80);
+}
+
+function goWzStep(n){
+  if(n>=2&&!wzFmt){alert('Bitte zuerst ein Format wählen!');return;}
+  wzStep=n;
+  [1,2,3].forEach(i=>{
+    document.getElementById('wzp'+i).style.display=i===n?'block':'none';
+    const stepEl=document.getElementById('wzs'+i);
+    stepEl.classList.toggle('active',i===n);
+    stepEl.classList.toggle('done',i<n);
+  });
+  if(n===2) wzSetupSettings();
+  if(n===3){wzUpdateSel();wzBuildPreview();}
+}
+
+function wzSetupSettings(){
+  const fmt=WZ_FORMATS[wzFmt]; if(!fmt) return;
+  ['paper','cardboard','pro','sticker','print'].forEach(g=>{
+    const el=document.getElementById('wz-settings-'+g);
+    if(el) el.style.display='none';
+  });
+  const iconMap={print:'🖨️',standard:'📄',cardboard:'🃏',pokemon_pro:'⚡',cr80:'💳',a6_pro:'📋',custom_pro:'✏️',stk_card:'🏷️',stk_square:'🟦',stk_custom:'📐'};
+  document.getElementById('wzSettingsIcon').textContent=iconMap[wzFmt]||'⚙️';
+  document.getElementById('wzSettingsTitle').textContent=(fmt.name||wzFmt)+' — Einstellungen';
+  if(wzFmt==='print'){
+    document.getElementById('wz-settings-print').style.display='block';
+  } else if(wzFmt==='cardboard'){
+    document.getElementById('wz-settings-cardboard').style.display='block';
+  } else if(fmt.group==='paper'){
+    document.getElementById('wz-settings-paper').style.display='block';
+  } else if(fmt.group==='pro'){
+    document.getElementById('wz-settings-pro').style.display='block';
+    document.getElementById('wzProCustom').style.display=wzFmt==='custom_pro'?'block':'none';
+    wzUpdateProInfo();
+  } else if(fmt.group==='sticker'){
+    document.getElementById('wz-settings-sticker').style.display='block';
+    document.getElementById('wzStkCustom').style.display=wzFmt==='stk_custom'?'block':'none';
+    if(fmt.w&&fmt.h){document.getElementById('wzStkW').value=fmt.w;document.getElementById('wzStkH').value=fmt.h;}
+    wzUpdateStkInfo();
+  }
+  const activeBlock=document.querySelector('#wzp2 [id^="wz-settings-"]:not([style*="display:none"],[style*="display: none"])');
+  if(activeBlock){
+    activeBlock.querySelectorAll('select,input[type=number],input[type=color]').forEach(el=>{
+      if(!el.dataset.wzWired){el.addEventListener('change',()=>wzPreviewDebounced());el.addEventListener('input',()=>wzPreviewDebounced());el.dataset.wzWired='1';}
+    });
+  }
+}
+
+function wzGetProDims(){
+  const fmt=WZ_FORMATS[wzFmt]||{};
+  let w,h;
+  if(wzFmt==='custom_pro'){w=parseFloat(document.getElementById('wzProW').value)||63;h=parseFloat(document.getElementById('wzProH').value)||88;}
+  else{w=fmt.w||63;h=fmt.h||88;}
+  const orient=document.getElementById('wzProOrient')?.value||'portrait';
+  if(orient==='portrait'&&w>h){[w,h]=[h,w];}
+  else if(orient==='landscape'&&h>w){[w,h]=[h,w];}
+  return{w,h};
+}
+function wzGetStkDims(){
+  const fmt=WZ_FORMATS[wzFmt]||{};
+  if(wzFmt==='stk_custom') return{w:parseFloat(document.getElementById('wzStkW').value)||63,h:parseFloat(document.getElementById('wzStkH').value)||88};
+  return{w:fmt.w||63,h:fmt.h||88};
+}
+
+function wzUpdateProInfo(){
+  const {w,h}=wzGetProDims();
+  const dpi=parseInt(document.getElementById('wzProDPI')?.value||300);
+  const bleed=parseFloat(document.getElementById('wzProBleed')?.value||2);
+  const pw=mm2px(w+bleed*2,dpi),ph=mm2px(h+bleed*2,dpi);
+  const el=document.getElementById('wzProInfo');
+  if(el) el.textContent=`${w}×${h}mm + ${bleed}mm Bleed · ${dpi}DPI → ${pw}×${ph}px`;
+  wzPreviewDebounced();
+}
+function wzUpdateStkInfo(){
+  const {w,h}=wzGetStkDims();
+  const dpi=parseInt(document.getElementById('wzStkDPI')?.value||300);
+  const bleed=parseFloat(document.getElementById('wzStkBleed')?.value||2);
+  const et=document.getElementById('wzStkType')?.value||'single';
+  const pw=mm2px(w+bleed*2,dpi),ph=mm2px(h+bleed*2,dpi);
+  let info=`${w}×${h}mm + ${bleed}mm Bleed · ${dpi}DPI → ${pw}×${ph}px`;
+  if(et!=='single'){
+    const paperW=et==='sheet_a3'?420:210;
+    const sw=mm2px(w+bleed*2,dpi),sh=mm2px(h+bleed*2,dpi);
+    const m=mm2px(8,dpi),g=mm2px(2,dpi);
+    const cols=Math.max(1,Math.floor((mm2px(paperW,dpi)-m*2+g)/(sw+g)));
+    const rows=Math.max(1,Math.floor((mm2px(297,dpi)-m*2+g)/(sh+g)));
+    info+=`\n${et==='sheet_a3'?'A3':'A4'}: ${cols}×${rows}=${cols*rows}/Seite`;
+  }
+  const el=document.getElementById('wzStkInfo');
+  if(el) el.textContent=info;
+  wzPreviewDebounced();
+}
+
+function wzGetCards(){
+  const fcat=document.getElementById('wzFCat')?.value||'';
+  const fpfx=document.getElementById('wzFPrefix')?.value||'';
+  return cards.filter(c=>(!fcat||c.catId===fcat)&&(!fpfx||c.prefixId===fpfx));
+}
+function wzUpdateSel(){
+  const n=wzGetCards().length;
+  const fmt=WZ_FORMATS[wzFmt];
+  const el=document.getElementById('wzSelSummary');
+  if(!el) return;
+  el.textContent=`${n} Karte${n!==1?'n':''} ausgewählt · Format: ${fmt?fmt.name:wzFmt}`;
+  const btn=document.getElementById('wzExportBtn');
+  if(btn) btn.disabled=(n===0);
+}
+
+// Helper functions
+function wz_drawCropMarks(ctx,x,y,w,h,size,lw){
+  ctx.save();ctx.strokeStyle='#aaa';ctx.lineWidth=lw;
+  [[x,y],[x+w,y],[x,y+h],[x+w,y+h]].forEach(([cx,cy])=>{
+    const sx=cx===x?-1:1,sy=cy===y?-1:1;
+    ctx.beginPath();ctx.moveTo(cx+sx*2,cy);ctx.lineTo(cx+sx*(2+size),cy);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(cx,cy+sy*2);ctx.lineTo(cx,cy+sy*(2+size));ctx.stroke();
+  });
+  ctx.restore();
+}
+function wz_drawProCropMarks(ctx,x,y,w,h,size,lw,bleedLines){
+  ctx.save();ctx.strokeStyle='#000';ctx.lineWidth=lw;
+  const off=3;
+  [[x,y],[x+w,y],[x,y+h],[x+w,y+h]].forEach(([cx,cy])=>{
+    const sx=cx===x?-1:1,sy=cy===y?-1:1;
+    ctx.beginPath();ctx.moveTo(cx+sx*off,cy);ctx.lineTo(cx+sx*(off+size),cy);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(cx,cy+sy*off);ctx.lineTo(cx,cy+sy*(off+size));ctx.stroke();
+  });
+  if(bleedLines){ctx.setLineDash([3,2]);ctx.strokeStyle='rgba(0,0,200,.3)';ctx.lineWidth=0.5;ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);}
+  ctx.restore();
+}
+function wz_drawRegistrationMark(ctx,cx,cy,r){
+  ctx.save();ctx.strokeStyle='#000';ctx.lineWidth=0.75;
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx-r*1.5,cy);ctx.lineTo(cx+r*1.5,cy);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx,cy-r*1.5);ctx.lineTo(cx,cy+r*1.5);ctx.stroke();
+  ctx.restore();
+}
+function wz_drawDimLine(ctx,x1,y1,x2,y2,label,dpr){
+  dpr=dpr||1;
+  ctx.save();
+  ctx.strokeStyle='rgba(96,165,250,.8)';ctx.fillStyle='rgba(96,165,250,.95)';ctx.lineWidth=1;ctx.setLineDash([3,2]);
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  const dx=x2-x1,dy=y2-y1,len=Math.sqrt(dx*dx+dy*dy);
+  if(len>=4){
+    const ux=dx/len,uy=dy/len,arr=5;
+    [[x1,y1,1],[x2,y2,-1]].forEach(([ax,ay,dir])=>{
+      ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ax+dir*ux*arr-uy*arr*.5,ay+dir*uy*arr+ux*arr*.5);ctx.lineTo(ax+dir*ux*arr+uy*arr*.5,ay+dir*uy*arr-ux*arr*.5);ctx.closePath();ctx.fillStyle='rgba(96,165,250,.9)';ctx.fill();
+    });
+  }
+  ctx.setLineDash([]);
+  const mx=(x1+x2)/2,my=(y1+y2)/2,fsz=Math.max(9,Math.round(11*dpr));
+  ctx.font=`bold ${fsz}px Oswald,sans-serif`;
+  const tw2=ctx.measureText(label).width,pad=3,lh=fsz+4;
+  ctx.fillStyle='rgba(15,20,40,.9)';ctx.fillRect(mx-tw2/2-pad,my-lh/2,tw2+pad*2,lh);
+  ctx.fillStyle='rgba(160,220,255,.98)';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(label,mx,my);
+  ctx.restore();
+}
+function wz_drawCornerLabel(ctx,x,y,text){
+  ctx.save();const fsz=10;ctx.font=`bold ${fsz}px Oswald,sans-serif`;
+  const tw2=ctx.measureText(text).width,pad=3,h=fsz+6;
+  ctx.fillStyle='rgba(230,57,70,.9)';ctx.fillRect(x,y,tw2+pad*2,h);
+  ctx.fillStyle='#fff';ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(text,x+pad,y+h/2);
+  ctx.restore();
+}
+function wz_drawBleedOverlay(ctx,bleedpx,cw,ch,annOffset){
+  annOffset=annOffset||0;
+  ctx.save();
+  ctx.fillStyle='rgba(255,200,0,.06)';
+  ctx.fillRect(0,annOffset,cw+bleedpx*2,bleedpx);ctx.fillRect(0,annOffset+ch+bleedpx,cw+bleedpx*2,bleedpx);
+  ctx.fillRect(0,annOffset+bleedpx,bleedpx,ch);ctx.fillRect(cw+bleedpx,annOffset+bleedpx,bleedpx,ch);
+  ctx.setLineDash([4,3]);ctx.strokeStyle='rgba(255,200,0,.75)';ctx.lineWidth=1;
+  ctx.strokeRect(bleedpx,annOffset+bleedpx,cw,ch);ctx.setLineDash([]);ctx.restore();
+}
+
+async function wzBuildPreview(){
+  const cv=document.getElementById('wzPreviewCanvas');
+  const info=document.getElementById('wzPreviewInfo');
+  if(!cv) return;
+  const dot=document.getElementById('wzPrevDot');
+  const st=document.getElementById('wzPrevStatus');
+  if(dot) dot.style.background='#ffd600';
+  if(st) st.textContent='Aktualisiert…';
+
+  const fmt=WZ_FORMATS[wzFmt]||{};
+  const pCards=wzGetCards();
+  if(!pCards.length){
+    cv.width=200;cv.height=200;
+    const ctx=cv.getContext('2d');ctx.fillStyle='#12141a';ctx.fillRect(0,0,200,200);
+    ctx.fillStyle='#2a3050';ctx.font='14px Oswald,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('Keine Karten',100,100);
+    if(info) info.textContent='Keine Karten für diesen Filter.';
+    if(dot) dot.style.background='#e63946';if(st) st.textContent='Keine Karten';
+    return;
+  }
+
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const wrap=document.getElementById('wzPreviewWrap');
+  const wrapW=(wrap?.clientWidth||440)-2;
+  const wrapH=(wrap?.clientHeight||380)-2;
+  const PDPI=96*dpr;
+
+  function setupCanvas(logW,logH){
+    const ratio=logW/logH;let dispW=wrapW,dispH=wrapH;
+    if(dispW/dispH>ratio){dispW=Math.round(dispH*ratio);}else{dispH=Math.round(dispW/ratio);}
+    cv.width=Math.round(dispW*dpr);cv.height=Math.round(dispH*dpr);
+    cv.style.width=dispW+'px';cv.style.height=dispH+'px';
+    const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+    return{ctx,dispW,dispH};
+  }
+
+  // Render card to canvas using existing drawCardOnCanvas
+  async function renderWzCard(card){
+    return await drawCardOnCanvas(card, 630, 880);
+  }
+
+  const S_=(logV,sc)=>logV*sc;
+
+  if(fmt.group==='print'||fmt.group==='paper'||wzFmt==='cardboard'){
+    const isPrint=fmt.group==='print';
+    const isCard=wzFmt==='cardboard';
+    const papId=document.getElementById(isPrint?'wzPrtPaper':isCard?'wzCbPaper':'wzPaper')?.value||'a4';
+    let pMM={a4:{w:210,h:297},a5:{w:148,h:210},letter:{w:215.9,h:279.4},a3:{w:297,h:420}}[papId]||{w:210,h:297};
+    const orientSel=document.getElementById(isPrint?'wzPrtOrient':isCard?'wzCbOrient':'wzOrient')?.value||'portrait';
+    if(orientSel==='landscape'&&pMM.h>pMM.w){[pMM.w,pMM.h]=[pMM.h,pMM.w];}
+    const pw=mm2px(pMM.w,PDPI),ph=mm2px(pMM.h,PDPI);
+    const cmm={w:63,h:88};
+    const gapMM=parseFloat(document.getElementById(isPrint?'wzPrtGap':isCard?'wzCbGap':'wzGap')?.value||3);
+    const marginMM=parseFloat(document.getElementById(isPrint?'wzPrtMargin':'wzMargin')?.value||10);
+    const margin=mm2px(marginMM,PDPI),gap=mm2px(gapMM,PDPI);
+    const cw=mm2px(cmm.w,PDPI),ch=mm2px(cmm.h,PDPI);
+    const colsSel=document.getElementById(isPrint?'wzPrtCols':isCard?'wzCbCols':'wzCols')?.value||'3';
+    const cols=colsSel==='auto'?Math.max(1,Math.floor((pw-margin*2+gap)/(cw+gap))):parseInt(colsSel);
+    const rows=Math.max(1,Math.floor((ph-margin*2+gap)/(ch+gap)));
+    const perPage=cols*rows;
+    const ANN=Math.round(ph*0.06);
+    const {ctx,dispW,dispH}=setupCanvas(pw+ANN,ph+ANN);
+    const sc=dispW/(pw+ANN);
+    const spw=pw*sc,sph=ph*sc,sANN=ANN*sc;
+    ctx.fillStyle='#1a1e2a';ctx.fillRect(0,0,dispW,dispH);
+    ctx.fillStyle='#fff';ctx.fillRect(0,sANN,spw,sph);
+    ctx.strokeStyle='rgba(255,255,255,.2)';ctx.lineWidth=1;ctx.strokeRect(0,sANN,spw,sph);
+    const slice=pCards.slice(0,perPage);
+    for(let i=0;i<slice.length;i++){
+      const col=i%cols,row=Math.floor(i/cols);
+      const x=sc*margin+sc*(col*(cw+gap)),y=sANN+sc*margin+sc*(row*(ch+gap));
+      const cc=await renderWzCard(slice[i]);
+      ctx.drawImage(cc,x,y,sc*cw,sc*ch);
+    }
+    if(document.getElementById(isPrint?'wzPrtCrop':isCard?'wzCbCrop':'wzCropStd')?.value==='1'){
+      ctx.save();ctx.strokeStyle='rgba(0,0,0,.3)';ctx.lineWidth=0.7;
+      for(let i=0;i<slice.length;i++){
+        const col=i%cols,row=Math.floor(i/cols);
+        wz_drawCropMarks(ctx,sc*margin+sc*(col*(cw+gap)),sANN+sc*margin+sc*(row*(ch+gap)),sc*cw,sc*ch,sc*5,0.6);
+      }
+      ctx.restore();
+    }
+    wz_drawDimLine(ctx,0,sANN/2,spw,sANN/2,`${pMM.w} mm`,dpr);
+    const pages=Math.ceil(pCards.length/perPage);
+    wz_drawCornerLabel(ctx,0,0,`${cols}×${rows} · ${perPage}/S · ${pages}S`);
+    const duplexHint=isPrint?` · ${({longEdge:'Lange Kante',shortEdge:'Kurze Kante',manual:'Manuell',single:'Einseitig'})[document.querySelector('input[name="wzDuplex"]:checked')?.value||'longEdge']}`:'';
+    if(info) info.textContent=`${pMM.w}×${pMM.h}mm · ${cols}×${rows} Karten/Seite · ${pCards.length} Karten · ${pages} Seite${pages!==1?'n':''}${duplexHint}`;
+
+  } else if(fmt.group==='pro'){
+    const {w,h}=wzGetProDims();
+    const bleedMM=parseFloat(document.getElementById('wzProBleed')?.value||2);
+    const cw=mm2px(w,PDPI),ch=mm2px(h,PDPI);
+    const bleedpx=mm2px(bleedMM,PDPI);
+    const tw=cw+bleedpx*2,th=ch+bleedpx*2,ANN=28;
+    const {ctx,dispW:pdW,dispH:pdH}=setupCanvas(tw+ANN,th+ANN);
+    const sc=pdW/(tw+ANN);
+    const stw=tw*sc,sth=th*sc,sANN=ANN*sc,sBleed=bleedpx*sc,scw=cw*sc,sch=ch*sc;
+    ctx.fillStyle='#1a1e2a';ctx.fillRect(0,0,pdW,pdH);
+    ctx.fillStyle='#fffde7';ctx.fillRect(0,sANN,stw,sth);
+    const cc=await renderWzCard(pCards[0]);
+    ctx.drawImage(cc,sBleed,sANN+sBleed,scw,sch);
+    if(bleedMM>0) wz_drawBleedOverlay(ctx,sBleed,scw,sch,sANN);
+    if(document.getElementById('wzProCrop')?.value==='1') wz_drawProCropMarks(ctx,sBleed,sANN+sBleed,scw,sch,sc*7,1,bleedMM>0);
+    wz_drawDimLine(ctx,sBleed,sANN/2,sBleed+scw,sANN/2,`${w} mm`,dpr);
+    const dpi=parseInt(document.getElementById('wzProDPI')?.value||300);
+    const rpw=Math.round(mm2px(w,dpi)),rph=Math.round(mm2px(h,dpi));
+    wz_drawCornerLabel(ctx,0,0,`${dpi}DPI · ${rpw}×${rph}px`);
+    if(info) info.textContent=`${w}×${h}mm + ${bleedMM}mm Bleed · ${dpi}DPI = ${rpw}×${rph}px · ${pCards.length} Karten`;
+
+  } else if(fmt.group==='sticker'){
+    const {w,h}=wzGetStkDims();
+    const bleedMM=parseFloat(document.getElementById('wzStkBleed')?.value||2);
+    const et=document.getElementById('wzStkType')?.value||'single';
+    const dpi=parseInt(document.getElementById('wzStkDPI')?.value||300);
+    if(et==='single'){
+      const cw=mm2px(w,PDPI),ch=mm2px(h,PDPI),bleedpx=mm2px(bleedMM,PDPI);
+      const tw=cw+bleedpx*2,th=ch+bleedpx*2,ANN=28;
+      const {ctx,dispW:sdW}=setupCanvas(tw+ANN,th+ANN);
+      const sc=sdW/(tw+ANN);
+      const stw=tw*sc,sth=th*sc,sANN=ANN*sc,sBleed=bleedpx*sc,scw=cw*sc,sch=ch*sc;
+      ctx.fillStyle='#1a1e2a';ctx.fillRect(0,0,sdW,sdW*(th+ANN)/(tw+ANN));
+      ctx.fillStyle=document.getElementById('wzStkBg')?.value||'#fff';ctx.fillRect(0,sANN,stw,sth);
+      const cc=await renderWzCard(pCards[0]);ctx.drawImage(cc,sBleed,sANN+sBleed,scw,sch);
+      if(bleedMM>0) wz_drawBleedOverlay(ctx,sBleed,scw,sch,sANN);
+      wz_drawDimLine(ctx,sBleed,sANN/2,sBleed+scw,sANN/2,`${w} mm`,dpr);
+      const rpw=Math.round(mm2px(w,dpi)),rph=Math.round(mm2px(h,dpi));
+      wz_drawCornerLabel(ctx,0,0,`${dpi}DPI · ${rpw}×${rph}px`);
+      if(info) info.textContent=`${w}×${h}mm + ${bleedMM}mm Bleed · ${dpi}DPI = ${rpw}×${rph}px · ${pCards.length} Sticker`;
+    } else {
+      const paperW=et==='sheet_a3'?420:210;
+      const pw=mm2px(paperW,PDPI),ph=mm2px(297,PDPI);
+      const sw=mm2px(w+bleedMM*2,PDPI),sh=mm2px(h+bleedMM*2,PDPI),bleedpx=mm2px(bleedMM,PDPI);
+      const cw=mm2px(w,PDPI),ch=mm2px(h,PDPI),m=mm2px(8,PDPI),g=mm2px(2,PDPI);
+      const cols=Math.max(1,Math.floor((pw-m*2+g)/(sw+g))),rows=Math.max(1,Math.floor((ph-m*2+g)/(sh+g)));
+      const perPage=cols*rows,ANN=26;
+      const {ctx,dispW:ssdW}=setupCanvas(pw+ANN,ph+ANN);
+      const sc=ssdW/(pw+ANN),sANN=ANN*sc;
+      ctx.fillStyle='#1a1e2a';ctx.fillRect(0,0,ssdW,ssdW*(ph+ANN)/(pw+ANN));
+      ctx.fillStyle='#fff';ctx.fillRect(0,sANN,sc*pw,sc*ph);
+      const slice=pCards.slice(0,perPage),sbp=sc*bleedpx,sm=sc*m,sg=sc*g,ssw=sc*sw,ssh=sc*sh,scw2=sc*cw,sch2=sc*ch;
+      const bg=document.getElementById('wzStkBg')?.value||'#fff';
+      for(let i=0;i<slice.length;i++){
+        const col=i%cols,row=Math.floor(i/cols),x=sm+col*(ssw+sg),y=sANN+sm+row*(ssh+sg);
+        ctx.fillStyle=bg;ctx.fillRect(x,y,ssw,ssh);
+        const cc=await renderWzCard(slice[i]);ctx.drawImage(cc,x+sbp,y+sbp,scw2,sch2);
+      }
+      const pages=Math.ceil(pCards.length/perPage);
+      wz_drawDimLine(ctx,sm,sANN/2,sm+ssw,sANN/2,`${(w+bleedMM*2).toFixed(1)} mm`,dpr);
+      wz_drawCornerLabel(ctx,0,0,`${cols}×${rows}/S · ${pages}S`);
+      if(info) info.textContent=`${paperW}×297mm · ${cols}×${rows}/Seite · ${pCards.length} Sticker · ${pages} Seite${pages!==1?'n':''}`;
+    }
+  }
+  if(dot) dot.style.background='#34d399';if(st) st.textContent='Vorschau automatisch';
+}
+
+async function doWizardExport(){
+  const pCards=wzGetCards();
+  if(!pCards.length){alert('Keine Karten ausgewählt!');return;}
+  const fmt=WZ_FORMATS[wzFmt]; if(!fmt) return;
+  setStatus('Export läuft…');
+
+  if(wzFmt==='print'){
+    await wzDoPrintExport(pCards);
+  } else if(wzFmt==='standard'||wzFmt==='cardboard'){
+    await wzDoPaperExport(pCards);
+  } else if(fmt.group==='pro'){
+    await wzDoProExport(pCards);
+  } else if(fmt.group==='sticker'){
+    await wzDoStickerExport(pCards);
+  }
+
+  hideStatus();
+  closeExportWizard();
+  setStatus(`✓ Export abgeschlossen (${pCards.length} Karten)`);
+  setTimeout(hideStatus,3000);
+}
+
+async function wzDoPrintExport(pCards){
+  const papId=document.getElementById('wzPrtPaper').value||'a4';
+  let pMM={a4:{w:210,h:297},a5:{w:148,h:210},letter:{w:215.9,h:279.4},a3:{w:297,h:420}}[papId]||{w:210,h:297};
+  const orientSel=document.getElementById('wzPrtOrient')?.value||'portrait';
+  if(orientSel==='landscape'&&pMM.h>pMM.w){pMM={w:pMM.h,h:pMM.w};}
+  const duplexMode=document.querySelector('input[name="wzDuplex"]:checked')?.value||'longEdge';
+  const PDPI=300, cmm={w:63,h:88};
+  const pw=mm2px(pMM.w,PDPI), ph=mm2px(pMM.h,PDPI);
+  const cw=mm2px(cmm.w,PDPI), ch=mm2px(cmm.h,PDPI);
+  const gapMM=parseFloat(document.getElementById('wzPrtGap')?.value||3);
+  const marginMM=parseFloat(document.getElementById('wzPrtMargin')?.value||10);
+  const gap=mm2px(gapMM,PDPI), margin=mm2px(marginMM,PDPI);
+  const colsSel=document.getElementById('wzPrtCols').value||'3';
+  const cols=colsSel==='auto'?Math.max(1,Math.floor((pw-margin*2+gap)/(cw+gap))):parseInt(colsSel);
+  const rows=Math.max(1,Math.floor((ph-margin*2+gap)/(ch+gap)));
+  const perPage=Math.max(1,cols*rows);
+  const pages=Math.ceil(pCards.length/perPage);
+  const showCrop=document.getElementById('wzPrtCrop').value==='1';
+  const bgColor=document.getElementById('wzPrtBg')?.value||'#ffffff';
+  const isSingle=duplexMode==='single';
+
+  // Render front pages
+  const pageCvs=[];
+  for(let p=0;p<pages;p++){
+    document.getElementById('statusText').textContent=`Vorderseite ${p+1}/${pages}…`;
+    const cv=document.createElement('canvas');cv.width=pw;cv.height=ph;
+    const ctx=cv.getContext('2d');ctx.fillStyle=bgColor;ctx.fillRect(0,0,pw,ph);
+    const slice=pCards.slice(p*perPage,(p+1)*perPage);
+    for(let i=0;i<slice.length;i++){
+      const col=i%cols,row=Math.floor(i/cols);
+      const x=margin+col*(cw+gap),y=margin+row*(ch+gap);
+      const cc=await drawCardOnCanvas(slice[i],cw,ch);ctx.drawImage(cc,x,y,cw,ch);
+      if(showCrop) wz_drawCropMarks(ctx,x,y,cw,ch,mm2px(3,PDPI),1);
+    }
+    pageCvs.push(cv);
+  }
+
+  // Render back pages (unless single-sided)
+  if(!isSingle){
+    // Duplex mirror-index maps (for 3-column layout at perPage=9; generalised below)
+    for(let p=0;p<pages;p++){
+      document.getElementById('statusText').textContent=`Rückseite ${p+1}/${pages}…`;
+      const cv=document.createElement('canvas');cv.width=pw;cv.height=ph;
+      const ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,pw,ph);
+      const slice=pCards.slice(p*perPage,(p+1)*perPage);
+
+      for(let i=0;i<slice.length;i++){
+        const col=i%cols,row=Math.floor(i/cols);
+        // Mirror column for duplex alignment
+        let mirrorCol;
+        if(duplexMode==='longEdge'){
+          mirrorCol=cols-1-col; // flip horizontal
+        } else if(duplexMode==='shortEdge'){
+          mirrorCol=col; // flip vertical — same column, row order reversed on paper
+        } else {
+          mirrorCol=col; // manual: same layout
+        }
+        const x=margin+mirrorCol*(cw+gap);
+        const backRow=duplexMode==='shortEdge'?rows-1-row:row;
+        const y=margin+backRow*(ch+gap);
+        const backCv=await drawBackOnCanvas();ctx.drawImage(backCv,x,y,cw,ch);
+        if(showCrop) wz_drawCropMarks(ctx,x,y,cw,ch,mm2px(3,PDPI),1);
+      }
+      pageCvs.push(cv);
+    }
+  }
+
+  // Build interleaved print order: front1, back1, front2, back2 … (or just fronts if single)
+  const ordered=[];
+  if(isSingle){
+    pageCvs.forEach(cv=>ordered.push(cv));
+  } else {
+    for(let p=0;p<pages;p++){
+      ordered.push(pageCvs[p]);          // front
+      ordered.push(pageCvs[pages+p]);    // back
+    }
+  }
+
+  // Open browser print dialog
+  const win=window.open('','_blank');
+  if(!win){alert('Popup blockiert – bitte Popups erlauben!');return;}
+  const duplexLabel=duplexMode==='longEdge'?'Lange Kante':duplexMode==='shortEdge'?'Kurze Kante':duplexMode==='manual'?'Manuell':'Einseitig';
+  win.document.write(`<!DOCTYPE html><html><head><title>Feuerwehr Karten – ${duplexLabel}</title>
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#888;}
+.page{display:block;margin:0 auto 8px;max-width:100%;}
+@media print{body{background:#fff;}.page{page-break-after:always;break-after:page;margin:0;max-width:100%;width:100%;}}
+</style></head><body>
+<p style="text-align:center;padding:10px;font-family:sans-serif;font-size:12px;color:#555;">
+  ${ordered.length} Seite${ordered.length!==1?'n':''} · Duplex: <b>${duplexLabel}</b> · Druckereinstellung auf <b>Beidseitig</b> setzen
+</p>`);
+  for(const cv of ordered){
+    win.document.write(`<img class="page" src="${cv.toDataURL('image/png')}" />`);
+  }
+  win.document.write(`<script>window.onload=()=>{window.print();}<\/script></body></html>`);
+  win.document.close();
+}
+
+async function wzDoPaperExport(pCards){
+  const isCard=wzFmt==='cardboard';
+  const papId=document.getElementById(isCard?'wzCbPaper':'wzPaper').value||'a4';
+  let pMM={a4:{w:210,h:297},a5:{w:148,h:210},letter:{w:215.9,h:279.4},a3:{w:297,h:420}}[papId]||{w:210,h:297};
+  const orientSel=document.getElementById(isCard?'wzCbOrient':'wzOrient')?.value||'portrait';
+  if(orientSel==='landscape'&&pMM.h>pMM.w){pMM={w:pMM.h,h:pMM.w};}
+  const PDPI=300,cmm={w:63,h:88};
+  const pw=mm2px(pMM.w,PDPI),ph=mm2px(pMM.h,PDPI);
+  const cw=mm2px(cmm.w,PDPI),ch=mm2px(cmm.h,PDPI);
+  const gapMM=parseFloat(document.getElementById(isCard?'wzCbGap':'wzGap')?.value||3);
+  const marginMM=parseFloat(document.getElementById('wzMargin')?.value||10);
+  const gap=mm2px(gapMM,PDPI),margin=mm2px(marginMM,PDPI);
+  const colsSel=document.getElementById(isCard?'wzCbCols':'wzCols').value||'3';
+  const cols=colsSel==='auto'?Math.max(1,Math.floor((pw-margin*2+gap)/(cw+gap))):parseInt(colsSel);
+  const rows=Math.max(1,Math.floor((ph-margin*2+gap)/(ch+gap)));
+  const perPage=Math.max(1,cols*rows);
+  const pages=Math.ceil(pCards.length/perPage);
+  const showCrop=isCard?(document.getElementById('wzCbCrop').value==='1'):(document.getElementById('wzCropStd').value==='1');
+  const bgColor=document.getElementById('wzPaperBg')?.value||'#ffffff';
+
+  for(let p=0;p<pages;p++){
+    document.getElementById('statusText').textContent=`Seite ${p+1}/${pages}…`;
+    const cv=document.createElement('canvas');cv.width=pw;cv.height=ph;
+    const ctx=cv.getContext('2d');ctx.fillStyle=bgColor;ctx.fillRect(0,0,pw,ph);
+    const slice=pCards.slice(p*perPage,(p+1)*perPage);
+    for(let i=0;i<slice.length;i++){
+      const col=i%cols,row=Math.floor(i/cols),x=margin+col*(cw+gap),y=margin+row*(ch+gap);
+      const cc=await drawCardOnCanvas(slice[i],cw,ch);ctx.drawImage(cc,x,y,cw,ch);
+      if(showCrop) wz_drawCropMarks(ctx,x,y,cw,ch,mm2px(3,PDPI),1);
+    }
+    const a=document.createElement('a');a.href=cv.toDataURL('image/png');
+    a.download=`Export_${isCard?'Karton':'Papier'}_${papId}_Seite${p+1}.png`;a.click();
+    await new Promise(r=>setTimeout(r,80));
+  }
+  if(isCard){
+    const bgCol=document.getElementById('wzCbBack').value;
+    const pattern=document.getElementById('wzCbPattern').value;
+    for(let p=0;p<pages;p++){
+      document.getElementById('statusText').textContent=`Rückseite ${p+1}/${pages}…`;
+      const cv=document.createElement('canvas');cv.width=pw;cv.height=ph;
+      const ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,pw,ph);
+      const slice=pCards.slice(p*perPage,(p+1)*perPage);
+      for(let i=0;i<slice.length;i++){
+        const col=i%cols,row=Math.floor(i/cols),x=margin+col*(cw+gap),y=margin+row*(ch+gap);
+        // Use the geraetekunde back drawing
+        const backCv=await drawBackOnCanvas(cw,ch);ctx.drawImage(backCv,x,y,cw,ch);
+        if(showCrop) wz_drawCropMarks(ctx,x,y,cw,ch,mm2px(3,PDPI),1);
+      }
+      const a=document.createElement('a');a.href=cv.toDataURL('image/png');
+      a.download=`Export_Karton_Rueckseite_Seite${p+1}.png`;a.click();
+      await new Promise(r=>setTimeout(r,80));
+    }
+  }
+}
+
+async function wzDoProExport(pCards){
+  const {w,h}=wzGetProDims();
+  const dpi=parseInt(document.getElementById('wzProDPI').value);
+  const bleed=parseFloat(document.getElementById('wzProBleed').value);
+  const safe=parseFloat(document.getElementById('wzProSafe').value);
+  const showCrop=document.getElementById('wzProCrop').value==='1';
+  const showReg=document.getElementById('wzProReg').value==='1';
+  const et=document.getElementById('wzProType').value;
+  const bg=document.getElementById('wzProBg')?.value||'#ffffff';
+  const totalW=mm2px(w+bleed*2,dpi),totalH=mm2px(h+bleed*2,dpi);
+  const bleedpx=mm2px(bleed,dpi),cardW=mm2px(w,dpi),cardH=mm2px(h,dpi);
+
+  if(et==='single'){
+    for(let i=0;i<pCards.length;i++){
+      document.getElementById('statusText').textContent=`Rendere ${i+1}/${pCards.length}…`;
+      const cv=document.createElement('canvas');cv.width=totalW;cv.height=totalH;
+      const ctx=cv.getContext('2d');ctx.fillStyle=bg;ctx.fillRect(0,0,totalW,totalH);
+      const cc=await drawCardOnCanvas(pCards[i],cardW,cardH);ctx.drawImage(cc,bleedpx,bleedpx,cardW,cardH);
+      if(showCrop) wz_drawProCropMarks(ctx,bleedpx,bleedpx,cardW,cardH,mm2px(3,dpi),1.5,bleed>0);
+      if(showReg){const rr2=mm2px(4,dpi);[[totalW/2,rr2],[totalW/2,totalH-rr2],[rr2,totalH/2],[totalW-rr2,totalH/2]].forEach(([cx,cy])=>wz_drawRegistrationMark(ctx,cx,cy,rr2));}
+      const a=document.createElement('a');a.href=cv.toDataURL('image/png');
+      a.download=`PROFI_${wzFmt}_${dpi}dpi_${pCards[i].serial.replace(/[^a-z0-9äöüÄÖÜ\-]/gi,'_')}.png`;a.click();
+      await new Promise(r=>setTimeout(r,100));
+    }
+  } else {
+    const paperW=et==='sheet_a3'?420:210;
+    const pw=mm2px(paperW,dpi),ph=mm2px(297,dpi);
+    const sw=mm2px(w+bleed*2,dpi),sh=mm2px(h+bleed*2,dpi);
+    const m=mm2px(10,dpi),g=mm2px(2,dpi);
+    const cols=Math.max(1,Math.floor((pw-m*2+g)/(sw+g))),rows=Math.max(1,Math.floor((ph-m*2+g)/(sh+g)));
+    const perPage=Math.max(1,cols*rows),pages=Math.ceil(pCards.length/perPage);
+    for(let p=0;p<pages;p++){
+      document.getElementById('statusText').textContent=`Bogen ${p+1}/${pages}…`;
+      const cv=document.createElement('canvas');cv.width=pw;cv.height=ph;
+      const ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,pw,ph);
+      const slice=pCards.slice(p*perPage,(p+1)*perPage);
+      for(let i=0;i<slice.length;i++){
+        const col=i%cols,row=Math.floor(i/cols),x=m+col*(sw+g),y=m+row*(sh+g);
+        ctx.fillStyle=bg;ctx.fillRect(x,y,sw,sh);
+        const cc=await drawCardOnCanvas(slice[i],cardW,cardH);ctx.drawImage(cc,x+bleedpx,y+bleedpx,cardW,cardH);
+        if(showCrop) wz_drawProCropMarks(ctx,x+bleedpx,y+bleedpx,cardW,cardH,mm2px(3,dpi),1.2,bleed>0);
+      }
+      const a=document.createElement('a');a.href=cv.toDataURL('image/png');
+      a.download=`PROFI_${et==='sheet_a3'?'A3':'A4'}_${wzFmt}_${dpi}dpi_Seite${p+1}.png`;a.click();
+      await new Promise(r=>setTimeout(r,150));
+    }
+  }
+}
+
+async function wzDoStickerExport(pCards){
+  const {w:wmm,h:hmm}=wzGetStkDims();
+  const dpi=parseInt(document.getElementById('wzStkDPI').value);
+  const bleed=parseFloat(document.getElementById('wzStkBleed').value);
+  const et=document.getElementById('wzStkType').value;
+  const showCrop=document.getElementById('wzStkCrop').value==='1';
+  const bleedpx=mm2px(bleed,dpi),cardW=mm2px(wmm,dpi),cardH=mm2px(hmm,dpi);
+  const wpx=mm2px(wmm+bleed*2,dpi),hpx=mm2px(hmm+bleed*2,dpi);
+
+  if(et==='single'){
+    for(let i=0;i<pCards.length;i++){
+      document.getElementById('statusText').textContent=`Sticker ${i+1}/${pCards.length}…`;
+      const cc=await drawCardOnCanvas(pCards[i],cardW,cardH);
+      const cv=document.createElement('canvas');cv.width=wpx;cv.height=hpx;
+      const ctx=cv.getContext('2d');
+      ctx.fillStyle=document.getElementById('wzStkBg')?.value||'#fff';ctx.fillRect(0,0,wpx,hpx);
+      ctx.drawImage(cc,bleedpx,bleedpx,cardW,cardH);
+      if(showCrop&&bleed>0){ctx.save();ctx.setLineDash([5,4]);ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=1;ctx.strokeRect(bleedpx,bleedpx,cardW,cardH);ctx.setLineDash([]);ctx.restore();}
+      const a=document.createElement('a');a.href=cv.toDataURL('image/png');
+      a.download=`STICKER_${pCards[i].serial.replace(/[^a-z0-9äöüÄÖÜ\-]/gi,'_')}.png`;a.click();
+      await new Promise(r=>setTimeout(r,80));
+    }
+  } else {
+    const paperW=et==='sheet_a3'?420:210;
+    const pw=mm2px(paperW,dpi),ph=mm2px(297,dpi);
+    const sw=mm2px(wmm+bleed*2,dpi),sh=mm2px(hmm+bleed*2,dpi);
+    const m=mm2px(8,dpi),g=mm2px(2,dpi);
+    const cols=Math.max(1,Math.floor((pw-m*2+g)/(sw+g))),rows=Math.max(1,Math.floor((ph-m*2+g)/(sh+g)));
+    const perPage=Math.max(1,cols*rows),pages=Math.ceil(pCards.length/perPage);
+    for(let p=0;p<pages;p++){
+      document.getElementById('statusText').textContent=`Bogen ${p+1}/${pages}…`;
+      const cv=document.createElement('canvas');cv.width=pw;cv.height=ph;
+      const ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,pw,ph);
+      const slice=pCards.slice(p*perPage,(p+1)*perPage);
+      for(let i=0;i<slice.length;i++){
+        const col=i%cols,row=Math.floor(i/cols),x=m+col*(sw+g),y=m+row*(sh+g);
+        ctx.fillStyle='#fff';ctx.fillRect(x,y,sw,sh);
+        const cc=await drawCardOnCanvas(slice[i],cardW,cardH);ctx.drawImage(cc,x+bleedpx,y+bleedpx,cardW,cardH);
+        if(showCrop&&bleed>0){ctx.save();ctx.setLineDash([4,3]);ctx.strokeStyle='rgba(0,0,0,.3)';ctx.lineWidth=1;ctx.strokeRect(x+bleedpx,y+bleedpx,cardW,cardH);ctx.setLineDash([]);ctx.restore();}
+      }
+      const a=document.createElement('a');a.href=cv.toDataURL('image/png');
+      a.download=`STICKER_${et==='sheet_a3'?'A3':'A4'}_Bogen${p+1}.png`;a.click();
+      await new Promise(r=>setTimeout(r,100));
+    }
+  }
+}
+
+/* ============================================================  I18N  ============================================================ */
+const TRANSLATIONS = {
+  de: {
+    subtitle:'Gerätekunde · Trading Card Edition', cards:'Karten', pages:'Seite(n)',
+    // sections
+    secNewCard:'Neue Karte', secCategories:'Kategorien', secBackside:'Rückseite',
+    secGlobal:'Globale Einstellungen', saveLoad:'Speichern & Laden',
+    secPrint:'Drucken', secProfiExport:'Profi-Export',
+    // new card
+    deviceName:'Gerätename', deviceNamePh:'z.B. B-Schlauch',
+    category:'Kategorie', photo:'Foto', uploadPhoto:'Foto hochladen',
+    addCard:'+ KARTE HINZUFÜGEN', addMultiple:'📦 MEHRERE AUF EINMAL',
+    addCategory:'+ Neue Kategorie',
+    // backside
+    backsideHint:'Standard: Feuerwehr-Design. Eigenes Bild ersetzt es.',
+    uploadBackside:'Eigenes Rückseitenbild', resetBackside:'✕ Standard-Rückseite',
+    imageScale:'Bild-Skalierung', scaleFit:'↔ Einpassen', scaleCover:'⬛ Füllen', scaleStretch:'⤢ Strecken',
+    // global
+    catSizeGlobal:'Kategorie-Größe (global)', catSizeHint:'Gilt für alle Kategorien ohne eigene Größe.',
+    serialNumber:'Seriennummer', showNumber:'Nummer anzeigen',
+    prefix:'Präfix:', prefixHint:'z.B. EPP-, FW-, TLF-', color:'Farbe',
+    // save/load
+    saveJson:'Als JSON speichern', saveJsonHint:'(Bilder eingebettet)',
+    saveZip:'Als ZIP speichern', saveZipHint:'(Bilder separat, kleiner)',
+    loadProject:'Projekt laden', clearAutosave:'Browser-Autosave löschen',
+    saveHint:'JSON: alles in einer Datei. ZIP: JSON + Bilder als separate Dateien, deutlich kleiner. Der Browser speichert automatisch beim Arbeiten.',
+    autosaveIdle:'Browser-Autosave: —', autosaveSaved:'Browser-Autosave: ✓ Gespeichert',
+    autosaveSaving:'Browser-Autosave: Speichern…', autosaveLoaded:'Browser-Autosave: geladen',
+    // print
+    duplexMode:'Duplex-Modus',
+    longEdge:'Lange Kante', longEdgeHint:'Hochformat · Buch-Umblättern',
+    shortEdge:'Kurze Kante', shortEdgeHint:'Hochformat · Block-Umblättern',
+    manual:'Manuell', manualHint:'Blatt selbst wenden',
+    printBtn:'DRUCKEN (Vorder + Rückseite)', deleteAll:'🗑 Alle Karten löschen',
+    printTip:'<strong>Drucktipp:</strong> Beidseitig aktivieren, dann Modus wählen.<br><strong>Nicht sicher?</strong> Erst 1 Seite drucken und Drehrichtung prüfen.',
+    // profi export
+    profiExportHint:'300 DPI Export für Plastikkarten-Druckfirma.',
+    cardSize:'Kartengröße', sizeTradingCard:'Trading Card (aktuell)',
+    cr80Hint:'85,6 × 54 mm — Standard Plastikkarte',
+    customSize:'Benutzerdefiniert', customSizeHint:'Eigene Maße',
+    bleed:'Beschnittrand (Bleed)', noBleed:'Kein Rand',
+    bleedHint:'Bleed-Rand wird in der Karten-Vorschau angezeigt.',
+    exportFormat:'Export-Format',
+    exportPNG:'PNG Einzeldateien', exportPNGHint:'FW-001-vorder.png …',
+    exportZIP:'ZIP (alle PNGs)', exportZIPHint:'Alle Karten in einem Archiv',
+    exportPDF:'PDF (1 Karte/Seite)', exportPDFHint:'Vorder + Rückseite abwechselnd',
+    // preview toolbar
+    preview:'VORSCHAU', viewCards:'🃏 Karten', viewPrint:'🖨 Druckvorschau',
+    sortSerial:'🔢 FW-Nummer', sortName:'🔤 Name A–Z', sortCat:'🎨 Kategorie',
+    showBack:'🔄 Rückseite',
+    // warning
+    warnTitle:'WICHTIGER HINWEIS',
+    warnText:'Diese App speichert deine Daten <strong>nur im Browser</strong>.<br>Beim Löschen des Browser-Caches oder auf einem anderen Gerät sind deine Karten weg.<br><br><strong>Speichere dein Projekt regelmäßig</strong> als JSON oder ZIP auf deinem Computer!',
+    warnDontShow:'Nicht mehr anzeigen', warnOk:'VERSTANDEN',
+  },
+  en: {
+    subtitle:'Equipment Training · Trading Card Edition', cards:'Cards', pages:'Page(s)',
+    // sections
+    secNewCard:'New Card', secCategories:'Categories', secBackside:'Back Side',
+    secGlobal:'Global Settings', saveLoad:'Save & Load',
+    secPrint:'Print', secProfiExport:'Pro Export',
+    // new card
+    deviceName:'Device Name', deviceNamePh:'e.g. Fire Hose',
+    category:'Category', photo:'Photo', uploadPhoto:'Upload photo',
+    addCard:'+ ADD CARD', addMultiple:'📦 ADD MULTIPLE',
+    addCategory:'+ New Category',
+    // backside
+    backsideHint:'Default: Fire dept. design. Custom image replaces it.',
+    uploadBackside:'Custom back image', resetBackside:'✕ Default back',
+    imageScale:'Image Scaling', scaleFit:'↔ Fit', scaleCover:'⬛ Fill', scaleStretch:'⤢ Stretch',
+    // global
+    catSizeGlobal:'Category Size (global)', catSizeHint:'Applies to all categories without own size.',
+    serialNumber:'Serial Number', showNumber:'Show number',
+    prefix:'Prefix:', prefixHint:'e.g. FD-, EMS-, RES-', color:'Color',
+    // save/load
+    saveJson:'Save as JSON', saveJsonHint:'(images embedded)',
+    saveZip:'Save as ZIP', saveZipHint:'(images separate, smaller)',
+    loadProject:'Load project', clearAutosave:'Clear browser autosave',
+    saveHint:'JSON: everything in one file. ZIP: JSON + images as separate files, much smaller. The browser saves automatically while you work.',
+    autosaveIdle:'Browser autosave: —', autosaveSaved:'Browser autosave: ✓ Saved',
+    autosaveSaving:'Browser autosave: Saving…', autosaveLoaded:'Browser autosave: loaded',
+    // print
+    duplexMode:'Duplex Mode',
+    longEdge:'Long Edge', longEdgeHint:'Portrait · Book flip',
+    shortEdge:'Short Edge', shortEdgeHint:'Portrait · Block flip',
+    manual:'Manual', manualHint:'Flip sheet yourself',
+    printBtn:'PRINT (Front + Back)', deleteAll:'🗑 Delete all cards',
+    printTip:'<strong>Print tip:</strong> Enable duplex, then select mode.<br><strong>Not sure?</strong> Print 1 page first and check the flip direction.',
+    // profi export
+    profiExportHint:'300 DPI export for professional card printing.',
+    cardSize:'Card Size', sizeTradingCard:'Trading Card (current)',
+    cr80Hint:'85.6 × 54 mm — Standard plastic card',
+    customSize:'Custom', customSizeHint:'Custom dimensions',
+    bleed:'Bleed (crop margin)', noBleed:'No margin',
+    bleedHint:'Bleed margin is shown in the card preview.',
+    exportFormat:'Export Format',
+    exportPNG:'PNG individual files', exportPNGHint:'FW-001-front.png …',
+    exportZIP:'ZIP (all PNGs)', exportZIPHint:'All cards in one archive',
+    exportPDF:'PDF (1 card/page)', exportPDFHint:'Front + back alternating',
+    // preview toolbar
+    preview:'PREVIEW', viewCards:'🃏 Cards', viewPrint:'🖨 Print Preview',
+    sortSerial:'🔢 Serial No.', sortName:'🔤 Name A–Z', sortCat:'🎨 Category',
+    showBack:'🔄 Back side',
+    // warning
+    warnTitle:'IMPORTANT NOTE',
+    warnText:'This app stores your data <strong>in the browser only</strong>.<br>If you clear your browser cache or use another device, your cards will be lost.<br><br><strong>Save your project regularly</strong> as JSON or ZIP to your computer!',
+    warnDontShow:"Don't show again", warnOk:'GOT IT',
+  }
+};
+
+let currentLang = localStorage.getItem('fw_lang') || 'de';
+
+function t(key){ return TRANSLATIONS[currentLang][key] || TRANSLATIONS['de'][key] || key; }
+
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    const val=t(key);
+    if(el.tagName==='OPTION') el.textContent=val;
+    else if(val.includes('<')) el.innerHTML=val;
+    else el.textContent=val;
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    el.placeholder=t(el.getAttribute('data-i18n-placeholder'));
+  });
+  document.getElementById('langBtn').textContent = currentLang==='de' ? '🌐 EN' : '🌐 DE';
+}
+
+function toggleLang(){
+  currentLang = currentLang==='de' ? 'en' : 'de';
+  localStorage.setItem('fw_lang', currentLang);
+  applyI18n();
+}
+
+/* ============================================================  WARNING MODAL  ============================================================ */
+function showWarning(){
+  if(localStorage.getItem('fw_warn_dismissed')==='1') return;
+  document.getElementById('warnOverlay').style.display='flex';
+  applyI18n(); // make sure warning text is translated
+}
+function closeWarning(){
+  if(document.getElementById('warnDontShow').checked){
+    localStorage.setItem('fw_warn_dismissed','1');
+  }
+  document.getElementById('warnOverlay').style.display='none';
+}
+
+/* ============================================================  BROWSER AUTOSAVE  ============================================================ */
+/* ============================================================  BROWSER AUTOSAVE (IndexedDB)  ============================================================ */
+const IDB_NAME = 'fw_karten_db';
+const IDB_STORE = 'autosave';
+const IDB_KEY = 'project';
+let autosaveTimer = null;
+let _idb = null;
+
+function openIDB(){
+  if(_idb) return Promise.resolve(_idb);
+  return new Promise((res,rej)=>{
+    const req = indexedDB.open(IDB_NAME, 1);
+    req.onupgradeneeded = e => {
+      e.target.result.createObjectStore(IDB_STORE);
+    };
+    req.onsuccess = e => { _idb = e.target.result; res(_idb); };
+    req.onerror = () => rej(req.error);
+  });
+}
+
+async function idbSet(data){
+  const db = await openIDB();
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).put(data, IDB_KEY);
+    tx.oncomplete = ()=>res();
+    tx.onerror = ()=>rej(tx.error);
+  });
+}
+
+async function idbGet(){
+  const db = await openIDB();
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(IDB_STORE, 'readonly');
+    const req = tx.objectStore(IDB_STORE).get(IDB_KEY);
+    req.onsuccess = ()=>res(req.result);
+    req.onerror = ()=>rej(req.error);
+  });
+}
+
+async function idbDelete(){
+  const db = await openIDB();
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).delete(IDB_KEY);
+    tx.oncomplete = ()=>res();
+    tx.onerror = ()=>rej(tx.error);
+  });
+}
+
+function scheduleAutosave(){
+  clearTimeout(autosaveTimer);
+  setAutosaveDot('saving');
+  autosaveTimer = setTimeout(async ()=>{
+    try{
+      const data={
+        version:2, categories, prefixes,
+        cards: cards.map(c=>({...c})),
+        bgImg: bgImg||null,
+        globalSettings,
+        savedAt: new Date().toISOString(),
+      };
+      await idbSet(data);
+      const total = cards.length;
+      const withImg = cards.filter(c=>c.img).length;
+      setAutosaveDot('saved', `✓ ${total} Karten, ${withImg} Bilder`);
+    }catch(e){
+      setAutosaveDot('error', '✕ Autosave fehlgeschlagen');
+      console.warn('IndexedDB autosave error:', e);
+    }
+  }, 2000);
+}
+
+function setAutosaveDot(state, customText){
+  const dot=document.getElementById('autosaveDot');
+  const txt=document.getElementById('autosaveText');
+  if(!dot||!txt) return;
+  const colors={saved:'#4caf50', saving:'var(--yellow)', warn:'#ff9800', error:'#e63946', idle:'#444'};
+  dot.style.background = colors[state]||colors.idle;
+  if(customText){ txt.textContent=customText; }
+  else if(state==='saved'){txt.setAttribute('data-i18n','autosaveSaved');txt.textContent=t('autosaveSaved');}
+  else if(state==='saving'){txt.setAttribute('data-i18n','autosaveSaving');txt.textContent=t('autosaveSaving');}
+  else{txt.setAttribute('data-i18n','autosaveIdle');txt.textContent=t('autosaveIdle');}
+}
+
+async function loadFromBrowser(){
+  try{
+    const data = await idbGet();
+    if(!data) return false;
+    applyProjectData(data, null, true);
+    setAutosaveDot('saved', t('autosaveLoaded')+' ('+new Date(data.savedAt).toLocaleString()+')');
+    return true;
+  }catch(e){ return false; }
+}
+
+async function clearBrowserSave(){
+  if(!confirm(currentLang==='de'?'Browser-Autosave wirklich löschen?':'Really clear browser autosave?')) return;
+  try{
+    await idbDelete();
+    setAutosaveDot('idle');
+  }catch(e){ console.warn('IDB delete error:', e); }
+}
+
+/* ============================================================  INIT  ============================================================ */
+renderCatList();renderCatMgmt();renderPrefixListNew();renderPrefixMgmt();render();initColorPairs();
+applyI18n();
+// Load from IndexedDB autosave if available
+loadFromBrowser().then(hadAutosave=>{
+  if(!hadAutosave) render();
+  showWarning();
+});
+</script>
+</body>
+</html>

@@ -3,361 +3,109 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Feuerwehr Karten Generator</title>
-<meta name="description" content="Professionelle Karten-Generatoren für die Feuerwehr – Gerätekunde & Fahrzeuge.">
+<title>Feuerwehr Karten Generator Suite</title>
+<meta name="description" content="Professionelle Karten-Generatoren für die Feuerwehr – Gerätekunde, Fahrzeuge & Bild-Annotator.">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Libre+Franklin:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#0d0f14;
-  --panel:#1a1d26;
-  --border:#2a2e3d;
-  --text:#e8eaf0;
-  --text2:#6a7a99;
-  --accent:#e63946;
-  --yellow:#ffd600;
+  --bg:#0d0f14;--panel:#1a1d26;--border:#2a2e3d;
+  --text:#e8eaf0;--text2:#6a7a99;
+  --accent:#e63946;--yellow:#ffd600;--teal:#06b6d4;
 }
+body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 20% 20%,rgba(230,57,70,.06) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(255,214,0,.04) 0%,transparent 60%);pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-gradient(-45deg,transparent,transparent 40px,rgba(255,255,255,.012) 40px,rgba(255,255,255,.012) 41px);pointer-events:none;z-index:0;}
 
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:'Libre Franklin',sans-serif;
-  min-height:100vh;
-  overflow-x:hidden;
-}
-
-/* ── BACKGROUND TEXTURE ── */
-body::before{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:
-    radial-gradient(ellipse 80% 50% at 20% 20%, rgba(230,57,70,.06) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(255,214,0,.04) 0%, transparent 60%);
-  pointer-events:none;
-  z-index:0;
-}
-
-/* diagonal grid lines */
-body::after{
-  content:'';
-  position:fixed;
-  inset:0;
-  background-image:
-    repeating-linear-gradient(
-      -45deg,
-      transparent,
-      transparent 40px,
-      rgba(255,255,255,.012) 40px,
-      rgba(255,255,255,.012) 41px
-    );
-  pointer-events:none;
-  z-index:0;
-}
-
-/* ── HEADER ── */
-header{
-  position:relative;
-  z-index:10;
-  border-bottom:1px solid var(--border);
-  background:linear-gradient(90deg,#080a0e,#141720 40%,#080a0e);
-  padding:0 32px;
-  height:64px;
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
-
-.logo{
-  width:40px;height:40px;
-  background:var(--accent);
-  border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.5rem;
-  box-shadow:0 0 20px rgba(230,57,70,.45);
-  flex-shrink:0;
-  animation:logoPulse 3s ease-in-out infinite;
-}
-@keyframes logoPulse{
-  0%,100%{box-shadow:0 0 20px rgba(230,57,70,.45);}
-  50%{box-shadow:0 0 30px rgba(230,57,70,.7),0 0 60px rgba(230,57,70,.2);}
-}
-
-.logo-text{
-  display:flex;flex-direction:column;
-}
-.logo-text h1{
-  font-family:'Oswald',sans-serif;
-  font-weight:700;
-  font-size:1.25rem;
-  letter-spacing:3px;
-  background:linear-gradient(90deg,#fff 30%,var(--yellow));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-}
-.logo-text p{
-  font-size:.5rem;
-  color:var(--text2);
-  letter-spacing:3px;
-  text-transform:uppercase;
-  margin-top:1px;
-}
-
-.header-badge{
-  margin-left:auto;
-  display:flex;
-  align-items:center;
-  gap:6px;
-  background:rgba(255,214,0,.06);
-  border:1px solid rgba(255,214,0,.2);
-  border-radius:20px;
-  padding:5px 12px;
-  font-size:.58rem;
-  letter-spacing:1.5px;
-  color:var(--yellow);
-  text-transform:uppercase;
-  font-weight:700;
-}
-.header-badge::before{
-  content:'';
-  width:6px;height:6px;
-  border-radius:50%;
-  background:var(--yellow);
-  animation:blink 1.5s ease-in-out infinite;
-}
+/* HEADER */
+header{position:relative;z-index:10;border-bottom:1px solid var(--border);background:linear-gradient(90deg,#080a0e,#141720 40%,#080a0e);padding:0 32px;height:64px;display:flex;align-items:center;gap:14px;}
+.logo{width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 0 20px rgba(230,57,70,.45);flex-shrink:0;animation:logoPulse 3s ease-in-out infinite;}
+@keyframes logoPulse{0%,100%{box-shadow:0 0 20px rgba(230,57,70,.45);}50%{box-shadow:0 0 30px rgba(230,57,70,.7),0 0 60px rgba(230,57,70,.2);}}
+.logo-text{display:flex;flex-direction:column;}
+.logo-text h1{font-family:'Oswald',sans-serif;font-weight:700;font-size:1.25rem;letter-spacing:3px;background:linear-gradient(90deg,#fff 30%,var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.logo-text p{font-size:.5rem;color:var(--text2);letter-spacing:3px;text-transform:uppercase;margin-top:1px;}
+.header-badge{margin-left:auto;display:flex;align-items:center;gap:6px;background:rgba(255,214,0,.06);border:1px solid rgba(255,214,0,.2);border-radius:20px;padding:5px 12px;font-size:.58rem;letter-spacing:1.5px;color:var(--yellow);text-transform:uppercase;font-weight:700;}
+.header-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--yellow);animation:blink 1.5s ease-in-out infinite;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
 
-/* ── HERO ── */
-.hero{
-  position:relative;
-  z-index:1;
-  text-align:center;
-  padding:80px 24px 60px;
-}
+/* HERO */
+.hero{position:relative;z-index:1;text-align:center;padding:72px 24px 48px;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.58rem;font-weight:900;letter-spacing:4px;text-transform:uppercase;color:var(--accent);border:1px solid rgba(230,57,70,.3);padding:5px 14px;border-radius:20px;background:rgba(230,57,70,.05);margin-bottom:24px;animation:fadeUp .6s ease both;}
+.hero h2{font-family:'Oswald',sans-serif;font-size:clamp(1.8rem,5vw,3.6rem);font-weight:700;letter-spacing:4px;line-height:1.1;margin-bottom:14px;animation:fadeUp .6s .1s ease both;}
+.hero h2 span{background:linear-gradient(90deg,var(--accent),var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero p{font-size:.88rem;color:var(--text2);max-width:540px;margin:0 auto;line-height:1.7;animation:fadeUp .6s .2s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 
-.hero-eyebrow{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  font-size:.58rem;
-  font-weight:900;
-  letter-spacing:4px;
-  text-transform:uppercase;
-  color:var(--accent);
-  border:1px solid rgba(230,57,70,.3);
-  padding:5px 14px;
-  border-radius:20px;
-  background:rgba(230,57,70,.05);
-  margin-bottom:24px;
-  animation:fadeUp .6s ease both;
-}
+/* WORKFLOW HINT */
+.workflow{position:relative;z-index:1;max-width:720px;margin:36px auto 48px;padding:0 24px;animation:fadeUp .6s .3s ease both;}
+.workflow-box{background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.2);border-radius:12px;padding:16px 20px;display:flex;align-items:flex-start;gap:14px;}
+.wf-icon{font-size:1.4rem;flex-shrink:0;margin-top:2px;}
+.wf-body p{font-size:.75rem;color:var(--text2);line-height:1.6;}
+.wf-body p strong{color:rgba(6,182,212,.9);display:block;margin-bottom:8px;font-size:.8rem;letter-spacing:.5px;}
+.wf-steps{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:8px;}
+.ws{font-size:.58rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 9px;border-radius:5px;}
+.ws.a{background:rgba(6,182,212,.12);color:rgba(6,182,212,.9);border:1px solid rgba(6,182,212,.25);}
+.ws.b{background:rgba(230,57,70,.1);color:var(--accent);border:1px solid rgba(230,57,70,.25);}
+.ws.c{background:rgba(255,214,0,.08);color:var(--yellow);border:1px solid rgba(255,214,0,.2);}
+.ws-arr{color:var(--border);font-size:.65rem;}
 
-.hero h2{
-  font-family:'Oswald',sans-serif;
-  font-size:clamp(2rem,6vw,4rem);
-  font-weight:700;
-  letter-spacing:4px;
-  line-height:1.1;
-  margin-bottom:16px;
-  animation:fadeUp .6s .1s ease both;
-}
-.hero h2 span{
-  background:linear-gradient(90deg,var(--accent),var(--yellow));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-}
+/* SECTION LABEL */
+.section-label{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 24px 14px;display:flex;align-items:center;gap:12px;}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+.section-label span{font-size:.52rem;font-weight:900;letter-spacing:3px;text-transform:uppercase;color:var(--text2);white-space:nowrap;background:rgba(255,255,255,.04);border:1px solid var(--border);padding:4px 10px;border-radius:20px;}
 
-.hero p{
-  font-size:.95rem;
-  color:var(--text2);
-  max-width:480px;
-  margin:0 auto 48px;
-  line-height:1.7;
-  animation:fadeUp .6s .2s ease both;
-}
+/* CARDS GRID */
+.cards{position:relative;z-index:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:20px;max-width:1120px;margin:0 auto;padding:0 24px 44px;}
 
-@keyframes fadeUp{
-  from{opacity:0;transform:translateY(20px);}
-  to{opacity:1;transform:translateY(0);}
-}
-
-/* ── DIVIDER ── */
-.divider{
-  position:relative;
-  display:flex;
-  align-items:center;
-  gap:16px;
-  max-width:700px;
-  margin:0 auto 48px;
-  animation:fadeUp .6s .25s ease both;
-}
-.divider::before,.divider::after{
-  content:'';flex:1;height:1px;
-  background:linear-gradient(90deg,transparent,var(--border),transparent);
-}
-.divider span{
-  font-size:.55rem;letter-spacing:3px;
-  text-transform:uppercase;color:var(--text2);
-  white-space:nowrap;
-}
-
-/* ── CARDS GRID ── */
-.cards{
-  position:relative;
-  z-index:1;
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-  gap:24px;
-  max-width:800px;
-  margin:0 auto;
-  padding:0 24px 80px;
-}
-
-.tool-card{
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:32px 28px 28px;
-  display:flex;
-  flex-direction:column;
-  gap:20px;
-  text-decoration:none;
-  color:inherit;
-  position:relative;
-  overflow:hidden;
-  transition:transform .25s, border-color .25s, box-shadow .25s;
-  animation:fadeUp .6s .3s ease both;
-}
-.tool-card:nth-child(2){animation-delay:.4s;}
-
-.tool-card::before{
-  content:'';
-  position:absolute;
-  inset:0;
-  opacity:0;
-  transition:opacity .3s;
-  border-radius:16px;
-}
-.tool-card.red::before{
-  background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(230,57,70,.12),transparent 70%);
-}
-.tool-card.yellow::before{
-  background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(255,214,0,.08),transparent 70%);
-}
-
-.tool-card:hover{
-  transform:translateY(-6px);
-  box-shadow:0 20px 60px rgba(0,0,0,.4);
-}
+/* TOOL CARD */
+.tool-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:28px 24px 22px;display:flex;flex-direction:column;gap:18px;text-decoration:none;color:inherit;position:relative;overflow:hidden;transition:transform .25s,border-color .25s,box-shadow .25s;}
+.tool-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .3s;border-radius:16px;}
+.tool-card.red::before{background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(230,57,70,.12),transparent 70%);}
+.tool-card.yellow::before{background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(255,214,0,.08),transparent 70%);}
+.tool-card.teal::before{background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(6,182,212,.1),transparent 70%);}
+.tool-card:hover{transform:translateY(-5px);}
 .tool-card.red:hover{border-color:rgba(230,57,70,.5);box-shadow:0 20px 60px rgba(230,57,70,.15);}
 .tool-card.yellow:hover{border-color:rgba(255,214,0,.4);box-shadow:0 20px 60px rgba(255,214,0,.1);}
+.tool-card.teal:hover{border-color:rgba(6,182,212,.4);box-shadow:0 20px 60px rgba(6,182,212,.12);}
 .tool-card:hover::before{opacity:1;}
-
-/* top accent stripe */
-.tool-card::after{
-  content:'';
-  position:absolute;
-  top:0;left:0;right:0;
-  height:3px;
-  border-radius:16px 16px 0 0;
-  opacity:.6;
-  transition:opacity .25s;
-}
+.tool-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:16px 16px 0 0;opacity:.6;transition:opacity .25s;}
 .tool-card.red::after{background:linear-gradient(90deg,var(--accent),rgba(230,57,70,.3));}
 .tool-card.yellow::after{background:linear-gradient(90deg,var(--yellow),rgba(255,214,0,.3));}
+.tool-card.teal::after{background:linear-gradient(90deg,var(--teal),rgba(6,182,212,.3));}
 .tool-card:hover::after{opacity:1;}
+.tool-card.dimmed{opacity:.65;}.tool-card.dimmed:hover{opacity:1;}
 
-.card-icon-wrap{
-  width:56px;height:56px;
-  border-radius:14px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.8rem;
-  flex-shrink:0;
-  position:relative;
-}
-.tool-card.red .card-icon-wrap{
-  background:rgba(230,57,70,.12);
-  border:1px solid rgba(230,57,70,.25);
-}
-.tool-card.yellow .card-icon-wrap{
-  background:rgba(255,214,0,.08);
-  border:1px solid rgba(255,214,0,.2);
-}
+.card-icon-wrap{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.7rem;flex-shrink:0;}
+.tool-card.red .card-icon-wrap{background:rgba(230,57,70,.12);border:1px solid rgba(230,57,70,.25);}
+.tool-card.yellow .card-icon-wrap{background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.2);}
+.tool-card.teal .card-icon-wrap{background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.2);}
 
 .card-content{flex:1;}
-.card-content h3{
-  font-family:'Oswald',sans-serif;
-  font-size:1.3rem;
-  font-weight:700;
-  letter-spacing:2px;
-  margin-bottom:6px;
-  line-height:1.2;
-}
-.card-content p{
-  font-size:.78rem;
-  color:var(--text2);
-  line-height:1.65;
-}
+.card-content h3{font-family:'Oswald',sans-serif;font-size:1.2rem;font-weight:700;letter-spacing:2px;margin-bottom:6px;line-height:1.2;}
+.card-content p{font-size:.75rem;color:var(--text2);line-height:1.65;}
 
-.card-tags{
-  display:flex;
-  flex-wrap:wrap;
-  gap:5px;
-}
-.tag{
-  font-size:.52rem;
-  font-weight:700;
-  letter-spacing:1.5px;
-  text-transform:uppercase;
-  padding:3px 8px;
-  border-radius:4px;
-  border:1px solid var(--border);
-  color:var(--text2);
-  background:#12141a;
-}
+.card-tags{display:flex;flex-wrap:wrap;gap:5px;}
+.tag{font-size:.5rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 7px;border-radius:4px;border:1px solid var(--border);color:var(--text2);background:#12141a;}
 
-.card-cta{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  border-top:1px solid var(--border);
-  padding-top:16px;
-  margin-top:4px;
-}
-.cta-label{
-  font-family:'Oswald',sans-serif;
-  font-size:.85rem;
-  letter-spacing:2px;
-  font-weight:700;
-  text-transform:uppercase;
-}
+.card-cta{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:14px;margin-top:2px;}
+.cta-label{font-family:'Oswald',sans-serif;font-size:.82rem;letter-spacing:2px;font-weight:700;text-transform:uppercase;}
 .tool-card.red .cta-label{color:var(--accent);}
 .tool-card.yellow .cta-label{color:var(--yellow);}
-
-.cta-arrow{
-  width:30px;height:30px;
-  border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:.75rem;
-  transition:transform .2s;
-}
+.tool-card.teal .cta-label{color:var(--teal);}
+.cta-arrow{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;transition:transform .2s;}
 .tool-card.red .cta-arrow{background:rgba(230,57,70,.15);color:var(--accent);}
 .tool-card.yellow .cta-arrow{background:rgba(255,214,0,.1);color:var(--yellow);}
+.tool-card.teal .cta-arrow{background:rgba(6,182,212,.1);color:var(--teal);}
 .tool-card:hover .cta-arrow{transform:translateX(4px);}
 
-/* ── FOOTER ── */
-footer{
-  position:relative;
-  z-index:1;
-  border-top:1px solid var(--border);
-  padding:20px 32px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  font-size:.58rem;
-  color:var(--text2);
-  letter-spacing:2px;
-  text-transform:uppercase;
-}
+/* VERSION BADGE */
+.vbadge{position:absolute;top:12px;right:12px;font-size:.46rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 7px;border-radius:4px;}
+.vbadge.latest{background:rgba(52,211,153,.15);color:#34d399;border:1px solid rgba(52,211,153,.3);}
+.vbadge.v2{background:rgba(96,165,250,.1);color:#60a5fa;border:1px solid rgba(96,165,250,.25);}
+.vbadge.legacy{background:rgba(255,255,255,.05);color:var(--text2);border:1px solid var(--border);}
+
+/* FOOTER */
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:20px 32px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:.58rem;color:var(--text2);letter-spacing:2px;text-transform:uppercase;margin-top:20px;}
 footer span{color:var(--accent);}
 </style>
 </head>
@@ -375,23 +123,67 @@ footer span{color:var(--accent);}
 <main>
   <section class="hero">
     <div class="hero-eyebrow">🔥 Ausbildungsmaterial</div>
-    <h2>Karten für die<br><span>Feuerwehr</span></h2>
-    <p>Erstelle professionelle Pokémon-style Karten für Gerätekunde und Fahrzeuge – direkt im Browser, ohne Anmeldung.</p>
-    <div class="divider"><span>Wähle einen Generator</span></div>
+    <h2>Tools für die<br><span>Feuerwehr</span></h2>
+    <p>Professionelle Pokémon-style Karten für Gerätekunde und Fahrzeuge – plus Bild-Annotator zur Bildvorbereitung. Direkt im Browser, ohne Anmeldung.</p>
   </section>
 
-  <div class="cards">
+  <div class="workflow">
+    <div class="workflow-box">
+      <div class="wf-icon">💡</div>
+      <div class="wf-body">
+        <p><strong>Empfohlener Workflow</strong></p>
+        <div class="wf-steps">
+          <span class="ws a">① Bild-Annotator</span>
+          <span class="ws-arr">→</span>
+          <span class="ws b">② Gerätekunde Karten</span>
+          <span class="ws-arr">/</span>
+          <span class="ws c">③ Fahrzeug Karten</span>
+        </div>
+        <p>Fotografiere Geräte oder Fahrzeuge, markiere Bauteile im Annotator mit beschrifteten Pfeilen und exportiere das Bild als PNG – dann direkt als Kartenbild in den Generator laden.</p>
+      </div>
+    </div>
+  </div>
 
-    <a href="geraetekunde-karten.html" class="tool-card red">
-      <div class="card-icon-wrap">🪓</div>
+  <!-- BILD-ANNOTATOR -->
+  <div class="section-label"><span>🖊️ Bildvorbereitung</span></div>
+  <div class="cards" style="padding-bottom:48px;">
+
+    <a href="image-annotator-v2.html" class="tool-card teal">
+      <div class="card-icon-wrap">🖊️</div>
       <div class="card-content">
-        <h3>Gerätekunde Karten</h3>
-        <p>Erstelle Karten für Feuerwehrgeräte im Pokémon-Stil – mit Kategorien, Bildern, Eigenschaften und Druckexport.</p>
+        <h3>Bild-Annotator</h3>
+        <p>Lade Fotos von Geräten oder Fahrzeugen und beschrifte Bauteile mit Pfeilen und Textlabels. Mehrere Bilder gleichzeitig – Export als PNG oder PDF. Ideal als Vorstufe für die Karten-Generatoren.</p>
       </div>
       <div class="card-tags">
-        <span class="tag">Gerätekunde</span>
-        <span class="tag">Ausbildung</span>
-        <span class="tag">Druckfertig</span>
+        <span class="tag">Pfeile &amp; Labels</span>
+        <span class="tag">Mehrere Bilder</span>
+        <span class="tag">PNG Export</span>
+        <span class="tag">PDF Export</span>
+      </div>
+      <div class="card-cta">
+        <span class="cta-label">Annotator öffnen</span>
+        <div class="cta-arrow">→</div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- GERÄTEKUNDE KARTEN -->
+  <div class="section-label"><span>🪓 Gerätekunde Karten</span></div>
+  <div class="cards" style="padding-bottom:48px;">
+
+    <a href="geraetekunde-karten-v2.html" class="tool-card red">
+      <span class="vbadge latest">Aktuell</span>
+      <div class="card-icon-wrap">🪓</div>
+      <div class="card-content">
+        <h3>Gerätekunde V3</h3>
+        <p>Export-Wizard mit Direktdruck (Duplex-Modi), Papier-, Profi- und Sticker-Export. Konfigurierbares Fahrzeug-Präfix-System pro Karte. Rückwärtskompatibel mit alten Projekten.</p>
+      </div>
+      <div class="card-tags">
+        <span class="tag">Export-Wizard</span>
+        <span class="tag">Präfix-System</span>
+        <span class="tag">Direktdruck</span>
+        <span class="tag">Duplex</span>
       </div>
       <div class="card-cta">
         <span class="cta-label">Generator öffnen</span>
@@ -399,15 +191,41 @@ footer span{color:var(--accent);}
       </div>
     </a>
 
+    <a href="geraetekunde-karten.html" class="tool-card red">
+      <span class="vbadge v2">V2</span>
+      <div class="card-icon-wrap">🪓</div>
+      <div class="card-content">
+        <h3>Gerätekunde V2</h3>
+        <p>Export-Wizard (Papier, Profi, Sticker) mit separater Drucken-Sektion. Fahrzeug-Präfixe pro Karte, Duplex-Optionen (Lange / Kurze Kante / Manuell).</p>
+      </div>
+      <div class="card-tags">
+        <span class="tag">Export-Wizard</span>
+        <span class="tag">Präfix-System</span>
+        <span class="tag">Duplex-Druck</span>
+      </div>
+      <div class="card-cta">
+        <span class="cta-label">Generator öffnen</span>
+        <div class="cta-arrow">→</div>
+      </div>
+    </a>
+
+
+  </div>
+
+  <!-- FAHRZEUG KARTEN -->
+  <div class="section-label"><span>🚒 Fahrzeug Karten</span></div>
+  <div class="cards" style="padding-bottom:64px;">
+
     <a href="fahrzeug-karten.html" class="tool-card yellow">
       <div class="card-icon-wrap">🚒</div>
       <div class="card-content">
         <h3>Fahrzeug Karten</h3>
-        <p>Generiere Karten für Feuerwehrfahrzeuge mit Typ-Auswahl, Statistiken, Shiny-Effekten und Stickerexport.</p>
+        <p>Karten für Feuerwehrfahrzeuge mit Kartentyp-Auswahl, Fahrzeugstatistiken, Shiny-Hologrammeffekten und vollständigem Export-Wizard (Papier, Profi, Sticker).</p>
       </div>
       <div class="card-tags">
         <span class="tag">Fahrzeugkunde</span>
         <span class="tag">Shiny-Effekte</span>
+        <span class="tag">Export-Wizard</span>
         <span class="tag">Stickerexport</span>
       </div>
       <div class="card-cta">
@@ -417,10 +235,11 @@ footer span{color:var(--accent);}
     </a>
 
   </div>
+
 </main>
 
 <footer>
-  Feuerwehr Karten Suite &nbsp;·&nbsp; <span>100% Browser-basiert</span> &nbsp;·&nbsp; Kein Server · Keine Daten
+  Feuerwehr Karten Suite &nbsp;·&nbsp; <span>100% Browser-basiert</span> &nbsp;·&nbsp; Kein Server &nbsp;·&nbsp; Keine Daten
 </footer>
 
 </body>
