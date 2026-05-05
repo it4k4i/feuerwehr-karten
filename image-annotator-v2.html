@@ -118,11 +118,50 @@ input[type=range]{width:100%;accent-color:var(--accent);}
   #canvas-area{background:white!important;padding:0!important;display:block!important;overflow:visible!important;}
   #sheet{box-shadow:none!important;margin:0!important;}
 }
+
+/* Nav bar */
+#ann-nav{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 10px;
+  background:var(--panel);
+  border-bottom:0.5px solid var(--border);
+  flex-shrink:0;
+}
+#ann-nav a.ann-home{
+  display:inline-flex;align-items:center;gap:4px;
+  color:var(--text2);text-decoration:none;font-size:11px;
+  padding:3px 8px;border-radius:5px;
+  border:0.5px solid var(--border2);background:var(--panel2);
+  transition:all .15s;
+}
+#ann-nav a.ann-home:hover{color:var(--text);border-color:var(--accent);}
+#ann-nav .ann-sep{color:rgba(255,255,255,.15);font-size:10px;margin:0 2px;}
+#ann-nav .ann-crumb{color:rgba(255,255,255,.25);font-size:10px;}
+#ann-nav .ann-lang{
+  margin-left:auto;padding:3px 9px;
+  background:var(--panel2);border:0.5px solid var(--border2);
+  border-radius:5px;color:var(--text2);font-size:11px;
+  cursor:pointer;transition:all .15s;font-family:inherit;
+}
+#ann-nav .ann-lang:hover{color:var(--text);border-color:var(--accent);}
+
 </style>
 </head>
 <body>
 
 <!-- TOP BAR -->
+<div id="ann-nav">
+  <a class="ann-home" href="index.html">🏠 <span id="ann-home-txt">Startseite</span></a>
+  <span class="ann-sep">›</span>
+  <span class="ann-crumb" id="ann-crumb-txt">Bild-Annotator</span>
+  <span id="ann-save-status" style="display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,.3);margin-left:12px;">
+    <span id="ann-save-dot" style="width:6px;height:6px;border-radius:50%;background:#444;flex-shrink:0;transition:background .3s;"></span>
+    <span id="ann-save-txt">—</span>
+  </span>
+  <button id="ann-clear-btn" onclick="annClearAutosave()" title="Autosave löschen" style="display:none;margin-left:6px;padding:2px 7px;background:rgba(220,80,80,.12);border:0.5px solid rgba(220,80,80,.3);border-radius:4px;color:rgba(220,120,120,.8);font-size:10px;cursor:pointer;font-family:inherit;transition:all .15s;">✕</button>
+  <button class="ann-lang" id="ann-lang-btn" onclick="annToggleLang()">🌐 EN</button>
+</div>
+
 <div id="topbar">
   <div class="tb-group">
     <button class="btn primary" onclick="triggerFileOpen()">+ Bild öffnen</button>
@@ -902,6 +941,603 @@ document.addEventListener('keydown', e => {
 
 // Init
 updateAnnList();
+
+/* ════════ ANNOTATOR LANGUAGE SWITCHER ════════ */
+const ANN_LANG_KEY = 'fw_lang';
+let annLang = localStorage.getItem(ANN_LANG_KEY) || 'de';
+
+const ANN_T = {
+  de:{
+    langBtn:'🌐 EN',
+    homeText:'Startseite',
+    crumb:'Bild-Annotator',
+    // topbar
+    btnOpen:'+ Bild öffnen',
+    lblTool:'Werkzeug',
+    toolArrow:'↗ Pfeil', toolLine:'— Linie', toolRect:'▭ Rect',
+    toolCircle:'◯ Kreis', toolText:'T Text', toolSelect:'↖ Auswahl',
+    lblColor:'Farbe', lblStroke:'Stärke', lblMargin:'Rand',
+    marginNone:'Kein',
+    lblAutoText:'Auto-Text',
+    btnClearAnns:'Anns löschen',
+    btnPdfAll:'PDF (alle)', btnPdfCur:'PDF (aktuell)', btnPrint:'Drucken',
+    // side panel left
+    spPages:'Seiten',
+    btnAddPage:'Bild hinzufügen',
+    spAnnotations:'Annotierungen',
+    // drop overlay
+    dropTitle:'Bild hier ablegen',
+    dropSub:'oder oben auf „Bild öffnen" klicken',
+    // props panel
+    spProps:'Eigenschaften',
+    propsEmpty:'Element auswählen',
+    propLabelTitle:'Beschriftung',
+    propLabelPh:'z. B. Ein/Aus-Knopf',
+    propColorTitle:'Farbe',
+    propStrokeTitle:'Strichstärke',
+    propActionsTitle:'Aktionen',
+    btnDuplicate:'Duplizieren',
+    btnDelete:'Löschen',
+    // popup
+    popupLabel:'Beschriftung für Pfeil',
+    popupPh:'z. B. Ein/Aus-Knopf',
+    popupOk:'OK', popupSkip:'Überspringen',
+    // alerts / confirms
+    alertNoImage:'Kein Bild geladen.',
+    alertNoPages:'Keine Seiten vorhanden.',
+    alertMinPage:'Mindestens eine Seite muss vorhanden sein.',
+    confirmClearAnns:'Alle Annotierungen dieser Seite löschen?',
+    // ann list empty
+    annListEmpty:'Noch keine Elemente',
+    // types
+    typeArrow:'↗ Pfeil', typeLine:'— Linie', typeRect:'▭ Rect',
+    typeCircle:'◯ Kreis', typeText:'T Text',
+    // autosave
+    saveSaving:'Speichern…',
+    saveSaved:'Gespeichert',
+    saveError:'Fehler beim Speichern',
+    saveCleared:'Autosave gelöscht',
+    saveRestored:'Wiederhergestellt',
+    restoreLoading:'Wird geladen…',
+    confirmClearSave:'Browser-Autosave wirklich löschen?',
+    restoreTitle:'Projekt wiederherstellen',
+    restoreInfo:'{pages} Seite(n) · {anns} Annotierung(en)',
+    restoreYes:'Wiederherstellen',
+    restoreNo:'Neu beginnen',
+  },
+  en:{
+    langBtn:'🌐 DE',
+    homeText:'Home',
+    crumb:'Image Annotator',
+    btnOpen:'+ Open Image',
+    lblTool:'Tool',
+    toolArrow:'↗ Arrow', toolLine:'— Line', toolRect:'▭ Rect',
+    toolCircle:'◯ Circle', toolText:'T Text', toolSelect:'↖ Select',
+    lblColor:'Color', lblStroke:'Width', lblMargin:'Margin',
+    marginNone:'None',
+    lblAutoText:'Auto-Text',
+    btnClearAnns:'Clear Anns',
+    btnPdfAll:'PDF (all)', btnPdfCur:'PDF (current)', btnPrint:'Print',
+    spPages:'Pages',
+    btnAddPage:'Add Image',
+    spAnnotations:'Annotations',
+    dropTitle:'Drop image here',
+    dropSub:'or click "Open Image" above',
+    spProps:'Properties',
+    propsEmpty:'Select element',
+    propLabelTitle:'Label',
+    propLabelPh:'e.g. On/Off button',
+    propColorTitle:'Color',
+    propStrokeTitle:'Stroke Width',
+    propActionsTitle:'Actions',
+    btnDuplicate:'Duplicate',
+    btnDelete:'Delete',
+    popupLabel:'Label for arrow',
+    popupPh:'e.g. On/Off button',
+    popupOk:'OK', popupSkip:'Skip',
+    alertNoImage:'No image loaded.',
+    alertNoPages:'No pages available.',
+    alertMinPage:'At least one page must remain.',
+    confirmClearAnns:'Delete all annotations on this page?',
+    annListEmpty:'No elements yet',
+    typeArrow:'↗ Arrow', typeLine:'— Line', typeRect:'▭ Rect',
+    typeCircle:'◯ Circle', typeText:'T Text',
+    // autosave
+    saveSaving:'Saving…',
+    saveSaved:'Saved',
+    saveError:'Save error',
+    saveCleared:'Autosave cleared',
+    saveRestored:'Restored',
+    restoreLoading:'Loading…',
+    confirmClearSave:'Really delete browser autosave?',
+    restoreTitle:'Restore Project',
+    restoreInfo:'{pages} page(s) · {anns} annotation(s)',
+    restoreYes:'Restore',
+    restoreNo:'Start fresh',
+  }
+};
+
+function annT(k){ return (ANN_T[annLang]||ANN_T.de)[k] || ANN_T.de[k] || k; }
+
+function applyAnnLang(){
+  const T = ANN_T[annLang];
+  // Nav
+  const lb=document.getElementById('ann-lang-btn'); if(lb) lb.textContent=T.langBtn;
+  const ht=document.getElementById('ann-home-txt'); if(ht) ht.textContent=T.homeText;
+  const ct=document.getElementById('ann-crumb-txt'); if(ct) ct.textContent=T.crumb;
+  // Topbar buttons
+  const btnOpen=document.querySelector('button.btn.primary[onclick="triggerFileOpen()"]');
+  if(btnOpen) btnOpen.textContent=T.btnOpen;
+  // Tool labels
+  const tbLabels=document.querySelectorAll('.tb-label');
+  const tbLabelKeys=['lblTool','lblColor','lblStroke','lblMargin','lblAutoText'];
+  tbLabels.forEach((el,i)=>{ if(tbLabelKeys[i]) el.textContent=T[tbLabelKeys[i]]; });
+  // Tool buttons
+  const toolMap={arrow:'toolArrow',line:'toolLine',rect:'toolRect',circle:'toolCircle',text:'toolText',select:'toolSelect'};
+  Object.entries(toolMap).forEach(([id,key])=>{
+    const el=document.getElementById('tool-'+id);
+    if(el) el.textContent=T[key];
+  });
+  // Margin option "Kein/None"
+  const marginNoneOpt=document.querySelector('#margin-sel option[value="0"]');
+  if(marginNoneOpt) marginNoneOpt.textContent=T.marginNone;
+  // Export buttons (right side)
+  const exportBtns=document.querySelectorAll('#topbar .tb-group:last-child .btn');
+  const exportKeys=['btnClearAnns','btnPdfAll','btnPdfCur','btnPrint'];
+  exportBtns.forEach((btn,i)=>{ if(exportKeys[i]) btn.textContent=T[exportKeys[i]]; });
+  // Side panel headings
+  const spHeads=document.querySelectorAll('.sp-head');
+  if(spHeads[0]) spHeads[0].textContent=T.spPages;
+  if(spHeads[1]) spHeads[1].textContent=T.spAnnotations;
+  if(spHeads[2]) spHeads[2].textContent=T.spProps;
+  // Add page btn
+  const addPage=document.getElementById('add-page-btn');
+  if(addPage){ addPage.innerHTML=`<span style="font-size:16px;line-height:1">+</span> ${T.btnAddPage}`; }
+  // Drop overlay
+  const dropTitle=document.querySelector('.drop-title'); if(dropTitle) dropTitle.textContent=T.dropTitle;
+  const dropSub=document.querySelector('.drop-sub'); if(dropSub) dropSub.textContent=T.dropSub;
+  // Props empty
+  const propsEmpty=document.getElementById('props-empty'); if(propsEmpty) propsEmpty.textContent=T.propsEmpty;
+  // Prop section titles
+  const propTitles=document.querySelectorAll('.prop-section-title');
+  const propTitleKeys=['propLabelTitle','propColorTitle','propStrokeTitle','propActionsTitle'];
+  propTitles.forEach((el,i)=>{ if(propTitleKeys[i]) el.textContent=T[propTitleKeys[i]]; });
+  // Prop label placeholder
+  const propLabel=document.getElementById('prop-label'); if(propLabel) propLabel.placeholder=T.propLabelPh;
+  // Prop action buttons
+  const propBtns=document.querySelectorAll('#props-panel .btn');
+  if(propBtns[0]) propBtns[0].textContent=T.btnDuplicate;
+  if(propBtns[1]) propBtns[1].textContent=T.btnDelete;
+  // Popup
+  const popupLabel=document.querySelector('#label-popup label'); if(popupLabel) popupLabel.textContent=T.popupLabel;
+  const lpInput=document.getElementById('lp-input'); if(lpInput) lpInput.placeholder=T.popupPh;
+  const popupBtns=document.querySelectorAll('.popup-row .btn');
+  if(popupBtns[0]) popupBtns[0].textContent=T.popupOk;
+  if(popupBtns[1]) popupBtns[1].textContent=T.popupSkip;
+  // Update restore dialog if currently shown
+  const restoreOverlay = document.getElementById('restore-overlay');
+  if (restoreOverlay && restoreOverlay.style.display === 'flex' && _annPendingRestore) {
+    document.getElementById('restore-title').textContent = T.restoreTitle;
+    document.getElementById('restore-yes').textContent  = T.restoreYes;
+    document.getElementById('restore-no').textContent   = T.restoreNo;
+  }
+  // HTML lang
+  document.documentElement.lang=annLang;
+  // Re-render ann list with translated type names
+  updateAnnList();
+}
+
+function annToggleLang(){
+  annLang=annLang==='de'?'en':'de';
+  localStorage.setItem(ANN_LANG_KEY,annLang);
+  applyAnnLang();
+}
+
+// Patch clearPageAnns to use translated confirm
+const _origClearPageAnns = clearPageAnns;
+window.clearPageAnns = function(){
+  const p=curPage(); if(!p||!p.annotations.length) return;
+  if(!confirm(annT('confirmClearAnns'))) return;
+  p.annotations=[]; selectedId=null; renderAll(); updatePropsPanel(); updateAnnList();
+};
+
+// Patch removePage to use translated alert
+const _origRemovePage = removePage;
+window.removePage = function(id){
+  if(pages.length===1){ alert(annT('alertMinPage')); return; }
+  pages=pages.filter(p=>p.id!==id);
+  if(currentPageId===id){ currentPageId=pages[0].id; switchPage(currentPageId); }
+  renderPageTabs();
+};
+
+// Patch exportCurrentPDF alert
+const _origExportCurrentPDF = exportCurrentPDF;
+window.exportCurrentPDF = async function(){
+  const p=curPage(); if(!p){ alert(annT('alertNoImage')); return; }
+  await _origExportCurrentPDF();
+};
+
+// Patch exportAllPDF alert
+const _origExportAllPDF = exportAllPDF;
+window.exportAllPDF = async function(){
+  if(!pages.length){ alert(annT('alertNoPages')); return; }
+  await _origExportAllPDF();
+};
+
+// Patch updateAnnList to use translated type names
+const _origUpdateAnnList = updateAnnList;
+window.updateAnnList = function(){
+  const list=document.getElementById('ann-list');
+  list.innerHTML='';
+  const anns=curAnns();
+  if(!anns.length){ list.innerHTML=`<div style="font-size:12px;color:var(--text2);padding:2px 0;">${annT('annListEmpty')}</div>`; return; }
+  const typeMap={arrow:annT('typeArrow'),line:annT('typeLine'),rect:annT('typeRect'),circle:annT('typeCircle'),text:annT('typeText')};
+  anns.forEach((ann,i)=>{
+    const d=document.createElement('div');
+    d.className='ann-item'+(ann.id===selectedId?' selected':'');
+    d.innerHTML=`<div class="ann-dot" style="background:${ann.color}"></div><span class="ann-item-label">${ann.label||(typeMap[ann.type]+' '+(i+1))}</span><button class="ann-item-del" onclick="event.stopPropagation();removeAnn(${ann.id})">✕</button>`;
+    d.addEventListener('click',()=>{ selectedId=ann.id; setTool('select'); renderAll(); updatePropsPanel(); });
+    list.appendChild(d);
+  });
+};
+
+document.addEventListener('DOMContentLoaded', function(){
+  annLang=localStorage.getItem(ANN_LANG_KEY)||'de';
+  applyAnnLang();
+  // annInitAutosave() is called directly at script end and handles its own async init
+});
+
+
+/* ════════════════════════════════════════════════════════
+   INDEXEDDB AUTOSAVE
+   - DB: ann_autosave_db  Store: project  Key: 'state'
+   - Saves: pages (with full src DataURLs), idCounter, marginMm, tool, color, strokeW
+   - Autosave: debounced 2s after any change
+   - Restore: modal on startup if saved state exists
+════════════════════════════════════════════════════════ */
+
+const ANN_IDB_NAME    = 'ann_autosave_db';
+const ANN_IDB_VERSION = 1;
+const ANN_IDB_STORE   = 'project';
+const ANN_IDB_KEY     = 'state';
+
+let _annIdb = null;
+let _annSaveTimer = null;
+
+/* ── Open DB ── */
+function annOpenIDB() {
+  if (_annIdb) return Promise.resolve(_annIdb);
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(ANN_IDB_NAME, ANN_IDB_VERSION);
+    req.onupgradeneeded = e => {
+      e.target.result.createObjectStore(ANN_IDB_STORE);
+    };
+    req.onsuccess = e => { _annIdb = e.target.result; resolve(_annIdb); };
+    req.onerror   = () => reject(req.error);
+  });
+}
+
+/* ── Write ── */
+async function annIdbSet(data) {
+  const db = await annOpenIDB();
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(ANN_IDB_STORE, 'readwrite');
+    tx.objectStore(ANN_IDB_STORE).put(data, ANN_IDB_KEY);
+    tx.oncomplete = () => resolve();
+    tx.onerror    = () => reject(tx.error);
+  });
+}
+
+/* ── Read ── */
+async function annIdbGet() {
+  const db = await annOpenIDB();
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(ANN_IDB_STORE, 'readonly');
+    const req = tx.objectStore(ANN_IDB_STORE).get(ANN_IDB_KEY);
+    req.onsuccess = () => resolve(req.result || null);
+    req.onerror   = () => reject(req.error);
+  });
+}
+
+/* ── Delete ── */
+async function annIdbDelete() {
+  const db = await annOpenIDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(ANN_IDB_STORE, 'readwrite');
+    tx.objectStore(ANN_IDB_STORE).delete(ANN_IDB_KEY);
+    tx.oncomplete = () => resolve();
+    tx.onerror    = () => reject(tx.error);
+  });
+}
+
+/* ── Status dot ── */
+function annSetSaveDot(state, text) {
+  const dot = document.getElementById('ann-save-dot');
+  const txt = document.getElementById('ann-save-txt');
+  const clr = document.getElementById('ann-clear-btn');
+  const colors = { saved:'#4cae6e', saving:'#e8c55a', error:'#e84040', idle:'#444' };
+  if (dot) dot.style.background = colors[state] || colors.idle;
+  if (txt) txt.textContent = text || '';
+  if (clr) clr.style.display = (state === 'saved') ? 'block' : 'none';
+}
+
+/* ── Serialize state ── */
+function annSerialize() {
+  return {
+    version:   2,
+    savedAt:   new Date().toISOString(),
+    idCounter,
+    marginMm,
+    tool,
+    color,
+    strokeW,
+    pages: pages.map(p => ({
+      id:          p.id,
+      name:        p.name,
+      src:         p.src,   // full DataURL — images included
+      nw:          p.nw,
+      nh:          p.nh,
+      annotations: p.annotations.map(a => ({ ...a })),
+    })),
+    currentPageId,
+  };
+}
+
+/* ── Deserialize and restore ── */
+async function annDeserialize(data) {
+  pages         = [];
+  idCounter     = data.idCounter  || 1;
+  marginMm      = data.marginMm   || 20;
+  tool          = data.tool       || 'arrow';
+  color         = data.color      || '#e84040';
+  strokeW       = data.strokeW    || 2;
+
+  // Restore margin selector
+  const marginSel = document.getElementById('margin-sel');
+  if (marginSel) marginSel.value = String(marginMm);
+
+  // Restore stroke selector
+  const strokeSel = document.getElementById('stroke-size');
+  if (strokeSel) strokeSel.value = String(strokeW);
+
+  // Restore color swatch
+  setColor(color);
+
+  // Restore tool
+  setTool(tool);
+
+  for (const pd of (data.pages || [])) {
+    await new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => {
+        pages.push({
+          id:          pd.id,
+          name:        pd.name,
+          src:         pd.src,
+          nw:          pd.nw  || img.naturalWidth,
+          nh:          pd.nh  || img.naturalHeight,
+          annotations: (pd.annotations || []).map(a => ({ ...a })),
+        });
+        resolve();
+      };
+      img.onerror = resolve;  // skip broken images gracefully
+      img.src = pd.src;
+    });
+  }
+
+  currentPageId = data.currentPageId || (pages[0] ? pages[0].id : null);
+
+  renderPageTabs();
+  if (currentPageId) {
+    switchPage(currentPageId);
+  } else {
+    updateAnnList();
+  }
+}
+
+/* ── Schedule autosave ── */
+function annScheduleSave() {
+  clearTimeout(_annSaveTimer);
+  annSetSaveDot('saving', annT('saveSaving'));
+  _annSaveTimer = setTimeout(async () => {
+    try {
+      await annIdbSet(annSerialize());
+      const ts = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      annSetSaveDot('saved', `${annT('saveSaved')} ${ts}`);
+    } catch (err) {
+      console.warn('Autosave error:', err);
+      annSetSaveDot('error', annT('saveError'));
+    }
+  }, 2000);
+}
+
+/* ── Clear autosave ── */
+async function annClearAutosave() {
+  const msg = annT('confirmClearSave');
+  if (!confirm(msg)) return;
+  try {
+    await annIdbDelete();
+    annSetSaveDot('idle', annT('saveCleared'));
+    document.getElementById('ann-clear-btn').style.display = 'none';
+  } catch (err) {
+    console.warn('IDB delete error:', err);
+  }
+}
+
+/* ── Restore dialog ── */
+let _annPendingRestore = null;
+
+function annShowRestoreDialog(data) {
+  _annPendingRestore = data;
+  const savedAt  = data.savedAt ? new Date(data.savedAt).toLocaleString() : '—';
+  const pageCount = (data.pages || []).length;
+  const annCount  = (data.pages || []).reduce((s, p) => s + (p.annotations || []).length, 0);
+
+  document.getElementById('restore-title').textContent = annT('restoreTitle');
+  document.getElementById('restore-info').innerHTML =
+    `${annT('restoreInfo')
+      .replace('{pages}', pageCount)
+      .replace('{anns}', annCount)}<br><span style="font-size:10px;opacity:.6;">${savedAt}</span>`;
+  document.getElementById('restore-yes').textContent = annT('restoreYes');
+  document.getElementById('restore-no').textContent  = annT('restoreNo');
+
+  const overlay = document.getElementById('restore-overlay');
+  overlay.style.display = 'flex';
+}
+
+async function annRestoreYes() {
+  document.getElementById('restore-overlay').style.display = 'none';
+  if (!_annPendingRestore) return;
+  annSetSaveDot('saving', annT('restoreLoading'));
+  try {
+    await annDeserialize(_annPendingRestore);
+    const ts = new Date(_annPendingRestore.savedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    annSetSaveDot('saved', `${annT('saveRestored')} ${ts}`);
+    document.getElementById('ann-clear-btn').style.display = 'block';
+  } catch (err) {
+    console.warn('Restore error:', err);
+    annSetSaveDot('error', annT('saveError'));
+  }
+  _annPendingRestore = null;
+}
+
+function annRestoreNo() {
+  document.getElementById('restore-overlay').style.display = 'none';
+  _annPendingRestore = null;
+  // Optionally wipe the old save so it doesn't prompt again
+  annIdbDelete().catch(() => {});
+  annSetSaveDot('idle', '—');
+}
+
+/* ── Hook all mutating functions to trigger autosave ── */
+function annHookMutations() {
+  // Patch svgUp to save after each draw
+  const _origSvgUp = svgUp;
+  window.svgUp = function(e) {
+    _origSvgUp(e);
+    annScheduleSave();
+  };
+
+  // Patch svgMove (for drag end) — save on mouseup is already covered,
+  // but also hook dragging end:
+  const _origSvgMove = svgMove;
+  window.svgMove = function(e) {
+    _origSvgMove(e);
+    // Only schedule save when actively dragging (not just hovering)
+    if (dragging) annScheduleSave();
+  };
+
+  // Patch commitTextEdit
+  const _origCommit = commitTextEdit;
+  window.commitTextEdit = function() {
+    _origCommit();
+    annScheduleSave();
+  };
+
+  // Patch updateSelLabel (typing in prop panel)
+  const _origUpdateSelLabel = updateSelLabel;
+  window.updateSelLabel = function(v) {
+    _origUpdateSelLabel(v);
+    annScheduleSave();
+  };
+
+  // Patch updateSelColor
+  const _origUpdateSelColor = updateSelColor;
+  window.updateSelColor = function(c) {
+    _origUpdateSelColor(c);
+    annScheduleSave();
+  };
+
+  // Patch updateSelStroke
+  const _origUpdateSelStroke = updateSelStroke;
+  window.updateSelStroke = function(v) {
+    _origUpdateSelStroke(v);
+    annScheduleSave();
+  };
+
+  // Patch deleteSel
+  const _origDeleteSel = deleteSel;
+  window.deleteSel = function() {
+    _origDeleteSel();
+    annScheduleSave();
+  };
+
+  // Patch duplicateSel
+  const _origDuplicateSel = duplicateSel;
+  window.duplicateSel = function() {
+    _origDuplicateSel();
+    annScheduleSave();
+  };
+
+  // Patch removeAnn
+  const _origRemoveAnn = removeAnn;
+  window.removeAnn = function(id) {
+    _origRemoveAnn(id);
+    annScheduleSave();
+  };
+
+  // Patch removePage
+  const _existingRemovePage = window.removePage;
+  window.removePage = function(id) {
+    _existingRemovePage(id);
+    annScheduleSave();
+  };
+
+  // Patch addImagePage to save after image is loaded
+  const _origAddImagePage = addImagePage;
+  window.addImagePage = function(file) {
+    _origAddImagePage(file);
+    // Save after a short delay to let the image load finish
+    setTimeout(annScheduleSave, 500);
+  };
+
+  // Patch setMargin
+  const _origSetMargin = setMargin;
+  window.setMargin = function(v) {
+    _origSetMargin(v);
+    annScheduleSave();
+  };
+
+  // Patch clearPageAnns (already patched for i18n — re-patch to also save)
+  const _existingClearPageAnns = window.clearPageAnns;
+  window.clearPageAnns = function() {
+    _existingClearPageAnns();
+    annScheduleSave();
+  };
+}
+
+/* ── Startup: check for saved state ── */
+async function annInitAutosave() {
+  annHookMutations();
+  try {
+    const saved = await annIdbGet();
+    if (saved && saved.pages && saved.pages.length > 0) {
+      annShowRestoreDialog(saved);
+    } else {
+      annSetSaveDot('idle', '—');
+    }
+  } catch (err) {
+    console.warn('IDB init error:', err);
+    annSetSaveDot('idle', '—');
+  }
+}
+
+annInitAutosave();
+
+
 </script>
+<!-- RESTORE MODAL -->
+<div id="restore-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;align-items:center;justify-content:center;">
+  <div id="restore-box" style="background:var(--panel);border:0.5px solid var(--border2);border-radius:var(--rl);padding:24px;width:340px;box-shadow:0 12px 48px rgba(0,0,0,.6);">
+    <div style="font-size:1.2rem;margin-bottom:10px;">🗂️</div>
+    <div id="restore-title" style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;">Projekt wiederherstellen</div>
+    <div id="restore-info" style="font-size:12px;color:var(--text2);margin-bottom:18px;line-height:1.6;">—</div>
+    <div style="display:flex;gap:8px;">
+      <button id="restore-yes" onclick="annRestoreYes()" style="flex:1;padding:8px;background:var(--accent);border:none;border-radius:var(--r);color:#fff;font-size:13px;cursor:pointer;font-family:inherit;transition:background .15s;">Wiederherstellen</button>
+      <button id="restore-no" onclick="annRestoreNo()" style="flex:1;padding:8px;background:var(--panel2);border:0.5px solid var(--border2);border-radius:var(--r);color:var(--text2);font-size:13px;cursor:pointer;font-family:inherit;transition:all .15s;">Neu beginnen</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

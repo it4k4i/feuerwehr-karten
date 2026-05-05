@@ -107,6 +107,27 @@ header{position:relative;z-index:10;border-bottom:1px solid var(--border);backgr
 /* FOOTER */
 footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:20px 32px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:.58rem;color:var(--text2);letter-spacing:2px;text-transform:uppercase;margin-top:20px;}
 footer span{color:var(--accent);}
+
+/* ── NAV / LANG TOGGLE ── */
+.fw-nav-bar{
+  display:flex;align-items:center;justify-content:flex-end;
+  padding:6px 28px;
+  border-bottom:1px solid var(--border);
+  background:rgba(0,0,0,.2);
+  position:relative;z-index:10;
+}
+.fw-lang-btn{
+  padding:4px 12px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:6px;
+  color:rgba(255,255,255,.5);
+  font-size:.58rem;letter-spacing:1px;
+  cursor:pointer;transition:all .15s;
+  font-family:'Libre Franklin',sans-serif;
+}
+.fw-lang-btn:hover{color:#fff;border-color:rgba(255,255,255,.35);}
+
 </style>
 </head>
 <body>
@@ -120,18 +141,23 @@ footer span{color:var(--accent);}
   <div class="header-badge">Kostenlos &amp; offline</div>
 </header>
 
+
+<div class="fw-nav-bar">
+  <button class="fw-lang-btn" id="fw-lang-btn" onclick="indexToggleLang()">🌐 EN</button>
+</div>
+
 <main>
   <section class="hero">
     <div class="hero-eyebrow">🔥 Ausbildungsmaterial</div>
     <h2>Tools für die<br><span>Feuerwehr</span></h2>
-    <p>Professionelle Pokémon-style Karten für Gerätekunde und Fahrzeuge – plus Bild-Annotator zur Bildvorbereitung. Direkt im Browser, ohne Anmeldung.</p>
+    <p id="hero-desc">Professionelle Pokémon-style Karten für Gerätekunde und Fahrzeuge – plus Bild-Annotator zur Bildvorbereitung. Direkt im Browser, ohne Anmeldung.</p>
   </section>
 
   <div class="workflow">
     <div class="workflow-box">
       <div class="wf-icon">💡</div>
       <div class="wf-body">
-        <p><strong>Empfohlener Workflow</strong></p>
+        <p><strong id="wf-title">Empfohlener Workflow</strong></p>
         <div class="wf-steps">
           <span class="ws a">① Bild-Annotator</span>
           <span class="ws-arr">→</span>
@@ -139,7 +165,7 @@ footer span{color:var(--accent);}
           <span class="ws-arr">/</span>
           <span class="ws c">③ Fahrzeug Karten</span>
         </div>
-        <p>Fotografiere Geräte oder Fahrzeuge, markiere Bauteile im Annotator mit beschrifteten Pfeilen und exportiere das Bild als PNG – dann direkt als Kartenbild in den Generator laden.</p>
+        <p id="wf-desc">Fotografiere Geräte oder Fahrzeuge, markiere Bauteile im Annotator mit beschrifteten Pfeilen und exportiere das Bild als PNG – dann direkt als Kartenbild in den Generator laden.</p>
       </div>
     </div>
   </div>
@@ -241,6 +267,58 @@ footer span{color:var(--accent);}
 <footer>
   Feuerwehr Karten Suite &nbsp;·&nbsp; <span>100% Browser-basiert</span> &nbsp;·&nbsp; Kein Server &nbsp;·&nbsp; Keine Daten
 </footer>
+
+
+<script>
+const INDEX_T = {
+  de:{
+    langBtn:'🌐 EN',
+    heroDesc:'Professionelle Pokémon-style Karten für Gerätekunde und Fahrzeuge – plus Bild-Annotator zur Bildvorbereitung. Direkt im Browser, ohne Anmeldung.',
+    wfTitle:'Empfohlener Workflow',
+    wfDesc:'Fotografiere Geräte oder Fahrzeuge, markiere Bauteile im Annotator mit beschrifteten Pfeilen und exportiere das Bild als PNG – dann direkt als Kartenbild in den Generator laden.',
+    wfStep1:'① Bild-Annotator', wfStep2:'② Gerätekunde Karten', wfStep3:'③ Fahrzeug Karten',
+    secAnnotate:'🖊️ Bildvorbereitung',
+    secGkarten:'🪓 Gerätekunde Karten',
+    secFkarten:'🚒 Fahrzeug Karten',
+    badge:'Kostenlos & offline',
+  },
+  en:{
+    langBtn:'🌐 DE',
+    heroDesc:'Professional Pokémon-style cards for equipment and vehicles – plus an image annotator for photo preparation. Directly in the browser, no login required.',
+    wfTitle:'Recommended Workflow',
+    wfDesc:'Photograph equipment or vehicles, label components in the annotator with arrows and export as PNG – then load directly as card image in the generator.',
+    wfStep1:'① Image Annotator', wfStep2:'② Equipment Cards', wfStep3:'③ Vehicle Cards',
+    secAnnotate:'🖊️ Image Preparation',
+    secGkarten:'🪓 Equipment Cards',
+    secFkarten:'🚒 Vehicle Cards',
+    badge:'Free & offline',
+  }
+};
+
+let indexLang = localStorage.getItem('fw_lang') || 'de';
+
+function applyIndexLang(){
+  const T = INDEX_T[indexLang];
+  const btn = document.getElementById('fw-lang-btn');
+  if(btn) btn.textContent = T.langBtn;
+  const heroDesc = document.getElementById('hero-desc');
+  if(heroDesc) heroDesc.textContent = T.heroDesc;
+  const wfTitle = document.getElementById('wf-title');
+  if(wfTitle) wfTitle.textContent = T.wfTitle;
+  const wfDesc = document.getElementById('wf-desc');
+  if(wfDesc) wfDesc.textContent = T.wfDesc;
+  // Update html lang
+  document.documentElement.lang = indexLang;
+}
+
+function indexToggleLang(){
+  indexLang = indexLang==='de' ? 'en' : 'de';
+  localStorage.setItem('fw_lang', indexLang);
+  applyIndexLang();
+}
+
+document.addEventListener('DOMContentLoaded', applyIndexLang);
+</script>
 
 </body>
 </html>

@@ -419,6 +419,24 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
 .sports-stat-lbl{font-size:calc(var(--cw)*0.033);color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;display:block;}
 .sports-bot{padding:calc(var(--cw)*0.014) calc(var(--cw)*0.042) calc(var(--cw)*0.016);background:#080808;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 .sports-serial{font-size:calc(var(--cw)*0.033);color:rgba(255,255,255,.3);}
+
+/* Home + Lang buttons */
+.hdr-home{
+  display:inline-flex;align-items:center;gap:4px;
+  background:transparent;border:1px solid var(--border);border-radius:6px;
+  padding:4px 10px;color:var(--text2);font-size:.7rem;
+  cursor:pointer;transition:all .15s;
+  font-family:'Rajdhani',sans-serif;
+  text-decoration:none;
+}
+.hdr-home:hover{border-color:#fff;color:#fff;}
+.hdr-lang{
+  padding:4px 10px;background:transparent;border:1px solid var(--border);
+  border-radius:6px;color:var(--text2);font-size:.7rem;
+  cursor:pointer;transition:all .15s;font-family:'Rajdhani',sans-serif;
+}
+.hdr-lang:hover{border-color:#fff;color:#fff;}
+
 </style>
 </head>
 <body>
@@ -431,6 +449,8 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
     <div class="hdr-sub">POKÉMON · YUGIOH · MAGIC · QUARTET · DBS · F&B · WS · SPORTS</div>
   </div>
   <div class="hdr-right">
+    <a class="hdr-home" href="index.html">🏠</a>
+    <button class="hdr-lang" id="fzLangBtn" onclick="fzToggleLang()">🌐 EN</button>
     <div class="autosave"><div class="asdot" id="asDot"></div><span id="asTxt">Bereit</span></div>
     <div class="cnt-badge"><span class="num" id="hdrCnt">0</span><span class="lbl">KARTEN</span></div>
   </div>
@@ -441,16 +461,16 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
 
   <!-- NEUE KARTE -->
   <div class="sb-sec">
-    <div class="sb-hd" onclick="togSec(this)">🃏 Neue Karte<span class="chev">▾</span></div>
+    <div class="sb-hd" onclick="togSec(this)"><span data-fz-i18n="secNewCard">🃏 Neue Karte</span><span class="chev">▾</span></div>
     <div class="sb-body">
 
       <div class="fg">
-        <label>Rufzeichen</label>
+        <label data-fz-i18n="lblCallsign">Rufzeichen</label>
         <input type="text" id="inName" placeholder="z.B. EPP-1-19-1" />
       </div>
 
       <div class="fg">
-        <label>Kartentyp</label>
+        <label data-fz-i18n="lblCardType">Kartentyp</label>
         <div class="style-grid" id="styleGrid">
           <div class="style-opt active" data-v="pokemon" onclick="pickStyle(this)"><span class="si">⚡</span><span class="sn">POKÉMON</span></div>
           <div class="style-opt" data-v="yugioh" onclick="pickStyle(this)"><span class="si">👁</span><span class="sn">YUGIOH</span></div>
@@ -477,12 +497,12 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
       </div>
 
       <div class="fg">
-        <label>Fahrzeugtyp</label>
+        <label data-fz-i18n="lblVehicleType">Fahrzeugtyp</label>
         <div class="cat-list" id="catListNew"></div>
       </div>
 
       <div class="fg">
-        <label>Seltenheit</label>
+        <label data-fz-i18n="lblRarity">Seltenheit</label>
         <div class="rarity-row" id="rarityNew">
           <div class="rchip sel" data-r="common"   onclick="pickRarity(this,'rarityNew')" style="color:#888;border-color:#888;">● Common</div>
           <div class="rchip"     data-r="uncommon" onclick="pickRarity(this,'rarityNew')" style="color:#4ade80;">◆ Unc.</div>
@@ -494,7 +514,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
 
       <!-- Stats-Block: immer sichtbar, Labels ändern sich je nach Stil -->
       <div class="fg">
-        <label id="statsLabel">Fahrzeugwerte</label>
+        <label id="statsLabel" data-fz-i18n="statsLabel">Fahrzeugwerte</label>
         <div class="stat-grid">
           <div class="sf"><label id="sl0">PS/kW</label><input type="text" id="st0" placeholder="320" /></div>
           <div class="sf"><label id="sl1">km/h</label><input type="text" id="st1" placeholder="160" /></div>
@@ -509,12 +529,12 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
 
       <!-- Beschreibung: nur für yugioh & magic -->
       <div class="fg" id="descBlock" style="display:none;">
-        <label>Beschreibung / Flavour</label>
+        <label data-fz-i18n="lblDesc">Beschreibung / Flavour</label>
         <textarea id="inDesc" placeholder="Kurze Beschreibung des Fahrzeugs…"></textarea>
       </div>
 
       <div class="fg">
-        <label>Foto</label>
+        <label data-fz-i18n="lblPhoto">Foto</label>
         <div class="upzone" id="upZone">
           <input type="file" id="upInput" accept="image/*" />
           <div class="uico">📷</div><p>Foto hochladen</p>
@@ -522,26 +542,26 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
         </div>
       </div>
 
-      <button class="btn-p" onclick="addCard()" style="margin-top:8px;">+ KARTE ERSTELLEN</button>
+      <button class="btn-p" onclick="addCard()" style="margin-top:8px;" data-fz-i18n="btnAddCard">+ KARTE ERSTELLEN</button>
     </div>
   </div>
 
   <!-- FAHRZEUGTYPEN -->
   <div class="sb-sec">
-    <div class="sb-hd" onclick="togSec(this)">🚒 Fahrzeugtypen<span class="chev">▾</span></div>
+    <div class="sb-hd" onclick="togSec(this)"><span data-fz-i18n="secVehicleTypes">🚒 Fahrzeugtypen</span><span class="chev">▾</span></div>
     <div class="sb-body">
       <div id="catMgmt" class="cat-list" style="max-height:none;"></div>
-      <button class="btn-ghost" onclick="openCatModal(null)" style="margin-top:8px;">+ Neuer Fahrzeugtyp</button>
+      <button class="btn-ghost" onclick="openCatModal(null)" style="margin-top:8px;" data-fz-i18n="btnNewType">+ Neuer Fahrzeugtyp</button>
     </div>
   </div>
 
   <!-- EXPORT -->
   <div class="sb-sec">
-    <div class="sb-hd" onclick="togSec(this)">🖨️ Druck & Export<span class="chev">▾</span></div>
+    <div class="sb-hd" onclick="togSec(this)"><span data-fz-i18n="secExport">🖨️ Druck & Export</span><span class="chev">▾</span></div>
     <div class="sb-body">
-      <button class="btn-p" onclick="openExportWizard()" style="margin-bottom:8px;background:linear-gradient(90deg,var(--accent),#c0392b);">🧙 Export-Wizard starten</button>
-      <button class="btn-ghost" onclick="exportAll()">💾 Alle als PNG (Schnell)</button>
-      <button class="btn-ghost" onclick="exportJSON()">📦 Projekt als JSON sichern</button>
+      <button class="btn-p" onclick="openExportWizard()" style="margin-bottom:8px;background:linear-gradient(90deg,var(--accent),#c0392b);" data-fz-i18n="btnWizard">🧙 Export-Wizard starten</button>
+      <button class="btn-ghost" onclick="exportAll()" data-fz-i18n="btnQuickPNG">💾 Alle als PNG (Schnell)</button>
+      <button class="btn-ghost" onclick="exportJSON()" data-fz-i18n="btnExportJSON">📦 Projekt als JSON sichern</button>
       <button class="btn-ghost" onclick="document.getElementById('jsonIn').click()">📂 JSON laden</button>
       <input type="file" id="jsonIn" accept=".json" style="display:none" onchange="doImportJSON(this)" />
       <button class="btn-ghost" onclick="clearAll()" style="color:#ff8a80;border-color:#4a2020;">🗑 Alle löschen</button>
@@ -552,7 +572,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
 
 <div class="preview">
   <div class="prev-hdr">
-    <h2>VORSCHAU</h2>
+    <h2 data-fz-i18n="lblPreview">VORSCHAU</h2>
     <select class="tb-select" id="filterStyle" onchange="render()">
       <option value="">Alle Typen</option>
       <option value="pokemon">Pokémon</option>
@@ -571,7 +591,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
     <button class="tb-btn" onclick="cycleSize()" id="sizeBtn">📐 Normal</button>
   </div>
   <div class="cgrid" id="cgrid">
-    <div class="empty" id="emptyMsg"><span>🚒</span>Noch keine Karten — links eine erstellen!</div>
+    <div class="empty" id="emptyMsg"><span>🚒</span data-fz-i18n="emptyMsg">Noch keine Karten — links eine erstellen!</div>
   </div>
 </div>
 </div><!-- end body -->
@@ -598,7 +618,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
   <div class="modal">
     <button class="modal-close-x" onclick="closeEditModal()">✕</button>
     <h3>KARTE BEARBEITEN</h3>
-    <div class="fg"><label>Rufzeichen</label><input type="text" id="eName" /></div>
+    <div class="fg"><label data-fz-i18n="lblCallsign">Rufzeichen</label><input type="text" id="eName" /></div>
     <div class="fg"><label>Kartentyp</label>
       <select id="eStyle" onchange="updateEditDesc()">
         <option value="pokemon">Pokémon</option>
@@ -4220,6 +4240,125 @@ initUpload('eUpInput','eUpPrev','eUpZone', d=>{ editNewImg=d; });
 renderCatList();
 updateFormForStyle();
 loadSave().then(had=>{ if(!had) render(); showWarn(); renderSidebarShinyChips(); });
+
+/* ════════ FAHRZEUG-KARTEN LANGUAGE SWITCHER ════════ */
+const FZ_LANG_KEY = 'fw_lang';
+let fzLang = localStorage.getItem(FZ_LANG_KEY) || 'de';
+
+const FZ_T = {
+  de:{
+    langBtn:'🌐 EN',
+    // Sidebar sections
+    secNewCard:'🃏 Neue Karte',
+    secVehicleTypes:'🚒 Fahrzeugtypen',
+    secExport:'🖨️ Druck & Export',
+    // New card form
+    lblCallsign:'Rufzeichen',
+    lblCardType:'Kartentyp',
+    lblVehicleType:'Fahrzeugtyp',
+    lblRarity:'Seltenheit',
+    lblStats:'Fahrzeugwerte',
+    lblDesc:'Beschreibung / Flavour',
+    lblPhoto:'Foto',
+    btnAddCard:'+ KARTE ERSTELLEN',
+    btnNewType:'+ Neuer Fahrzeugtyp',
+    // Export
+    btnWizard:'🧙 Export-Wizard starten',
+    btnQuickPNG:'💾 Alle als PNG (Schnell)',
+    btnExportJSON:'📦 Projekt als JSON sichern',
+    btnLoadJSON:'📂 JSON laden',
+    btnDeleteAll:'🗑 Alle löschen',
+    // Preview
+    lblPreview:'VORSCHAU',
+    filterAllTypes:'Alle Fahrzeugtypen',
+    emptyMsg:'Noch keine Karten — links eine erstellen!',
+    // Rarity
+    rCommon:'● Common', rUncommon:'◆ Unc.', rRare:'★ Rare', rUltra:'◉ Ultra', rSecret:'✦ Secret',
+    // Stats labels
+    sl0:'PS/kW',sl1:'km/h',sl2:'Liter',sl3:'0–100',sl4:'Baujahr',sl5:'Gewicht t',
+    statsLabel:'Fahrzeugwerte',
+    // Autosave
+    autosaveReady:'Bereit',
+    // Warning
+    warnTitle:'WICHTIGER HINWEIS',
+    warnText:'Diese App speichert deine Daten <strong>nur im Browser</strong>.<br>Exportiere dein Projekt regelmäßig als JSON!',
+    warnCheck:'Nicht mehr anzeigen',
+    // Wizard
+    wzStep1:'Format', wzStep2:'Einstellungen', wzStep3:'Auswahl',
+  },
+  en:{
+    langBtn:'🌐 DE',
+    secNewCard:'🃏 New Card',
+    secVehicleTypes:'🚒 Vehicle Types',
+    secExport:'🖨️ Print & Export',
+    lblCallsign:'Call Sign',
+    lblCardType:'Card Type',
+    lblVehicleType:'Vehicle Type',
+    lblRarity:'Rarity',
+    lblStats:'Vehicle Stats',
+    lblDesc:'Description / Flavour',
+    lblPhoto:'Photo',
+    btnAddCard:'+ CREATE CARD',
+    btnNewType:'+ New Vehicle Type',
+    btnWizard:'🧙 Open Export Wizard',
+    btnQuickPNG:'💾 All as PNG (Quick)',
+    btnExportJSON:'📦 Save project as JSON',
+    btnLoadJSON:'📂 Load JSON',
+    btnDeleteAll:'🗑 Delete all',
+    lblPreview:'PREVIEW',
+    filterAllTypes:'All Vehicle Types',
+    emptyMsg:'No cards yet — create one on the left!',
+    rCommon:'● Common', rUncommon:'◆ Unc.', rRare:'★ Rare', rUltra:'◉ Ultra', rSecret:'✦ Secret',
+    sl0:'HP/kW',sl1:'km/h',sl2:'Liters',sl3:'0–60mph',sl4:'Year',sl5:'Weight t',
+    statsLabel:'Vehicle Stats',
+    autosaveReady:'Ready',
+    warnTitle:'IMPORTANT NOTE',
+    warnText:'This app stores your data <strong>in the browser only</strong>.<br>Export your project as JSON regularly!',
+    warnCheck:'Do not show again',
+    wzStep1:'Format', wzStep2:'Settings', wzStep3:'Selection',
+  }
+};
+
+function fzT(k){ return (FZ_T[fzLang]||FZ_T['de'])[k] || FZ_T['de'][k] || k; }
+
+function applyFzLang(){
+  const T = FZ_T[fzLang];
+  // Header
+  const lb = document.getElementById('fzLangBtn');
+  if(lb) lb.textContent = T.langBtn;
+  // Sidebar section headers (sb-hd)
+  document.querySelectorAll('[data-fz-i18n]').forEach(el=>{
+    const k = el.getAttribute('data-fz-i18n');
+    const v = fzT(k);
+    if(el.tagName==='OPTION') el.textContent = v;
+    else if(v.includes('<')) el.innerHTML = v;
+    else el.textContent = v;
+  });
+  // Placeholder
+  document.querySelectorAll('[data-fz-ph]').forEach(el=>{
+    el.placeholder = fzT(el.getAttribute('data-fz-ph'));
+  });
+  // Html lang
+  document.documentElement.lang = fzLang;
+  // Autosave status (only if currently "Bereit"/"Ready")
+  const asTxt = document.getElementById('asTxt');
+  if(asTxt && (asTxt.textContent==='Bereit'||asTxt.textContent==='Ready')) {
+    asTxt.textContent = T.autosaveReady;
+  }
+}
+
+function fzToggleLang(){
+  fzLang = fzLang==='de' ? 'en' : 'de';
+  localStorage.setItem(FZ_LANG_KEY, fzLang);
+  applyFzLang();
+}
+
+// Init on load
+document.addEventListener('DOMContentLoaded', function(){
+  fzLang = localStorage.getItem(FZ_LANG_KEY) || 'de';
+  applyFzLang();
+});
+
 </script>
 </body>
 </html>

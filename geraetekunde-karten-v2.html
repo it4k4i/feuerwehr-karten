@@ -243,6 +243,18 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
 .warn-box .warn-check input{width:14px;height:14px;accent-color:var(--accent);}
 .warn-btn{padding:10px 28px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-family:'Oswald',sans-serif;font-size:.95rem;letter-spacing:2px;cursor:pointer;}
 .warn-btn:hover{filter:brightness(1.1);}
+
+/* Home button in header */
+.hdr-home{
+  display:inline-flex;align-items:center;gap:4px;
+  background:transparent;border:1px solid var(--border);border-radius:6px;
+  padding:4px 10px;color:var(--text2);font-size:.7rem;
+  cursor:pointer;transition:all .15s;
+  font-family:'Libre Franklin',sans-serif;
+  text-decoration:none;
+}
+.hdr-home:hover{border-color:#fff;color:#fff;}
+
 </style>
 </head>
 <body>
@@ -251,6 +263,7 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
     <div class="hdr-logo">🔥</div>
     <div><h1>FEUERWEHR KARTEN</h1><p data-i18n="subtitle">Gerätekunde · Pokémon Edition</p></div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+      <a class="hdr-home" href="index.html" title="Gerätekunde Aktuell – Startseite">🏠</a>
       <button onclick="toggleLang()" id="langBtn" style="background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text2);font-size:.7rem;cursor:pointer;font-family:'Libre Franklin',sans-serif;transition:all .15s;" onmouseover="this.style.borderColor='#fff';this.style.color='#fff'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">🌐 EN</button>
       <div class="hdr-counter">
         <span class="hdr-cnt-num" id="hdrCnt">0</span>
@@ -3235,6 +3248,28 @@ loadFromBrowser().then(hadAutosave=>{
   if(!hadAutosave) render();
   showWarning();
 });
+
+/* Sync language with shared fw_lang key */
+(function(){
+  // On load: read shared key and override page default
+  const shared = localStorage.getItem('fw_lang');
+  if(shared && (shared==='de'||shared==='en')){
+    currentLang = shared;
+  }
+  // Wrap toggleLang to also write shared key
+  const _origToggle = typeof toggleLang === 'function' ? toggleLang : null;
+  window.toggleLang = function(){
+    if(_origToggle) _origToggle();
+    localStorage.setItem('fw_lang', currentLang);
+  };
+  // Apply i18n after DOM ready
+  document.addEventListener('DOMContentLoaded', function(){
+    const shared2 = localStorage.getItem('fw_lang');
+    if(shared2 && (shared2==='de'||shared2==='en')) currentLang = shared2;
+    if(typeof applyI18n==='function') applyI18n();
+  });
+})();
+
 </script>
 </body>
 </html>
