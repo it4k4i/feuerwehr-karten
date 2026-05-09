@@ -450,7 +450,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
   </div>
   <div class="hdr-right">
     <a class="hdr-home" href="index.html">🏠</a>
-    <a href="https://github.com/it4k4i/feuerwehr-karten/issues/new" target="_blank" rel="noopener"
+    <a href="https://github.com/issues/new" target="_blank" rel="noopener"
        style="display:inline-flex;align-items:center;gap:4px;background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text2);font-size:.62rem;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.5px;text-decoration:none;transition:all .15s;"
        onmouseover="this.style.borderColor='rgba(255,255,255,.4)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">🐛 Bug melden</a>
     <button class="hdr-lang" id="fzLangBtn" onclick="fzToggleLang()">🌐 EN</button>
@@ -568,6 +568,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
       <button class="btn-ghost" onclick="document.getElementById('jsonIn').click()">📂 JSON laden</button>
       <input type="file" id="jsonIn" accept=".json" style="display:none" onchange="doImportJSON(this)" />
       <button class="btn-ghost" onclick="clearAll()" style="color:#ff8a80;border-color:#4a2020;">🗑 Alle löschen</button>
+      <p style="font-size:.58rem;color:rgba(245,158,11,.85);margin-top:8px;line-height:1.5;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-radius:4px;padding:5px 7px;">⚠️ <strong style="color:#fbbf24;">Experimentell</strong> – nicht vollständig getestet. Projekt regelmäßig als JSON sichern!</p>
     </div>
   </div>
 
@@ -683,7 +684,7 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
   <div class="warn-box">
     <div style="font-size:2.5rem;margin-bottom:10px;">⚠️</div>
     <h2>HINWEIS</h2>
-    <p>Daten werden <strong>nur im Browser</strong> gespeichert.<br>Bitte regelmäßig als JSON sichern!</p>
+    <p>Daten werden <strong>nur im Browser</strong> gespeichert.<br>Bitte regelmäßig als JSON sichern!<br><span style="font-size:.75em;color:rgba(245,158,11,.9);display:block;margin-top:8px;padding:4px 8px;background:rgba(245,158,11,.1);border-radius:4px;border:1px solid rgba(245,158,11,.25);">⚠️ Diese App ist <strong>experimentell</strong> und nicht vollständig getestet.</span></p>
     <label class="warn-check"><input type="checkbox" id="warnCb" /> Nicht mehr anzeigen</label>
     <button class="btn-p" onclick="closeWarn()" style="padding:8px 24px;width:auto;">VERSTANDEN</button>
   </div>

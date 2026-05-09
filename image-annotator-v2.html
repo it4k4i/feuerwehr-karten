@@ -159,7 +159,7 @@ input[type=range]{width:100%;accent-color:var(--accent);}
     <span id="ann-save-txt">—</span>
   </span>
   <button id="ann-clear-btn" onclick="annClearAutosave()" title="Autosave löschen" style="display:none;margin-left:6px;padding:2px 7px;background:rgba(220,80,80,.12);border:0.5px solid rgba(220,80,80,.3);border-radius:4px;color:rgba(220,120,120,.8);font-size:10px;cursor:pointer;font-family:inherit;transition:all .15s;">✕</button>
-  <a id="ann-issue-btn" href="https://github.com/it4k4i/feuerwehr-karten/issues/new" target="_blank" rel="noopener"
+  <a id="ann-issue-btn" href="https://github.com/issues/new" target="_blank" rel="noopener"
      style="margin-left:8px;padding:3px 9px;background:rgba(255,255,255,.04);border:0.5px solid rgba(255,255,255,.12);border-radius:5px;color:rgba(255,255,255,.35);font-size:10px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:all .15s;"
      onmouseover="this.style.borderColor='rgba(255,255,255,.3)';this.style.color='rgba(255,255,255,.7)'"
      onmouseout="this.style.borderColor='rgba(255,255,255,.12)';this.style.color='rgba(255,255,255,.35)'">
@@ -1674,7 +1674,8 @@ annInitAutosave();
   <div id="restore-box" style="background:var(--panel);border:0.5px solid var(--border2);border-radius:var(--rl);padding:24px;width:340px;box-shadow:0 12px 48px rgba(0,0,0,.6);">
     <div style="font-size:1.2rem;margin-bottom:10px;">🗂️</div>
     <div id="restore-title" style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;">Projekt wiederherstellen</div>
-    <div id="restore-info" style="font-size:12px;color:var(--text2);margin-bottom:18px;line-height:1.6;">—</div>
+    <div id="restore-info" style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.6;">—</div>
+    <p style="font-size:11px;color:rgba(245,158,11,.85);margin-bottom:14px;padding:5px 8px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:5px;line-height:1.5;">⚠️ <strong style="color:#fbbf24;">Experimentell</strong> – Autosave kann unvollständig sein. Als PNG/PDF exportieren sichert Ergebnisse zuverlässig.</p>
     <div style="display:flex;gap:8px;">
       <button id="restore-yes" onclick="annRestoreYes()" style="flex:1;padding:8px;background:var(--accent);border:none;border-radius:var(--r);color:#fff;font-size:13px;cursor:pointer;font-family:inherit;transition:background .15s;">Wiederherstellen</button>
       <button id="restore-no" onclick="annRestoreNo()" style="flex:1;padding:8px;background:var(--panel2);border:0.5px solid var(--border2);border-radius:var(--r);color:var(--text2);font-size:13px;cursor:pointer;font-family:inherit;transition:all .15s;">Neu beginnen</button>

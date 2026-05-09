@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="de">
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taktische Zeichen Generator – DV 102 / FwDV 102</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Libre+Franklin:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0c0e12;--panel:#14171e;--panel2:#191c26;--panel3:#1f2330;
+  --border:#252a38;--border2:#2e3448;
+  --text:#e2e6f2;--text2:#6e7c96;--text3:#404c62;
+  --accent:#e63946;--teal:#0ea5e9;--green:#22c55e;--yellow:#f59e0b;
+}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-serif;display:flex;flex-direction:column;}
+
+/* HEADER */
+.hdr{flex-shrink:0;z-index:20;position:relative;background:linear-gradient(90deg,#07080c,#10131a 50%,#07080c);border-bottom:1px solid var(--border2);height:54px;display:flex;align-items:center;padding:0 18px;gap:12px;}
+.hdr-logo{width:32px;height:32px;background:linear-gradient(135deg,#dc2626,#991b1b);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 0 14px rgba(220,38,38,.4);}
+.hdr-title{font-family:'Oswald',sans-serif;font-weight:700;font-size:1rem;letter-spacing:2.5px;background:linear-gradient(90deg,#fff 40%,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hdr-sub{font-size:.46rem;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-top:1px;}
+.hdr-spacer{flex:1;}
+.hdr-norm{font-size:.52rem;font-weight:700;letter-spacing:1px;color:#60a5fa;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:3px 9px;}
+
+/* LAYOUT */
+.app-body{display:grid;grid-template-columns:270px 1fr 286px;flex:1;min-height:0;overflow:hidden;position:relative;z-index:1;}
+
+/* LEFT SIDEBAR */
+.sidebar{background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sb-head{padding:10px 12px 8px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.sb-search{display:flex;align-items:center;gap:7px;background:var(--panel2);border:1px solid var(--border2);border-radius:7px;padding:5px 9px;}
+.sb-search input{background:none;border:none;outline:none;color:var(--text);font-size:.7rem;width:100%;font-family:'Libre Franklin',sans-serif;}
+.sb-search input::placeholder{color:var(--text3);}
+.symbol-list-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+.symbol-list-scroll::-webkit-scrollbar{width:3px;}
+.symbol-list-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* Category accordion */
+.cat-section{border-bottom:1px solid var(--border);}
+.cat-header{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;cursor:pointer;user-select:none;transition:background .12s;}
+.cat-header:hover{background:rgba(255,255,255,.02);}
+.cat-header-left{display:flex;align-items:center;gap:7px;}
+.cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.cat-title-text{font-size:.56rem;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:var(--text);}
+.cat-badge{font-size:.44rem;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:3px;}
+.cat-badge.official{background:rgba(34,197,94,.1);color:#4ade80;border:1px solid rgba(34,197,94,.2);}
+.cat-badge.eigen{background:rgba(245,158,11,.1);color:#fbbf24;border:1px solid rgba(245,158,11,.2);}
+.cat-count{font-size:.46rem;color:var(--text3);background:var(--panel2);border-radius:8px;padding:1px 5px;}
+.cat-chevron{font-size:.55rem;color:var(--text3);transition:transform .15s;}
+.cat-body{display:none;padding:4px 8px 8px;}
+.cat-body.open{display:block;}
+
+/* Symbol grid */
+.sym-subgroup{font-size:.44rem;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:6px 4px 3px;display:flex;align-items:center;gap:5px;}
+.sym-subgroup::after{content:'';flex:1;height:1px;background:var(--border);}
+.sym-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:4px;}
+.sym-item{background:var(--panel2);border:1px solid var(--border);border-radius:6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 3px 4px;transition:all .14s;user-select:none;position:relative;}
+.sym-item:hover{border-color:var(--border2);background:var(--panel3);transform:translateY(-1px);}
+.sym-item:active{transform:scale(.96);}
+.sym-item.selected{border-color:var(--accent);background:rgba(230,57,70,.08);}
+.sym-item svg{width:46px;height:38px;}
+.sym-item-label{font-size:.38rem;font-weight:700;letter-spacing:.2px;text-transform:uppercase;color:var(--text2);text-align:center;line-height:1.2;padding:0 2px;}
+.sym-item:hover .sym-item-label{color:var(--text);}
+.sym-item .sym-status{position:absolute;top:2px;right:2px;width:5px;height:5px;border-radius:50%;}
+.sym-status.official{background:#4ade80;}
+.sym-status.eigen{background:#fbbf24;}
+
+/* CENTER CANVAS */
+.canvas-area{background:var(--panel2);display:flex;flex-direction:column;overflow:hidden;}
+.canvas-toolbar{flex-shrink:0;background:var(--panel);border-bottom:1px solid var(--border);padding:7px 12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.tb-lbl{font-size:.5rem;color:var(--text3);font-weight:700;letter-spacing:.8px;text-transform:uppercase;}
+.tb-btn{display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--text2);font-size:.55rem;font-weight:700;letter-spacing:.7px;text-transform:uppercase;cursor:pointer;transition:all .12s;font-family:'Libre Franklin',sans-serif;}
+.tb-btn:hover{border-color:var(--border2);color:var(--text);}
+.tb-btn.active{border-color:var(--teal);color:var(--teal);background:rgba(14,165,233,.07);}
+.tb-btn.red{background:rgba(220,38,38,.1);border-color:rgba(220,38,38,.35);color:#f87171;}
+.tb-btn.green{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.3);color:#4ade80;}
+.tb-sep{width:1px;height:18px;background:var(--border);margin:0 1px;}
+#canvasCounter{font-size:.54rem;font-weight:700;color:var(--text3);}
+.canvas-wrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:auto;padding:20px;}
+#printCanvas{background:#fff;border-radius:3px;box-shadow:0 0 0 1px rgba(255,255,255,.06),0 8px 40px rgba(0,0,0,.6);}
+
+/* Magnet cells */
+.magnet-cell{position:relative;border:1px dashed rgba(0,0,0,.13);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .12s;overflow:hidden;}
+.magnet-cell:hover{background:rgba(59,130,246,.05);}
+.magnet-cell.drag-over{background:rgba(59,130,246,.15)!important;outline:2px dashed #3b82f6;}
+.drop-hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;font-size:.42rem;color:rgba(0,0,0,.2);letter-spacing:.6px;text-transform:uppercase;font-weight:700;pointer-events:none;}
+.magnet-cell:hover .drop-hint{opacity:1;}
+.magnet-cell.filled .drop-hint{display:none;}
+.placed-sign{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;}
+.placed-sign svg{max-width:86%;max-height:86%;}
+.cell-lbl{font-family:'Share Tech Mono',monospace;text-align:center;line-height:1.2;padding:0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.cell-remove{position:absolute;top:2px;right:2px;width:13px;height:13px;background:rgba(220,38,38,.85);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transition:opacity .12s;font-size:.48rem;color:#fff;z-index:5;line-height:1;}
+.magnet-cell:hover .cell-remove{opacity:1;}
+
+/* RIGHT INSPECTOR */
+.inspector{background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.insp-head{padding:10px 12px 8px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.insp-title{font-family:'Oswald',sans-serif;font-size:.7rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text2);}
+.insp-body{flex:1;overflow-y:auto;padding:10px;}
+.insp-body::-webkit-scrollbar{width:3px;}
+.insp-body::-webkit-scrollbar-thumb{background:var(--border2);}
+.insp-sec{margin-bottom:14px;}
+.insp-sec-title{font-size:.48rem;font-weight:900;letter-spacing:1.8px;text-transform:uppercase;color:var(--text3);margin-bottom:7px;display:flex;align-items:center;gap:5px;}
+.insp-sec-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.fg{margin-bottom:8px;}
+.fg label{display:block;font-size:.5rem;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--text2);margin-bottom:4px;}
+.fg input[type=text],.fg input[type=number],.fg select{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:5px;padding:5px 7px;color:var(--text);font-size:.67rem;font-family:'Libre Franklin',sans-serif;outline:none;}
+.fg input:focus,.fg select:focus{border-color:var(--border2);}
+.fg input[type=color]{width:100%;height:26px;background:var(--panel2);border:1px solid var(--border);border-radius:5px;padding:2px 3px;cursor:pointer;}
+.radio-row{display:flex;gap:5px;flex-wrap:wrap;}
+.radio-chip{display:flex;align-items:center;gap:4px;padding:3px 7px;border-radius:4px;border:1px solid var(--border);background:var(--panel2);cursor:pointer;font-size:.52rem;font-weight:700;color:var(--text2);user-select:none;}
+.radio-chip input{display:none;}
+.radio-chip:has(input:checked){border-color:var(--accent);background:rgba(230,57,70,.1);color:var(--text);}
+.size-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.size-btn{padding:5px 7px;background:var(--panel2);border:1px solid var(--border);border-radius:5px;cursor:pointer;font-family:'Libre Franklin',sans-serif;text-align:left;transition:all .12s;}
+.size-btn:hover{border-color:var(--border2);}
+.size-btn.active{border-color:var(--accent);background:rgba(230,57,70,.07);}
+.size-btn-name{font-size:.58rem;font-weight:700;color:var(--text);display:block;}
+.size-btn-sub{font-size:.44rem;color:var(--text2);}
+.sym-preview-box{background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:5px;margin-bottom:10px;}
+.sym-preview-box svg{width:70px;height:58px;}
+.sym-preview-name{font-size:.6rem;font-weight:700;color:var(--text);text-align:center;}
+.sym-preview-ref{font-size:.48rem;color:var(--teal);font-family:'Share Tech Mono',monospace;text-align:center;}
+.official-tag{display:inline-flex;align-items:center;gap:3px;font-size:.46rem;font-weight:700;padding:2px 6px;border-radius:3px;background:rgba(34,197,94,.08);color:#4ade80;border:1px solid rgba(34,197,94,.2);}
+.eigen-tag{display:inline-flex;align-items:center;gap:3px;font-size:.46rem;font-weight:700;padding:2px 6px;border-radius:3px;background:rgba(245,158,11,.08);color:#fbbf24;border:1px solid rgba(245,158,11,.2);}
+.color-legend{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px;}
+.cl-item{display:flex;align-items:center;gap:5px;padding:4px 6px;background:var(--panel2);border-radius:4px;border:1px solid var(--border);}
+.cl-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.cl-text{font-size:.46rem;color:var(--text2);}
+.info-box{background:rgba(14,165,233,.04);border:1px solid rgba(14,165,233,.14);border-radius:6px;padding:8px 10px;font-size:.56rem;color:var(--text2);line-height:1.8;white-space:pre-wrap;}
+.info-box strong{color:rgba(14,165,233,.8);display:block;margin-bottom:3px;}
+.warn-box{background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.16);border-radius:6px;padding:8px 10px;font-size:.56rem;color:var(--text2);line-height:1.7;margin-bottom:8px;}
+.warn-box strong{color:#fbbf24;display:block;margin-bottom:2px;}
+.action-row{display:flex;flex-direction:column;gap:6px;}
+.action-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 12px;border-radius:6px;border:none;cursor:pointer;font-size:.6rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;font-family:'Libre Franklin',sans-serif;transition:all .14s;}
+.action-btn.fire{background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;box-shadow:0 3px 12px rgba(220,38,38,.25);}
+.action-btn.fire:hover{box-shadow:0 5px 20px rgba(220,38,38,.4);transform:translateY(-1px);}
+.action-btn.ghost{background:var(--panel2);border:1px solid var(--border);color:var(--text2);}
+.action-btn.ghost:hover{border-color:var(--border2);color:var(--text);}
+.action-btn.info{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);color:#60a5fa;}
+.empty-state{text-align:center;padding:20px 10px;color:var(--text3);}
+.empty-state .es-ico{font-size:2rem;margin-bottom:8px;opacity:.35;}
+.empty-state p{font-size:.58rem;line-height:1.6;}
+
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .18s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--panel);border:1px solid var(--border2);border-radius:12px;padding:22px;max-width:500px;width:92%;max-height:86vh;overflow-y:auto;transform:translateY(10px);transition:transform .18s;}
+.modal-overlay.open .modal{transform:translateY(0);}
+.modal h3{font-family:'Oswald',sans-serif;font-size:.9rem;font-weight:600;letter-spacing:2px;margin-bottom:14px;color:var(--text);}
+.modal-btns{display:flex;gap:7px;justify-content:flex-end;margin-top:14px;}
+.mbtn{padding:6px 14px;border-radius:5px;border:none;cursor:pointer;font-size:.58rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;font-family:'Libre Franklin',sans-serif;transition:all .12s;}
+.mbtn.cancel{background:var(--panel2);border:1px solid var(--border);color:var(--text2);}
+.mbtn.save{background:var(--accent);color:#fff;}
+.mbtn.danger{background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.3);color:#f87171;cursor:pointer;}
+#symTooltip{position:fixed;z-index:999;background:var(--panel);border:1px solid var(--border2);border-radius:7px;padding:7px 9px;pointer-events:none;opacity:0;transition:opacity .1s;font-size:.54rem;color:var(--text2);display:flex;flex-direction:column;align-items:center;gap:3px;min-width:70px;text-align:center;box-shadow:0 4px 18px rgba(0,0,0,.5);}
+#symTooltip svg{width:38px;height:32px;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+@media print{
+  .hdr,.sidebar,.inspector,.canvas-toolbar{display:none!important;}
+  body{overflow:visible!important;height:auto!important;}
+  .app-body,.canvas-area{display:block!important;overflow:visible!important;}
+  .canvas-wrap{padding:0!important;overflow:visible!important;}
+  #printCanvas{box-shadow:none!important;border-radius:0!important;}
+  .magnet-cell{border:1px dashed #bbb!important;}
+  .cell-remove,.drop-hint{display:none!important;}
+  @page{margin:0;}
+}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr-logo">⚑</div>
+  <div><div class="hdr-title">TAKTISCHE ZEICHEN GENERATOR</div><div class="hdr-sub">DV 102 · FwDV 102 · THW DV 1-102 – Grün = Offiziell · Gelb = Eigeninterpretation</div></div>
+  <div class="hdr-spacer"></div>
+  <div class="hdr-norm">📋 DV 102 / Stand 2023</div>
+</header>
+<div class="app-body">
+  <aside class="sidebar">
+    <div class="sb-head">
+      <div class="sb-search">
+        <span style="color:var(--text3)">🔍</span>
+        <input type="text" id="searchInput" placeholder="Zeichen suchen…" oninput="filterSymbols(this.value)">
+      </div>
+    </div>
+    <div class="symbol-list-scroll" id="symbolList"></div>
+  </aside>
+  <main class="canvas-area">
+    <div class="canvas-toolbar">
+      <span class="tb-lbl">Format:</span>
+      <button class="tb-btn" id="btnA4P" onclick="setFormat('A4P')">📄 A4 Hoch</button>
+      <button class="tb-btn" id="btnA4L" onclick="setFormat('A4L')">📄 A4 Quer</button>
+      <div class="tb-sep"></div>
+      <span class="tb-lbl">Raster:</span>
+      <button class="tb-btn" id="btnGrid11" onclick="setGrid(1,1)">1×1</button>
+      <button class="tb-btn" id="btnGrid22" onclick="setGrid(2,2)">2×2</button>
+      <button class="tb-btn" id="btnGrid33" onclick="setGrid(3,3)">3×3</button>
+      <button class="tb-btn" id="btnGrid44" onclick="setGrid(4,4)">4×4</button>
+      <button class="tb-btn" id="btnGrid35" onclick="setGrid(3,5)">3×5</button>
+      <button class="tb-btn" id="btnGrid24" onclick="setGrid(2,4)">2×4</button>
+      <div class="tb-sep"></div>
+      <button class="tb-btn" onclick="clearCanvas()">🗑 Leeren</button>
+      <button class="tb-btn red" onclick="printPage()">🖨 Drucken</button>
+      <button class="tb-btn green" onclick="exportSVG()">💾 SVG</button>
+      <button class="tb-btn" onclick="openOrderModal()">🛒 Bestellung</button>
+      <div class="tb-sep"></div>
+      <span id="canvasCounter">0 / 9</span>
+    </div>
+    <div class="canvas-wrap"><div id="printCanvas"></div></div>
+  </main>
+  <aside class="inspector">
+    <div class="insp-head"><div class="insp-title">⚙ Einstellungen</div></div>
+    <div class="insp-body">
+      <div id="symPreviewSection">
+        <div class="empty-state"><div class="es-ico">👆</div><p>Symbol wählen → Zelle klicken oder ziehen<br><br>🟢 Grüner Punkt = offiziell DV 102<br>🟡 Gelber Punkt = Eigeninterpretation</p></div>
+      </div>
+      <div class="insp-sec">
+        <div class="insp-sec-title">DV 102 Farbsystem (Kap. 2)</div>
+        <div class="color-legend">
+          <div class="cl-item"><div class="cl-dot" style="background:#dc2626"></div><span class="cl-text">Feuerwehr (rot)</span></div>
+          <div class="cl-item"><div class="cl-dot" style="background:#1d4ed8"></div><span class="cl-text">THW (blau)</span></div>
+          <div class="cl-item"><div class="cl-dot" style="background:#aaa;border:1px solid #666"></div><span class="cl-text">HiOrg (weiß)</span></div>
+          <div class="cl-item"><div class="cl-dot" style="background:#ca8a04"></div><span class="cl-text">Führung (gelb)</span></div>
+          <div class="cl-item"><div class="cl-dot" style="background:#15803d"></div><span class="cl-text">Polizei (grün)</span></div>
+          <div class="cl-item"><div class="cl-dot" style="background:#ea580c"></div><span class="cl-text">Sonstige (orange)</span></div>
+        </div>
+      </div>
+      <div class="insp-sec">
+        <div class="insp-sec-title">Magnet-Größe</div>
+        <div class="size-grid">
+          <button class="size-btn active" onclick="setMagnetSize(60,40,this)"><span class="size-btn-name">60 × 40 mm</span><span class="size-btn-sub">Standard</span></button>
+          <button class="size-btn" onclick="setMagnetSize(80,50,this)"><span class="size-btn-name">80 × 50 mm</span><span class="size-btn-sub">Groß</span></button>
+          <button class="size-btn" onclick="setMagnetSize(50,50,this)"><span class="size-btn-name">50 × 50 mm</span><span class="size-btn-sub">Quadratisch</span></button>
+          <button class="size-btn" onclick="setMagnetSize(85,54,this)"><span class="size-btn-name">85 × 54 mm</span><span class="size-btn-sub">Visitenkarte</span></button>
+          <button class="size-btn" onclick="setMagnetSize(100,70,this)"><span class="size-btn-name">100 × 70 mm</span><span class="size-btn-sub">XL</span></button>
+          <button class="size-btn" onclick="openModal('customSizeModal')"><span class="size-btn-name">Individuell</span><span class="size-btn-sub">Eigene Größe</span></button>
+        </div>
+      </div>
+      <div class="insp-sec">
+        <div class="insp-sec-title">Beschriftung</div>
+        <div class="fg"><label>Lagetext</label><input type="text" id="labelText" placeholder="z.B. MS 0-13-2 / EL FW" oninput="state.labelText=this.value"></div>
+        <div class="fg"><label>Textposition</label>
+          <div class="radio-row">
+            <label class="radio-chip"><input type="radio" name="tp" value="below" checked onchange="state.textPos=this.value"><span>Unten</span></label>
+            <label class="radio-chip"><input type="radio" name="tp" value="above" onchange="state.textPos=this.value"><span>Oben</span></label>
+            <label class="radio-chip"><input type="radio" name="tp" value="none" onchange="state.textPos=this.value"><span>Kein</span></label>
+          </div>
+        </div>
+        <div class="fg"><label>Schriftgröße</label><input type="number" id="fontSize" value="9" min="5" max="22" oninput="state.fontSize=parseInt(this.value)||9;rebuildCanvas()"></div>
+      </div>
+      <div class="insp-sec">
+        <div class="insp-sec-title">Farb-Override</div>
+        <div class="warn-box"><strong>⚠ DV 102 Kap. 2</strong>Farben sind normiert. Override nur bei Eigeninterpretationen oder Spezialanwendungen nutzen.</div>
+        <div class="fg"><label>Linienfarbe</label><input type="color" id="strokeColor" value="#000000" oninput="state.strokeColor=this.value;rebuildCanvas();buildSymbolList();updateSymPreview()"></div>
+        <div class="fg"><label>Füllfarbe</label><input type="color" id="fillColor" value="#ffffff" oninput="state.fillColor=this.value;rebuildCanvas();buildSymbolList();updateSymPreview()"></div>
+        <div class="fg"><label>Schriftfarbe</label><input type="color" id="textColor" value="#000000" oninput="state.textColor=this.value;rebuildCanvas()"></div>
+        <div class="fg"><label>Magnet-Hintergrund</label><input type="color" id="bgColor" value="#ffffff" oninput="state.bgColor=this.value;rebuildCanvas()"></div>
+      </div>
+      <div class="insp-sec">
+        <div class="insp-sec-title">Druckinfo</div>
+        <div class="info-box" id="printInfo">Wird berechnet…</div>
+      </div>
+      <div class="action-row">
+        <button class="action-btn fire" onclick="printPage()">🖨 Drucken / als PDF</button>
+        <button class="action-btn info" onclick="exportSVG()">💾 SVG Export (druckfertig)</button>
+        <button class="action-btn ghost" onclick="openOrderModal()">🛒 Bestellvorlage Magnete</button>
+        <button class="action-btn ghost" onclick="saveProject()">📁 Projekt speichern</button>
+        <button class="action-btn ghost" onclick="document.getElementById('loadFile').click()">📂 Projekt laden</button>
+        <input type="file" id="loadFile" accept=".json" style="display:none" onchange="loadProject(this)">
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div id="symTooltip"></div>
+
+<div class="modal-overlay" id="cellEditModal">
+  <div class="modal">
+    <h3>✏ ZEICHEN BEARBEITEN</h3>
+    <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:12px;">
+      <div id="cellEditPreview" style="flex-shrink:0;width:68px;height:58px;background:var(--panel2);border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;"></div>
+      <div style="flex:1;">
+        <div class="fg"><label>Lagetext</label><input type="text" id="cellEditLabel" placeholder="z.B. MS 0-13-2" maxlength="40"></div>
+        <div class="fg"><label>Textposition</label>
+          <div class="radio-row">
+            <label class="radio-chip"><input type="radio" name="cep" value="below" checked><span>Unten</span></label>
+            <label class="radio-chip"><input type="radio" name="cep" value="above"><span>Oben</span></label>
+            <label class="radio-chip"><input type="radio" name="cep" value="none"><span>Kein</span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="fg"><label>Symbol wechseln</label><div id="cellEditSwapHint" style="font-size:.58rem;color:var(--text2);background:var(--panel2);border:1px solid var(--border);border-radius:5px;padding:6px 8px;line-height:1.5;"></div></div>
+    <div class="modal-btns">
+      <button class="mbtn cancel" onclick="closeModal('cellEditModal')">Abbrechen</button>
+      <button class="mbtn danger" onclick="deleteCellFromEdit()">🗑 Löschen</button>
+      <button class="mbtn save" onclick="saveCellEdit()">✓ Speichern</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="customSizeModal">
+  <div class="modal">
+    <h3>INDIVIDUELLE MAGNETGRÖSSE</h3>
+    <div class="fg"><label>Breite (mm)</label><input type="number" id="customW" value="75" min="20" max="300"></div>
+    <div class="fg"><label>Höhe (mm)</label><input type="number" id="customH" value="50" min="20" max="300"></div>
+    <div class="modal-btns">
+      <button class="mbtn cancel" onclick="closeModal('customSizeModal')">Abbrechen</button>
+      <button class="mbtn save" onclick="applyCustomSize()">Übernehmen</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="orderModal">
+  <div class="modal" style="max-width:560px;">
+    <h3>🛒 BESTELLVORLAGE – MAGNETE</h3>
+    <div id="orderContent" style="background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:.62rem;line-height:1.9;color:var(--text);font-family:'Share Tech Mono',monospace;white-space:pre-wrap;max-height:340px;overflow-y:auto;"></div>
+    <p style="font-size:.54rem;color:var(--text2);margin-top:8px;line-height:1.6;">SVG-Datei als Anlage mitschicken. Alle Maße in mm. Bleed mind. 2–3 mm einplanen.</p>
+    <div class="modal-btns">
+      <button class="mbtn cancel" onclick="closeModal('orderModal')">Schließen</button>
+      <button class="mbtn save" onclick="copyOrderText(this)">📋 Kopieren</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════════
+   DV 102 FARBEN (Kapitel 2)
+   rot=FW, blau=THW, weiß=HiOrg, gelb=Führung, grün=Pol, orange=Sonst
+═══════════════════════════════════════════ */
+const C = {
+  FW_F:'#dc2626', FW_S:'#ffffff',
+  THW_F:'#1d4ed8', THW_S:'#ffffff',
+  HO_F:'#ffffff', HO_S:'#000000',
+  FÜ_F:'#ca8a04', FÜ_S:'#000000',
+  POL_F:'#15803d', POL_S:'#ffffff',
+  SONST_F:'#ea580c', SONST_S:'#000000',
+};
+
+/* ═══════════════════════════════════════════
+   KATEGORIEN
+   cat: dv102      = Grundzeichen §1
+        dv102_fa   = Fachaufgaben §3
+        dv102_eo   = Einheitsgrößen §4
+        dv102_fü   = Führungskräfte §5
+        dv102_fz   = Fahrzeuge §6
+        dv102_ri   = Richtungen §7
+        dv102_lage = Lagebild Anhang 1.9
+        dv102_fw   = FW-Einheiten (rot) Anh.1.1
+        dv102_san  = San/RD Anhang 1.3
+        dv102_thw  = THW Anhang 1.2
+        eigen      = Eigeninterpretation (FüSYS-Stil, angelehnt an Bilder)
+═══════════════════════════════════════════ */
+const SYM = {
+
+/* ══ §1 GRUNDZEICHEN ══ */
+gz_formation:{name:'1.1 Takt. Formation / Dienststelle',ref:'DV102 §1.1',cat:'dv102',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${f}" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+gz_befehlsstelle:{name:'1.2 Befehlsstelle (im Einsatz)',ref:'DV102 §1.2',cat:'dv102',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="8" y1="65" x2="92" y2="65" stroke="${s}" stroke-width="5"/></svg>`},
+
+gz_stelle:{name:'1.3 Stelle / Einrichtung',ref:'DV102 §1.3',cat:'dv102',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="40" r="34" fill="${f}" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+gz_person:{name:'1.4 Person',ref:'DV102 §1.4',cat:'dv102',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="40" r="26" fill="${f}" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+gz_gebiet:{name:'1.5 Gebiet / Fläche',ref:'DV102 §1.5',cat:'dv102',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${f}" stroke="${s}" stroke-width="2.5" stroke-dasharray="8,4"/></svg>`},
+
+gz_massnahme:{name:'1.6 Maßnahme (allgemein)',ref:'DV102 §1.6',cat:'dv102',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="50,6 94,40 50,74 6,40" fill="${f}" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+gz_anlass:{name:'1.7 Anlass / Ereignis',ref:'DV102 §1.7',cat:'dv102',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="50,6 94,40 50,74 6,40" fill="${f}" stroke="${s}" stroke-width="2.5" stroke-dasharray="7,3"/></svg>`},
+
+gz_gefahr:{name:'1.8 Gefahr',ref:'DV102 §1.8',cat:'dv102',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="50,5 94,73 6,73" fill="${f}" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+gz_ortsgebunden:{name:'1.9 Ortsgebunden / ortsfest',ref:'DV102 §1.9',cat:'dv102',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="40" r="34" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="16" y1="40" x2="84" y2="40" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+gz_gebaeude:{name:'1.10 Gebäude',ref:'DV102 §1.10',cat:'dv102',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="35" width="72" height="40" fill="${f}" stroke="${s}" stroke-width="2.5"/><polygon points="50,8 86,35 14,35" fill="${f}" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+/* ══ §3 FACHAUFGABEN ══ */
+fa_brand:{name:'3.1.1 Brandbekämpfung / Löscheinsatz',ref:'DV102 §3.1.1',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><path d="M30 70 Q34 44 24 28 Q42 50 48 36 Q44 56 56 70Z" fill="${s}"/><path d="M52 70 Q56 52 50 42 Q60 54 64 46 Q62 60 70 70Z" fill="${s}"/></svg>`},
+
+fa_retten:{name:'3.1.2 Retten aus Höhen / Tiefen',ref:'DV102 §3.1.2',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><line x1="50" y1="10" x2="50" y2="70" stroke="${s}" stroke-width="3"/><polyline points="30,28 50,10 70,28" fill="none" stroke="${s}" stroke-width="2.5"/><polyline points="30,52 50,70 70,52" fill="none" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+fa_wasser:{name:'3.1.3 Wasserversorgung / -förderung',ref:'DV102 §3.1.3',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><path d="M15 42 Q30 26 50 38 Q70 50 85 34" fill="none" stroke="${s}" stroke-width="3"/><path d="M15 56 Q30 40 50 52 Q70 64 85 48" fill="none" stroke="${s}" stroke-width="3"/></svg>`},
+
+fa_th:{name:'3.1.4 Technische Hilfeleistung',ref:'DV102 §3.1.4',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><line x1="20" y1="40" x2="80" y2="40" stroke="${s}" stroke-width="3.5"/><line x1="50" y1="15" x2="50" y2="65" stroke="${s}" stroke-width="3.5"/><circle cx="50" cy="40" r="10" fill="${f}" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+fa_heben:{name:'3.1.5 Heben von Lasten',ref:'DV102 §3.1.5',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><line x1="50" y1="10" x2="50" y2="52" stroke="${s}" stroke-width="2.5"/><polyline points="32,28 50,10 68,28" fill="none" stroke="${s}" stroke-width="2.5"/><rect x="28" y="52" width="44" height="18" fill="${f}" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+fa_bergen:{name:'3.1.6 Bergen / Bergung',ref:'DV102 §3.1.6',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><path d="M20 65 L50 20 L80 65" fill="none" stroke="${s}" stroke-width="3"/><line x1="30" y1="65" x2="70" y2="65" stroke="${s}" stroke-width="3"/><circle cx="50" cy="20" r="7" fill="${s}"/></svg>`},
+
+fa_raeumen:{name:'3.1.7 Räumen / Hindernisbeseitigung',ref:'DV102 §3.1.7',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><line x1="15" y1="55" x2="85" y2="55" stroke="${s}" stroke-width="3"/><polyline points="25,55 50,20 75,55" fill="none" stroke="${s}" stroke-width="2.5"/><line x1="30" y1="55" x2="15" y2="68" stroke="${s}" stroke-width="2"/><line x1="50" y1="55" x2="50" y2="70" stroke="${s}" stroke-width="2"/><line x1="70" y1="55" x2="85" y2="68" stroke="${s}" stroke-width="2"/></svg>`},
+
+fa_entschaerfen:{name:'3.1.8 Entschärfung / Kampfmittelräumung',ref:'DV102 §3.1.8',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="40" rx="30" ry="22" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="50" y1="8" x2="50" y2="18" stroke="${s}" stroke-width="2.5"/><line x1="50" y1="62" x2="50" y2="72" stroke="${s}" stroke-width="2.5"/><line x1="20" y1="40" x2="30" y2="40" stroke="${s}" stroke-width="2.5"/><line x1="70" y1="40" x2="80" y2="40" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+fa_sprengen:{name:'3.1.9 Sprengen',ref:'DV102 §3.1.9',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><path d="M50 15 L58 32 L76 28 L64 43 L74 58 L50 52 L26 58 L36 43 L24 28 L42 32 Z" fill="${s}"/></svg>`},
+
+fa_transport:{name:'3.1.10 Transport',ref:'DV102 §3.1.10',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><line x1="15" y1="40" x2="80" y2="40" stroke="${s}" stroke-width="3"/><polyline points="64,26 80,40 64,54" fill="none" stroke="${s}" stroke-width="3"/><circle cx="28" cy="58" r="7" fill="${f}" stroke="${s}" stroke-width="2"/><circle cx="56" cy="58" r="7" fill="${f}" stroke="${s}" stroke-width="2"/><rect x="16" y="34" width="52" height="18" fill="${f}" stroke="${s}" stroke-width="2"/></svg>`},
+
+fa_beleuchtung:{name:'3.1.11 Beleuchtung',ref:'DV102 §3.1.11',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="36" r="14" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="50" y1="50" x2="50" y2="66" stroke="${s}" stroke-width="2"/><line x1="50" y1="8" x2="50" y2="22" stroke="${s}" stroke-width="2"/><line x1="22" y1="36" x2="36" y2="36" stroke="${s}" stroke-width="2"/><line x1="64" y1="36" x2="78" y2="36" stroke="${s}" stroke-width="2"/><line x1="30" y1="16" x2="39" y2="25" stroke="${s}" stroke-width="2"/><line x1="61" y1="47" x2="70" y2="56" stroke="${s}" stroke-width="2"/><line x1="70" y1="16" x2="61" y2="25" stroke="${s}" stroke-width="2"/><line x1="30" y1="56" x2="39" y2="47" stroke="${s}" stroke-width="2"/></svg>`},
+
+fa_luftfahrzeug:{name:'3.1.12 Einsatz Luftfahrzeuge',ref:'DV102 §3.1.12',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><path d="M50 15 L70 45 L50 38 L30 45 Z" fill="${s}"/><path d="M50 38 L56 65 L50 58 L44 65 Z" fill="${s}"/></svg>`},
+
+fa_wasserfahrzeug:{name:'3.1.13 Einsatz Wasserfahrzeuge',ref:'DV102 §3.1.13',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><path d="M15 50 Q50 28 85 50 L80 62 Q50 72 20 62 Z" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="50" y1="18" x2="50" y2="50" stroke="${s}" stroke-width="2"/><polyline points="50,18 72,30 50,30" fill="none" stroke="${s}" stroke-width="1.5"/></svg>`},
+
+fa_hunde:{name:'3.1.14 Suchen mit Rettungshunden',ref:'DV102 §3.1.14',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><ellipse cx="42" cy="44" rx="22" ry="14" fill="${f}" stroke="${s}" stroke-width="2.5"/><ellipse cx="62" cy="36" rx="12" ry="9" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="36" y1="58" x2="32" y2="70" stroke="${s}" stroke-width="2"/><line x1="46" y1="58" x2="46" y2="70" stroke="${s}" stroke-width="2"/><line x1="52" y1="58" x2="56" y2="70" stroke="${s}" stroke-width="2"/><circle cx="68" cy="33" r="3" fill="${s}"/></svg>`},
+
+fa_wasserrettung:{name:'3.1.15 Wasserrettung (inkl. Tauchen)',ref:'DV102 §3.1.15',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><path d="M15 40 Q30 24 50 36 Q70 48 85 32" fill="none" stroke="${s}" stroke-width="2.5"/><path d="M15 54 Q30 38 50 50 Q70 62 85 46" fill="none" stroke="${s}" stroke-width="2.5"/><circle cx="50" cy="24" r="9" fill="${f}" stroke="${s}" stroke-width="2"/><line x1="50" y1="33" x2="50" y2="46" stroke="${s}" stroke-width="2"/></svg>`},
+
+fa_pumpen:{name:'3.1.16 Pumpen / Lenzen',ref:'DV102 §3.1.16',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="40" r="22" fill="${f}" stroke="${s}" stroke-width="2.5"/><path d="M34 30 Q50 18 66 30" fill="none" stroke="${s}" stroke-width="2.5"/><path d="M34 50 Q50 62 66 50" fill="none" stroke="${s}" stroke-width="2.5"/><polyline points="20,30 28,40 20,50" fill="none" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+fa_deich:{name:'3.1.17 Deichverteidigung / Wasserabwehr',ref:'DV102 §3.1.17',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="10,70 50,20 90,70" fill="${f}" stroke="${s}" stroke-width="2.5"/><path d="M10 60 Q30 50 50 60 Q70 70 90 60" fill="none" stroke="${s}" stroke-width="2"/></svg>`},
+
+fa_abc:{name:'3.1.18 ABC-Schutz / Gefahrgut',ref:'DV102 §3.1.18',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="40" r="30" fill="${f}" stroke="${s}" stroke-width="2.5"/><text x="50" y="46" text-anchor="middle" font-size="16" font-weight="bold" fill="${s}" font-family="Arial">ABC</text></svg>`},
+
+fa_messen:{name:'3.1.19 Messen / Spüren',ref:'DV102 §3.1.19',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="44" r="24" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="50" y1="20" x2="50" y2="30" stroke="${s}" stroke-width="2"/><line x1="26" y1="44" x2="36" y2="44" stroke="${s}" stroke-width="2"/><line x1="64" y1="44" x2="74" y2="44" stroke="${s}" stroke-width="2"/><line x1="50" y1="44" x2="66" y2="30" stroke="${s}" stroke-width="2.5"/><circle cx="50" cy="44" r="3" fill="${s}"/></svg>`},
+
+fa_dekon:{name:'3.1.20 Dekontamination',ref:'DV102 §3.1.20',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><path d="M20 60 L40 20 L50 35 L60 20 L80 60 Z" fill="${f}" stroke="${s}" stroke-width="2.5"/><path d="M22 60 Q50 52 78 60" fill="none" stroke="${s}" stroke-width="2"/></svg>`},
+
+fa_oel:{name:'3.1.21 Ölschadenbekämpfung',ref:'DV102 §3.1.21',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><path d="M15 35 Q30 18 50 32 Q70 46 85 30" fill="none" stroke="${s}" stroke-width="2.5"/><path d="M15 50 Q30 33 50 47 Q70 61 85 45" fill="none" stroke="${s}" stroke-width="2"/><text x="50" y="70" text-anchor="middle" font-size="11" font-weight="bold" fill="${s}" font-family="Arial">ÖL</text></svg>`},
+
+fa_san:{name:'3.2.1 Sanitätswesen / Rettungswesen',ref:'DV102 §3.2.1',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><line x1="50" y1="14" x2="50" y2="66" stroke="${s}" stroke-width="7"/><line x1="24" y1="40" x2="76" y2="40" stroke="${s}" stroke-width="7"/></svg>`},
+
+fa_arzt:{name:'3.2.2 Ärztliche Versorgung',ref:'DV102 §3.2.2',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><line x1="50" y1="14" x2="50" y2="66" stroke="${s}" stroke-width="7"/><line x1="24" y1="40" x2="76" y2="40" stroke="${s}" stroke-width="7"/><circle cx="50" cy="40" r="9" fill="${f}" stroke="${s}" stroke-width="2"/><text x="50" y="43" text-anchor="middle" font-size="9" font-weight="bold" fill="${s}" font-family="Arial">A</text></svg>`},
+
+fa_betreuung:{name:'3.3.1 Betreuung',ref:'DV102 §3.3.1',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><path d="M50 65 C50 65 20 48 20 30 C20 20 30 14 40 20 C44 22 48 28 50 32 C52 28 56 22 60 20 C70 14 80 20 80 30 C80 48 50 65 50 65 Z" fill="${s}"/></svg>`},
+
+fa_seelsorge:{name:'3.3.2 Seelsorge',ref:'DV102 §3.3.2',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><line x1="50" y1="12" x2="50" y2="68" stroke="${s}" stroke-width="4"/><line x1="32" y1="28" x2="68" y2="28" stroke="${s}" stroke-width="4"/></svg>`},
+
+fa_unterbringung:{name:'3.3.3 Unterbringung',ref:'DV102 §3.3.3',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="18" y="38" width="64" height="32" fill="${f}" stroke="${s}" stroke-width="2.5"/><polygon points="50,10 86,38 14,38" fill="${f}" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+fa_versorgung:{name:'3.4.1 Versorgung / Logistik',ref:'DV102 §3.4.1',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="18" y="22" width="64" height="44" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="50" y1="22" x2="50" y2="66" stroke="${s}" stroke-width="2"/><line x1="18" y1="44" x2="82" y2="44" stroke="${s}" stroke-width="2"/></svg>`},
+
+fa_verpflegung:{name:'3.4.2 Verpflegung',ref:'DV102 §3.4.2',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="40" r="30" fill="${f}" stroke="${s}" stroke-width="2.5"/><path d="M50 14 L50 40 L74 26 Z" fill="${s}"/><circle cx="68" cy="22" r="5" fill="${f}" stroke="${s}" stroke-width="1.5"/></svg>`},
+
+fa_trinkwasser:{name:'3.4.4 Trinkwasserversorgung',ref:'DV102 §3.4.4',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><path d="M50 12 Q50 12 68 38 A20 20 0 1 1 32 38 Q50 12 50 12Z" fill="${f}" stroke="${s}" stroke-width="2.5"/><text x="50" y="58" text-anchor="middle" font-size="11" font-weight="bold" fill="${s}" font-family="Arial">TW</text></svg>`},
+
+fa_brauchwasser:{name:'3.4.5 Brauchwasserversorgung',ref:'DV102 §3.4.5',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><path d="M50 12 Q50 12 68 38 A20 20 0 1 1 32 38 Q50 12 50 12Z" fill="${f}" stroke="${s}" stroke-width="2.5"/><text x="50" y="58" text-anchor="middle" font-size="11" font-weight="bold" fill="${s}" font-family="Arial">BW</text></svg>`},
+
+fa_strom:{name:'3.4.6 Elektrizitätsversorgung',ref:'DV102 §3.4.6',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="58,10 35,46 52,46 42,70 65,34 48,34" fill="${s}"/></svg>`},
+
+fa_instand:{name:'3.4.7 Instandhaltung / Instandsetzung',ref:'DV102 §3.4.7',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><path d="M35 62 L62 35 L68 28 A12 12 0 0 1 72 38 L65 38 L62 35 L38 65 Z" fill="${s}"/><circle cx="30" cy="56" r="10" fill="${f}" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+fa_veterinaer:{name:'3.5.1 Veterinärwesen',ref:'DV102 §3.5.1',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><ellipse cx="44" cy="44" rx="24" ry="16" fill="${f}" stroke="${s}" stroke-width="2.5"/><ellipse cx="66" cy="36" rx="14" ry="10" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="36" y1="60" x2="32" y2="72" stroke="${s}" stroke-width="2"/><line x1="46" y1="60" x2="46" y2="72" stroke="${s}" stroke-width="2"/><line x1="54" y1="60" x2="58" y2="72" stroke="${s}" stroke-width="2"/><text x="66" y="40" text-anchor="middle" font-size="9" font-weight="bold" fill="${s}" font-family="Arial">Vet</text></svg>`},
+
+fa_fuehrung:{name:'3.6.1 Führung / Leitung / Stab',ref:'DV102 §3.6.1',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><line x1="50" y1="12" x2="50" y2="68" stroke="${s}" stroke-width="4"/><line x1="50" y1="12" x2="78" y2="12" stroke="${s}" stroke-width="4"/><line x1="50" y1="40" x2="72" y2="40" stroke="${s}" stroke-width="4"/></svg>`},
+
+fa_iuk:{name:'3.6.2 Information und Kommunikation',ref:'DV102 §3.6.2',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><path d="M22 55 Q50 20 78 55" fill="none" stroke="${s}" stroke-width="2.5"/><path d="M30 62 Q50 36 70 62" fill="none" stroke="${s}" stroke-width="2.5"/><line x1="50" y1="55" x2="50" y2="70" stroke="${s}" stroke-width="2.5"/><circle cx="50" cy="70" r="4" fill="${s}"/></svg>`},
+
+fa_erkundung:{name:'3.6.3 Erkundung',ref:'DV102 §3.6.3',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="44" cy="38" r="20" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="58" y1="52" x2="78" y2="72" stroke="${s}" stroke-width="3.5"/><line x1="36" y1="38" x2="52" y2="38" stroke="${s}" stroke-width="2"/><line x1="44" y1="30" x2="44" y2="46" stroke="${s}" stroke-width="2"/></svg>`},
+
+fa_warnen:{name:'3.6.4 Warnen',ref:'DV102 §3.6.4',cat:'dv102_fa',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><path d="M25 48 A28 28 0 0 1 75 48" fill="none" stroke="${s}" stroke-width="3"/><path d="M18 58 A38 38 0 0 1 82 58" fill="none" stroke="${s}" stroke-width="3"/><line x1="50" y1="58" x2="50" y2="72" stroke="${s}" stroke-width="3"/><circle cx="50" cy="26" r="8" fill="${f}" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+/* ══ §4 GRÖßENORDNUNGEN ══ */
+eo_trupp:{name:'4.1.1 Trupp',ref:'DV102 §4.1.1',cat:'dv102_eo',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="8" y1="40" x2="92" y2="40" stroke="${s}" stroke-width="2"/></svg>`},
+
+eo_staffel:{name:'4.1.2 Staffel',ref:'DV102 §4.1.2',cat:'dv102_eo',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${f}" stroke="${s}" stroke-width="2.5"/><circle cx="50" cy="40" r="9" fill="${s}"/></svg>`},
+
+eo_gruppe:{name:'4.1.3 Gruppe',ref:'DV102 §4.1.3',cat:'dv102_eo',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="8" y1="40" x2="92" y2="40" stroke="${s}" stroke-width="2"/><circle cx="50" cy="40" r="9" fill="${s}"/></svg>`},
+
+eo_zug:{name:'4.1.4 Zug',ref:'DV102 §4.1.4',cat:'dv102_eo',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="8" y1="40" x2="92" y2="40" stroke="${s}" stroke-width="2"/><circle cx="50" cy="40" r="9" fill="${s}"/><line x1="8" y1="15" x2="8" y2="65" stroke="${s}" stroke-width="3"/></svg>`},
+
+eo_zugtrupp:{name:'4.1.5 Zugtrupp',ref:'DV102 §4.1.5',cat:'dv102_eo',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="8" y1="40" x2="92" y2="40" stroke="${s}" stroke-width="2"/><line x1="8" y1="15" x2="8" y2="65" stroke="${s}" stroke-width="3"/></svg>`},
+
+eo_bereitschaft:{name:'4.2.1 Bereitschaft (Verband I)',ref:'DV102 §4.2.1',cat:'dv102_eo',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="8" y1="40" x2="92" y2="40" stroke="${s}" stroke-width="2"/><circle cx="50" cy="40" r="9" fill="${s}"/><line x1="8" y1="15" x2="8" y2="65" stroke="${s}" stroke-width="3"/><line x1="92" y1="15" x2="92" y2="65" stroke="${s}" stroke-width="3"/></svg>`},
+
+eo_abteilung:{name:'4.2.2 Abteilung (Verband II)',ref:'DV102 §4.2.2',cat:'dv102_eo',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="8" y1="40" x2="92" y2="40" stroke="${s}" stroke-width="2"/><circle cx="50" cy="40" r="9" fill="${s}"/><line x1="8" y1="15" x2="8" y2="65" stroke="${s}" stroke-width="3"/><line x1="92" y1="15" x2="92" y2="65" stroke="${s}" stroke-width="3"/><line x1="8" y1="8" x2="92" y2="8" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+eo_grossverband:{name:'4.2.3 Großverband (Verband III)',ref:'DV102 §4.2.3',cat:'dv102_eo',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="8" y1="40" x2="92" y2="40" stroke="${s}" stroke-width="2"/><circle cx="50" cy="40" r="9" fill="${s}"/><line x1="8" y1="15" x2="8" y2="65" stroke="${s}" stroke-width="3"/><line x1="92" y1="15" x2="92" y2="65" stroke="${s}" stroke-width="3"/><line x1="8" y1="8" x2="92" y2="8" stroke="${s}" stroke-width="2.5"/><line x1="8" y1="2" x2="92" y2="2" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+/* ══ §5 FÜHRUNGSKRÄFTE ══ */
+fü_truppfuehrer:{name:'5.1.2 Truppführer',ref:'DV102 §5.1.2',cat:'dv102_fü',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="40" r="28" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="22" y1="40" x2="78" y2="40" stroke="${s}" stroke-width="2"/><text x="50" y="33" text-anchor="middle" font-size="8" font-weight="bold" fill="${s}" font-family="Arial">TrFü</text></svg>`},
+
+fü_gruppenfuehrer:{name:'5.1.3 Gruppenführer',ref:'DV102 §5.1.3',cat:'dv102_fü',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="40" r="28" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="22" y1="40" x2="78" y2="40" stroke="${s}" stroke-width="2"/><circle cx="50" cy="40" r="7" fill="${s}"/><text x="50" y="30" text-anchor="middle" font-size="8" font-weight="bold" fill="${s}" font-family="Arial">GrFü</text></svg>`},
+
+fü_zugfuehrer:{name:'5.1.4 Zugführer',ref:'DV102 §5.1.4',cat:'dv102_fü',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="40" r="28" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="22" y1="40" x2="78" y2="40" stroke="${s}" stroke-width="2"/><circle cx="50" cy="40" r="7" fill="${s}"/><line x1="22" y1="14" x2="22" y2="66" stroke="${s}" stroke-width="2.5"/><text x="58" y="29" text-anchor="middle" font-size="8" font-weight="bold" fill="${s}" font-family="Arial">ZFü</text></svg>`},
+
+fü_bereitschaftsfuehrer:{name:'5.1.5 Bereitschaftsführer (Vbd. I)',ref:'DV102 §5.1.5',cat:'dv102_fü',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="40" r="28" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="22" y1="40" x2="78" y2="40" stroke="${s}" stroke-width="2"/><circle cx="50" cy="40" r="7" fill="${s}"/><line x1="22" y1="14" x2="22" y2="66" stroke="${s}" stroke-width="2.5"/><line x1="78" y1="14" x2="78" y2="66" stroke="${s}" stroke-width="2.5"/><text x="50" y="26" text-anchor="middle" font-size="7" font-weight="bold" fill="${s}" font-family="Arial">BerFü</text></svg>`},
+
+fü_sonder:{name:'5.2.1 Person m. Sonderfunktion (Fachber.)',ref:'DV102 §5.2.1',cat:'dv102_fü',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="40" r="28" fill="${f}" stroke="${s}" stroke-width="2.5" stroke-dasharray="6,3"/><text x="50" y="44" text-anchor="middle" font-size="9" fill="${s}" font-family="Arial">Fachber.</text></svg>`},
+
+/* ══ §6 FAHRZEUGE ══ */
+fz_kfz:{name:'6.1.2 Kraftfahrzeug (landgebunden)',ref:'DV102 §6.1.2',cat:'dv102_fz',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="22" width="80" height="34" rx="3" fill="${f}" stroke="${s}" stroke-width="2.5"/><circle cx="26" cy="60" r="9" fill="${f}" stroke="${s}" stroke-width="2.5"/><circle cx="74" cy="60" r="9" fill="${f}" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+fz_gelaendegaengig:{name:'6.1.3 KFZ geländegängig',ref:'DV102 §6.1.3',cat:'dv102_fz',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="22" width="80" height="34" rx="3" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="10" y1="22" x2="10" y2="56" stroke="${s}" stroke-width="3"/><circle cx="26" cy="60" r="9" fill="${f}" stroke="${s}" stroke-width="2.5"/><circle cx="74" cy="60" r="9" fill="${f}" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+fz_wlf:{name:'6.1.4 Wechselladerfahrzeug',ref:'DV102 §6.1.4',cat:'dv102_fz',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="20" width="84" height="36" rx="3" fill="${f}" stroke="${s}" stroke-width="2.5"/><rect x="20" y="14" width="38" height="12" rx="2" fill="${f}" stroke="${s}" stroke-width="1.5"/><circle cx="26" cy="60" r="8" fill="${f}" stroke="${s}" stroke-width="2.5"/><circle cx="74" cy="60" r="8" fill="${f}" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+fz_abrollbehaelter:{name:'6.1.5 Abrollbehälter / Container',ref:'DV102 §6.1.5',cat:'dv102_fz',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="20" width="80" height="36" rx="2" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="10" y1="38" x2="90" y2="38" stroke="${s}" stroke-width="1.5"/><circle cx="26" cy="58" r="7" fill="${f}" stroke="${s}" stroke-width="2"/><circle cx="74" cy="58" r="7" fill="${f}" stroke="${s}" stroke-width="2"/></svg>`},
+
+fz_anhaenger:{name:'6.1.6 Anhänger',ref:'DV102 §6.1.6',cat:'dv102_fz',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="16" y="22" width="68" height="34" rx="3" fill="${f}" stroke="${s}" stroke-width="2.5"/><circle cx="50" cy="60" r="9" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="8" y1="39" x2="16" y2="39" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+fz_krad:{name:'6.1.9 Kraftrad',ref:'DV102 §6.1.9',cat:'dv102_fz',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="52" r="16" fill="${f}" stroke="${s}" stroke-width="2.5"/><circle cx="76" cy="52" r="16" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="24" y1="52" x2="50" y2="28" stroke="${s}" stroke-width="2"/><line x1="50" y1="28" x2="76" y2="52" stroke="${s}" stroke-width="2"/><circle cx="50" cy="52" r="5" fill="${f}" stroke="${s}" stroke-width="2"/></svg>`},
+
+fz_schienenfahrzeug:{name:'6.1.7 Schienenfahrzeug',ref:'DV102 §6.1.7',cat:'dv102_fz',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="20" width="80" height="32" rx="4" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="10" y1="60" x2="90" y2="60" stroke="${s}" stroke-width="2"/><line x1="10" y1="66" x2="90" y2="66" stroke="${s}" stroke-width="2"/><circle cx="26" cy="60" r="7" fill="${f}" stroke="${s}" stroke-width="2"/><circle cx="50" cy="60" r="7" fill="${f}" stroke="${s}" stroke-width="2"/><circle cx="74" cy="60" r="7" fill="${f}" stroke="${s}" stroke-width="2"/></svg>`},
+
+fz_wasserfahrzeug:{name:'6.2.1 Wasserfahrzeug',ref:'DV102 §6.2.1',cat:'dv102_fz',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><path d="M14 44 Q50 24 86 44 L80 60 Q50 68 20 60 Z" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="50" y1="14" x2="50" y2="44" stroke="${s}" stroke-width="2"/><polyline points="50,14 68,26 50,26" fill="none" stroke="${s}" stroke-width="1.5"/></svg>`},
+
+fz_hubschrauber:{name:'6.3.2 Hubschrauber',ref:'DV102 §6.3.2',cat:'dv102_fz',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="42" rx="22" ry="14" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="14" y1="28" x2="86" y2="28" stroke="${s}" stroke-width="3"/><line x1="50" y1="28" x2="50" y2="18" stroke="${s}" stroke-width="2"/><line x1="68" y1="56" x2="76" y2="68" stroke="${s}" stroke-width="2"/></svg>`},
+
+fz_flugzeug:{name:'6.3.1 Flugzeug',ref:'DV102 §6.3.1',cat:'dv102_fz',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="40" rx="10" ry="28" fill="${f}" stroke="${s}" stroke-width="2"/><line x1="14" y1="50" x2="86" y2="50" stroke="${s}" stroke-width="3"/><line x1="34" y1="62" x2="66" y2="62" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+fz_sirene:{name:'6.4.1 Sirene',ref:'DV102 §6.4.1',cat:'dv102_fz',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="30,60 70,60 60,28 40,28" fill="${f}" stroke="${s}" stroke-width="2.5"/><path d="M24 46 A30 30 0 0 1 76 46" fill="none" stroke="${s}" stroke-width="2"/><path d="M16 56 A42 42 0 0 1 84 56" fill="none" stroke="${s}" stroke-width="2"/><rect x="38" y="60" width="24" height="10" fill="${f}" stroke="${s}" stroke-width="1.5"/></svg>`},
+
+fz_lautsprecher:{name:'6.4.2 Lautsprecher',ref:'DV102 §6.4.2',cat:'dv102_fz',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="16,30 38,30 58,14 58,66 38,50 16,50" fill="${f}" stroke="${s}" stroke-width="2.5"/><path d="M65 24 Q78 40 65 56" fill="none" stroke="${s}" stroke-width="2.5"/><path d="M70 18 Q88 40 70 62" fill="none" stroke="${s}" stroke-width="2"/></svg>`},
+
+/* ══ §7 RICHTUNGEN ══ */
+ri_vortragen:{name:'7.1 Richtung Vortragen',ref:'DV102 §7.1',cat:'dv102_ri',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><line x1="14" y1="40" x2="78" y2="40" stroke="${s}" stroke-width="3"/><polyline points="62,24 78,40 62,56" fill="none" stroke="${s}" stroke-width="3"/><line x1="14" y1="28" x2="14" y2="52" stroke="${s}" stroke-width="3"/></svg>`},
+
+ri_bewegung:{name:'7.2 Richtung / Bewegung / Verbindung',ref:'DV102 §7.2',cat:'dv102_ri',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><line x1="14" y1="40" x2="74" y2="40" stroke="${s}" stroke-width="3"/><polyline points="58,24 74,40 58,56" fill="none" stroke="${s}" stroke-width="3"/></svg>`},
+
+ri_ausgangspunkt:{name:'7.3 Ausgangspunkt einer Bewegung',ref:'DV102 §7.3',cat:'dv102_ri',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="26" cy="40" r="14" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="40" y1="40" x2="80" y2="40" stroke="${s}" stroke-width="3"/><polyline points="64,26 80,40 64,54" fill="none" stroke="${s}" stroke-width="3"/></svg>`},
+
+ri_endpunkt:{name:'7.4 Endpunkt einer Bewegung',ref:'DV102 §7.4',cat:'dv102_ri',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><line x1="14" y1="40" x2="64" y2="40" stroke="${s}" stroke-width="3"/><polyline points="48,26 64,40 48,54" fill="none" stroke="${s}" stroke-width="3"/><circle cx="76" cy="40" r="12" fill="${s}"/></svg>`},
+
+ri_zweirichtungen:{name:'7.5 Bewegung zwei Richtungen',ref:'DV102 §7.5',cat:'dv102_ri',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><line x1="14" y1="40" x2="86" y2="40" stroke="${s}" stroke-width="3"/><polyline points="28,26 14,40 28,54" fill="none" stroke="${s}" stroke-width="3"/><polyline points="72,26 86,40 72,54" fill="none" stroke="${s}" stroke-width="3"/></svg>`},
+
+ri_sammeln:{name:'7.6 Sammeln',ref:'DV102 §7.6',cat:'dv102_ri',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="40" r="12" fill="${s}"/><line x1="16" y1="16" x2="40" y2="32" stroke="${s}" stroke-width="2.5"/><line x1="84" y1="16" x2="60" y2="32" stroke="${s}" stroke-width="2.5"/><line x1="16" y1="64" x2="40" y2="48" stroke="${s}" stroke-width="2.5"/><line x1="84" y1="64" x2="60" y2="48" stroke="${s}" stroke-width="2.5"/><polyline points="19,19 16,16 20,14" fill="none" stroke="${s}" stroke-width="2"/><polyline points="81,19 84,16 80,14" fill="none" stroke="${s}" stroke-width="2"/><polyline points="19,61 16,64 20,66" fill="none" stroke="${s}" stroke-width="2"/><polyline points="81,61 84,64 80,66" fill="none" stroke="${s}" stroke-width="2"/></svg>`},
+
+/* ══ §9 SONSTIGE ══ */
+so_vermutung:{name:'9.1 Hinweis auf Vermutung (?)',ref:'DV102 §9.1',cat:'dv102_fz',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><text x="50" y="58" text-anchor="middle" font-size="52" font-weight="bold" fill="${s}" font-family="Arial">?</text></svg>`},
+
+so_akut:{name:'9.2 Hinweis auf akute Situation (!)',ref:'DV102 §9.2',cat:'dv102_fz',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><text x="50" y="62" text-anchor="middle" font-size="56" font-weight="bold" fill="${s}" font-family="Arial">!</text></svg>`},
+
+/* ══ LAGEBILD / SCHADENSDARSTELLUNG (Anhang 1.9) ══ */
+lage_betroffene:{name:'Betroffene Person',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="50,6 94,72 6,72" fill="${f}" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+lage_verletzte:{name:'Verletzte Person',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="50,6 94,72 6,72" fill="${s}" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+lage_tote:{name:'Tote Person',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="50,6 94,72 6,72" fill="${s}" stroke="${s}" stroke-width="2.5"/><line x1="34" y1="32" x2="66" y2="64" stroke="${f}" stroke-width="3"/><line x1="66" y1="32" x2="34" y2="64" stroke="${f}" stroke-width="3"/></svg>`},
+
+lage_vermisste:{name:'Vermisste Person',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="50,6 94,72 6,72" fill="${f}" stroke="${s}" stroke-width="2.5" stroke-dasharray="6,3"/></svg>`},
+
+lage_verschuettet:{name:'Verschüttete Person',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="50,6 94,72 6,72" fill="${f}" stroke="${s}" stroke-width="2.5"/><polygon points="50,24 80,68 20,68" fill="${s}"/></svg>`},
+
+lage_gerettet:{name:'Gerettete Person',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="50,6 94,72 6,72" fill="${f}" stroke="${s}" stroke-width="2.5"/><polyline points="30,44 45,60 70,28" fill="none" stroke="${s}" stroke-width="4"/></svg>`},
+
+lage_verletztes_tier:{name:'Verletztes Tier',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="50,6 94,72 6,72" fill="${s}" stroke="${s}" stroke-width="2.5"/><text x="50" y="62" text-anchor="middle" font-size="14" font-weight="bold" fill="${f}" font-family="Arial">T</text></svg>`},
+
+lage_brand_ent:{name:'Entstehungsbrand',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><path d="M42 70 Q46 48 38 34 Q52 52 56 40 Q54 58 62 70Z" fill="${f}" stroke="${s}" stroke-width="2"/></svg>`},
+
+lage_brand_fort:{name:'Fortentwickelter Brand',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><path d="M35 70 Q40 44 30 28 Q48 50 52 36 Q50 56 60 70Z" fill="${s}"/></svg>`},
+
+lage_brand_voll:{name:'Vollbrand',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><path d="M28 70 Q34 42 22 22 Q44 46 50 28 Q48 52 60 38 Q56 58 68 42 Q62 64 72 70Z" fill="${s}"/></svg>`},
+
+lage_angeschlagen:{name:'Angeschlagen / beschädigt',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="18" width="72" height="44" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="14" y1="62" x2="86" y2="62" stroke="${s}" stroke-width="4"/></svg>`},
+
+lage_teilzerstoert:{name:'Teilzerstört / teilweise kollabiert',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="18" width="72" height="44" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="14" y1="54" x2="86" y2="54" stroke="${s}" stroke-width="4"/><line x1="14" y1="62" x2="86" y2="62" stroke="${s}" stroke-width="4"/></svg>`},
+
+lage_zerstoert:{name:'Zerstört / zusammengebrochen',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="18" width="72" height="44" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="14" y1="46" x2="86" y2="46" stroke="${s}" stroke-width="4"/><line x1="14" y1="54" x2="86" y2="54" stroke="${s}" stroke-width="4"/><line x1="14" y1="62" x2="86" y2="62" stroke="${s}" stroke-width="4"/></svg>`},
+
+lage_schwer_befahrbar:{name:'Schwer befahrbar / teilblockiert',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><line x1="14" y1="40" x2="86" y2="40" stroke="${s}" stroke-width="3"/><line x1="14" y1="30" x2="86" y2="50" stroke="${s}" stroke-width="2"/></svg>`},
+
+lage_blockiert:{name:'Nicht befahrbar / blockiert',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><line x1="14" y1="40" x2="86" y2="40" stroke="${s}" stroke-width="3"/><line x1="14" y1="28" x2="86" y2="52" stroke="${s}" stroke-width="3"/><line x1="14" y1="52" x2="86" y2="28" stroke="${s}" stroke-width="3"/></svg>`},
+
+lage_ueberschwemmt:{name:'Überschwemmtes Gebiet',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${f}" stroke="${s}" stroke-width="2.5" stroke-dasharray="8,4"/><text x="50" y="46" text-anchor="middle" font-size="16" font-weight="bold" fill="${s}" font-family="Arial">W</text></svg>`},
+
+lage_gefahr_vermut:{name:'Vermutete Gefahr (durch …)',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="50,5 94,73 6,73" fill="${f}" stroke="${s}" stroke-width="2.5" stroke-dasharray="7,3"/><text x="50" y="56" text-anchor="middle" font-size="22" font-weight="bold" fill="${s}" font-family="Arial">?</text></svg>`},
+
+lage_gefahr_akut:{name:'Akute Gefahr (durch …)',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="50,5 94,73 6,73" fill="${s}" stroke="${s}" stroke-width="2.5"/><text x="50" y="60" text-anchor="middle" font-size="28" font-weight="bold" fill="${f}" font-family="Arial">!</text></svg>`},
+
+lage_radioaktiv:{name:'Radioaktivität (A – ABC)',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="50,5 94,73 6,73" fill="${f}" stroke="${s}" stroke-width="2.5"/><text x="50" y="58" text-anchor="middle" font-size="22" font-weight="bold" fill="${s}" font-family="Arial">A</text></svg>`},
+
+lage_gef_stoffe:{name:'Gefährliche Stoffe (GS)',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="50,5 94,73 6,73" fill="${f}" stroke="${s}" stroke-width="2.5"/><text x="50" y="55" text-anchor="middle" font-size="14" font-weight="bold" fill="${s}" font-family="Arial">GS</text></svg>`},
+
+lage_elektrisch:{name:'Elektrische Energie – Gefahr',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="50,5 94,73 6,73" fill="${f}" stroke="${s}" stroke-width="2.5"/><polygon points="56,26 40,52 50,52 44,68 62,42 52,42" fill="${s}"/></svg>`},
+
+lage_explosion:{name:'Explosionsgefahr (Ex)',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="50,5 94,73 6,73" fill="${f}" stroke="${s}" stroke-width="2.5"/><text x="50" y="57" text-anchor="middle" font-size="14" font-weight="bold" fill="${s}" font-family="Arial">Ex</text></svg>`},
+
+lage_oel_gefahr:{name:'Mineralöl-Gefahr',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="50,5 94,73 6,73" fill="${f}" stroke="${s}" stroke-width="2.5"/><text x="50" y="57" text-anchor="middle" font-size="14" font-weight="bold" fill="${s}" font-family="Arial">Ö</text></svg>`},
+
+lage_wasser_gefahr:{name:'Gefahr durch Wassereinbruch',ref:'DV102 Anh.1.9',cat:'dv102_lage',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="50,5 94,73 6,73" fill="${f}" stroke="${s}" stroke-width="2.5"/><path d="M36 58 Q50 45 64 58" fill="none" stroke="${s}" stroke-width="3"/></svg>`},
+
+/* ══ FW EINHEITEN mit DV102-Farbe (Anhang 1.1) ══ */
+fw_loeschzug:{name:'Löschzug FW (rot)',ref:'DV102 Anh.1.1',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.FW_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.FW_S}"/><line x1="8" y1="15" x2="8" y2="65" stroke="${C.FW_S}" stroke-width="2.5"/><text x="60" y="28" font-size="9" font-weight="bold" fill="${C.FW_S}" font-family="Arial">Fw</text></svg>`},
+
+fw_loeschgruppe:{name:'Löschgruppe FW (rot)',ref:'DV102 Anh.1.1',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.FW_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.FW_S}"/><text x="60" y="28" font-size="9" font-weight="bold" fill="${C.FW_S}" font-family="Arial">Fw</text></svg>`},
+
+fw_staffel:{name:'Staffel FW (rot)',ref:'DV102 Anh.1.1',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><circle cx="50" cy="40" r="8" fill="${C.FW_S}"/><text x="60" y="28" font-size="9" font-weight="bold" fill="${C.FW_S}" font-family="Arial">Fw</text></svg>`},
+
+fw_trupp:{name:'Trupp FW (rot)',ref:'DV102 Anh.1.1',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.FW_S}" stroke-width="1.5"/><text x="60" y="28" font-size="9" font-weight="bold" fill="${C.FW_S}" font-family="Arial">Fw</text></svg>`},
+
+fw_bereitschaft:{name:'Bereitschaft FW (rot)',ref:'DV102 Anh.1.1',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.FW_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.FW_S}"/><line x1="8" y1="15" x2="8" y2="65" stroke="${C.FW_S}" stroke-width="2.5"/><line x1="92" y1="15" x2="92" y2="65" stroke="${C.FW_S}" stroke-width="2.5"/></svg>`},
+
+fw_elw:{name:'ELW FW',ref:'DV102+DIN14033',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="18" width="84" height="42" rx="3" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><circle cx="24" cy="64" r="8" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><circle cx="76" cy="64" r="8" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><text x="50" y="43" text-anchor="middle" font-size="14" font-weight="bold" fill="${C.FW_S}" font-family="Arial">ELW</text></svg>`},
+
+fw_hlf:{name:'HLF FW',ref:'DV102+DIN14033',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="18" width="84" height="42" rx="3" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><circle cx="24" cy="64" r="8" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><circle cx="76" cy="64" r="8" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><text x="50" y="43" text-anchor="middle" font-size="14" font-weight="bold" fill="${C.FW_S}" font-family="Arial">HLF</text></svg>`},
+
+fw_lf:{name:'LF FW',ref:'DV102+DIN14033',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="18" width="84" height="42" rx="3" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><circle cx="24" cy="64" r="8" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><circle cx="76" cy="64" r="8" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><text x="50" y="46" text-anchor="middle" font-size="18" font-weight="bold" fill="${C.FW_S}" font-family="Arial">LF</text></svg>`},
+
+fw_tlf:{name:'TLF FW',ref:'DV102+DIN14033',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="18" width="84" height="42" rx="3" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><circle cx="24" cy="64" r="8" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><circle cx="76" cy="64" r="8" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><text x="50" y="43" text-anchor="middle" font-size="15" font-weight="bold" fill="${C.FW_S}" font-family="Arial">TLF</text></svg>`},
+
+fw_dlk:{name:'DLK 23/12 FW',ref:'DV102+DIN14033',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="18" width="84" height="42" rx="3" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><circle cx="24" cy="64" r="8" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><circle cx="76" cy="64" r="8" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><text x="50" y="34" text-anchor="middle" font-size="13" font-weight="bold" fill="${C.FW_S}" font-family="Arial">DLK</text><text x="50" y="54" text-anchor="middle" font-size="12" fill="${C.FW_S}" font-family="Arial">23/12</text></svg>`},
+
+fw_rw:{name:'RW FW',ref:'DV102+DIN14033',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="18" width="84" height="42" rx="3" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><circle cx="24" cy="64" r="8" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><circle cx="76" cy="64" r="8" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><text x="50" y="46" text-anchor="middle" font-size="18" font-weight="bold" fill="${C.FW_S}" font-family="Arial">RW</text></svg>`},
+
+fw_gw_a:{name:'GW-A (Atemschutz)',ref:'DIN14033',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="18" width="84" height="42" rx="3" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><circle cx="24" cy="64" r="8" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><circle cx="76" cy="64" r="8" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><text x="50" y="43" text-anchor="middle" font-size="13" font-weight="bold" fill="${C.FW_S}" font-family="Arial">GW-A</text></svg>`},
+
+fw_wlf:{name:'WLF FW (Wechsellader)',ref:'DIN14033',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="18" width="84" height="42" rx="3" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><rect x="18" y="12" width="36" height="12" rx="2" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="1.5"/><circle cx="24" cy="64" r="8" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><circle cx="76" cy="64" r="8" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><text x="50" y="43" text-anchor="middle" font-size="13" font-weight="bold" fill="${C.FW_S}" font-family="Arial">WLF</text></svg>`},
+
+fw_abc_zug:{name:'ABC-Zug / Gefahrstoffzug',ref:'DV102 Anh.1.1',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.FW_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.FW_S}"/><line x1="8" y1="15" x2="8" y2="65" stroke="${C.FW_S}" stroke-width="2.5"/><text x="60" y="28" font-size="8" font-weight="bold" fill="${C.FW_S}" font-family="Arial">ABC</text></svg>`},
+
+fw_iuk_zug:{name:'IuK-Zug FW',ref:'DV102 Anh.1.7',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.FW_F}" stroke="${C.FW_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.FW_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.FW_S}"/><line x1="8" y1="15" x2="8" y2="65" stroke="${C.FW_S}" stroke-width="2.5"/><text x="60" y="28" font-size="8" font-weight="bold" fill="${C.FW_S}" font-family="Arial">IuK</text></svg>`},
+
+fw_el_farbig:{name:'Einsatzleiter FW (Befehlsstelle)',ref:'DV102 Anh.1.6+Kap2',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="10" width="84" height="60" fill="${C.FÜ_F}" stroke="${C.FÜ_S}" stroke-width="2.5"/><line x1="8" y1="70" x2="92" y2="70" stroke="${C.FÜ_S}" stroke-width="5"/><text x="50" y="48" text-anchor="middle" font-size="20" font-weight="bold" fill="${C.FÜ_S}" font-family="Arial">EL</text></svg>`},
+
+fw_eal:{name:'Einsatzabschnittsleitung',ref:'DV102 Anh.1.6',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="10" width="84" height="60" fill="${C.FÜ_F}" stroke="${C.FÜ_S}" stroke-width="2.5"/><line x1="8" y1="70" x2="92" y2="70" stroke="${C.FÜ_S}" stroke-width="5"/><text x="50" y="48" text-anchor="middle" font-size="16" font-weight="bold" fill="${C.FÜ_S}" font-family="Arial">EAL</text></svg>`},
+
+fw_leitstelle:{name:'Leitstelle',ref:'DV102 Anh.1.6',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="10" width="84" height="60" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="8" y1="70" x2="92" y2="70" stroke="${s}" stroke-width="5"/><text x="50" y="48" text-anchor="middle" font-size="14" font-weight="bold" fill="${s}" font-family="Arial">LtS</text></svg>`},
+
+fw_bereitstellungsraum:{name:'Bereitstellungsraum',ref:'DV102 Anh.1.6',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="10" width="84" height="60" fill="${f}" stroke="${s}" stroke-width="2.5" stroke-dasharray="8,4"/><text x="50" y="36" text-anchor="middle" font-size="9" font-weight="bold" fill="${s}" font-family="Arial">BEREIT-</text><text x="50" y="50" text-anchor="middle" font-size="9" font-weight="bold" fill="${s}" font-family="Arial">STELLUNG</text></svg>`},
+
+fw_verletztenablage:{name:'Verletztenablage',ref:'DV102 Anh.1.3',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="20" width="84" height="42" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="50" y1="26" x2="50" y2="56" stroke="${s}" stroke-width="5"/><line x1="30" y1="41" x2="70" y2="41" stroke="${s}" stroke-width="5"/></svg>`},
+
+fw_behandlungsplatz:{name:'Behandlungsplatz',ref:'DV102 Anh.1.3',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="10" width="84" height="60" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="8" y1="70" x2="92" y2="70" stroke="${s}" stroke-width="5"/><line x1="50" y1="18" x2="50" y2="62" stroke="${s}" stroke-width="5"/><line x1="26" y1="40" x2="74" y2="40" stroke="${s}" stroke-width="5"/></svg>`},
+
+fw_hubschrauber_lp:{name:'Hubschrauberlandeplatz',ref:'DV102 Anh.1.6',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="40" r="34" fill="${f}" stroke="${s}" stroke-width="2.5"/><text x="50" y="52" text-anchor="middle" font-size="36" font-weight="bold" fill="${s}" font-family="Arial">H</text></svg>`},
+
+fw_sammelstelle:{name:'Sammelstelle Betroffene',ref:'DV102 Anh.1.3',cat:'dv102_fw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="40" r="32" fill="${f}" stroke="${s}" stroke-width="2.5"/><line x1="50" y1="12" x2="50" y2="68" stroke="${s}" stroke-width="2.5"/><line x1="22" y1="40" x2="78" y2="40" stroke="${s}" stroke-width="2.5"/><line x1="32" y1="20" x2="68" y2="60" stroke="${s}" stroke-width="2.5"/><line x1="68" y1="20" x2="32" y2="60" stroke="${s}" stroke-width="2.5"/></svg>`},
+
+/* ══ SAN / RETTUNGSDIENST (Anhang 1.3) ══ */
+san_rtw:{name:'RTW (Rettungswagen)',ref:'DV102 Anh.1.3',cat:'dv102_san',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="18" width="84" height="42" rx="3" fill="${C.HO_F}" stroke="${C.HO_S}" stroke-width="2"/><circle cx="24" cy="64" r="8" fill="${C.HO_F}" stroke="${C.HO_S}" stroke-width="2"/><circle cx="76" cy="64" r="8" fill="${C.HO_F}" stroke="${C.HO_S}" stroke-width="2"/><text x="50" y="43" text-anchor="middle" font-size="14" font-weight="bold" fill="${C.HO_S}" font-family="Arial">RTW</text></svg>`},
+
+san_ktw:{name:'KTW (Krankentransportwagen)',ref:'DV102 Anh.1.3',cat:'dv102_san',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="18" width="84" height="42" rx="3" fill="${C.HO_F}" stroke="${C.HO_S}" stroke-width="2"/><circle cx="24" cy="64" r="8" fill="${C.HO_F}" stroke="${C.HO_S}" stroke-width="2"/><circle cx="76" cy="64" r="8" fill="${C.HO_F}" stroke="${C.HO_S}" stroke-width="2"/><text x="50" y="43" text-anchor="middle" font-size="14" font-weight="bold" fill="${C.HO_S}" font-family="Arial">KTW</text></svg>`},
+
+san_nef:{name:'NEF (Notarzteinsatzfahrzeug)',ref:'DV102 Anh.1.3',cat:'dv102_san',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="18" width="84" height="42" rx="3" fill="${C.HO_F}" stroke="${C.HO_S}" stroke-width="2"/><circle cx="24" cy="64" r="8" fill="${C.HO_F}" stroke="${C.HO_S}" stroke-width="2"/><circle cx="76" cy="64" r="8" fill="${C.HO_F}" stroke="${C.HO_S}" stroke-width="2"/><text x="50" y="43" text-anchor="middle" font-size="14" font-weight="bold" fill="${C.HO_S}" font-family="Arial">NEF</text></svg>`},
+
+san_naw:{name:'NAW (Notarztwagen)',ref:'DV102 Anh.1.3',cat:'dv102_san',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="18" width="84" height="42" rx="3" fill="${C.HO_F}" stroke="${C.HO_S}" stroke-width="2"/><circle cx="24" cy="64" r="8" fill="${C.HO_F}" stroke="${C.HO_S}" stroke-width="2"/><circle cx="76" cy="64" r="8" fill="${C.HO_F}" stroke="${C.HO_S}" stroke-width="2"/><text x="50" y="43" text-anchor="middle" font-size="14" font-weight="bold" fill="${C.HO_S}" font-family="Arial">NAW</text></svg>`},
+
+san_seg:{name:'SEG Rettung/Sanitätsdienst',ref:'DV102 Anh.1.3',cat:'dv102_san',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.HO_F}" stroke="${C.HO_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.HO_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.HO_S}"/><text x="64" y="28" font-size="8" font-weight="bold" fill="${C.HO_S}" font-family="Arial">SEG</text></svg>`},
+
+san_sanitaetszug:{name:'Sanitätszug',ref:'DV102 Anh.1.3',cat:'dv102_san',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.HO_F}" stroke="${C.HO_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.HO_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.HO_S}"/><line x1="8" y1="15" x2="8" y2="65" stroke="${C.HO_S}" stroke-width="2.5"/><text x="58" y="28" font-size="8" font-weight="bold" fill="${C.HO_S}" font-family="Arial">San</text></svg>`},
+
+san_lna:{name:'LNA – Leitender Notarzt',ref:'DV102 Anh.1.6',cat:'dv102_san',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="40" r="30" fill="${C.HO_F}" stroke="${C.HO_S}" stroke-width="2.5"/><text x="50" y="34" text-anchor="middle" font-size="11" font-weight="bold" fill="${C.HO_S}" font-family="Arial">LNA</text><line x1="50" y1="38" x2="50" y2="56" stroke="${C.HO_S}" stroke-width="4"/><line x1="34" y1="47" x2="66" y2="47" stroke="${C.HO_S}" stroke-width="4"/></svg>`},
+
+san_orgl:{name:'OrgL – Organ. Leiter RD',ref:'DV102 Anh.1.6',cat:'dv102_san',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="40" r="30" fill="${C.HO_F}" stroke="${C.HO_S}" stroke-width="2.5"/><text x="50" y="44" text-anchor="middle" font-size="12" font-weight="bold" fill="${C.HO_S}" font-family="Arial">OrgL</text></svg>`},
+
+san_drk_ee:{name:'DRK Einsatzeinheit',ref:'DV102 Anh.1.3',cat:'dv102_san',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.HO_F}" stroke="${C.HO_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.HO_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.HO_S}"/><line x1="8" y1="15" x2="8" y2="65" stroke="${C.HO_S}" stroke-width="2.5"/><text x="58" y="28" font-size="8" font-weight="bold" fill="${C.HO_S}" font-family="Arial">DRK</text></svg>`},
+
+san_betreuungszug:{name:'Betreuungszug HiOrg',ref:'DV102 Anh.1.3',cat:'dv102_san',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.HO_F}" stroke="${C.HO_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.HO_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.HO_S}"/><line x1="8" y1="15" x2="8" y2="65" stroke="${C.HO_S}" stroke-width="2.5"/><text x="58" y="28" font-size="8" font-weight="bold" fill="${C.HO_S}" font-family="Arial">Bt</text></svg>`},
+
+san_wasserrettung:{name:'Wasserrettungszug',ref:'DV102 Anh.1.3',cat:'dv102_san',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.HO_F}" stroke="${C.HO_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.HO_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.HO_S}"/><line x1="8" y1="15" x2="8" y2="65" stroke="${C.HO_S}" stroke-width="2.5"/><text x="56" y="28" font-size="7" font-weight="bold" fill="${C.HO_S}" font-family="Arial">WRett</text></svg>`},
+
+/* ══ THW (Anhang 1.2) ══ */
+thw_tz:{name:'Technischer Zug THW',ref:'DV102 Anh.1.2',cat:'dv102_thw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.THW_F}" stroke="${C.THW_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.THW_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.THW_S}"/><line x1="8" y1="15" x2="8" y2="65" stroke="${C.THW_S}" stroke-width="2.5"/><text x="60" y="27" font-size="8" font-weight="bold" fill="${C.THW_S}" font-family="Arial">TZ</text><text x="60" y="60" font-size="7" fill="${C.THW_S}" font-family="Arial">THW</text></svg>`},
+
+thw_b1:{name:'1. Bergungsgruppe THW',ref:'DV102 Anh.1.2',cat:'dv102_thw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.THW_F}" stroke="${C.THW_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.THW_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.THW_S}"/><text x="60" y="27" font-size="8" font-weight="bold" fill="${C.THW_S}" font-family="Arial">B 1</text><text x="60" y="60" font-size="7" fill="${C.THW_S}" font-family="Arial">THW</text></svg>`},
+
+thw_b2:{name:'2. Bergungsgruppe THW',ref:'DV102 Anh.1.2',cat:'dv102_thw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.THW_F}" stroke="${C.THW_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.THW_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.THW_S}"/><text x="60" y="27" font-size="8" font-weight="bold" fill="${C.THW_S}" font-family="Arial">B 2</text><text x="60" y="60" font-size="7" fill="${C.THW_S}" font-family="Arial">THW</text></svg>`},
+
+thw_fgr_i:{name:'FGr Infrastruktur THW',ref:'DV102 Anh.1.2',cat:'dv102_thw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.THW_F}" stroke="${C.THW_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.THW_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.THW_S}"/><text x="60" y="28" font-size="10" font-weight="bold" fill="${C.THW_S}" font-family="Arial">I</text><text x="60" y="60" font-size="7" fill="${C.THW_S}" font-family="Arial">THW</text></svg>`},
+
+thw_fgr_r:{name:'FGr Räumen THW',ref:'DV102 Anh.1.2',cat:'dv102_thw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.THW_F}" stroke="${C.THW_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.THW_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.THW_S}"/><text x="60" y="28" font-size="10" font-weight="bold" fill="${C.THW_S}" font-family="Arial">R</text><text x="60" y="60" font-size="7" fill="${C.THW_S}" font-family="Arial">THW</text></svg>`},
+
+thw_fgr_w:{name:'FGr Wassergefahren THW',ref:'DV102 Anh.1.2',cat:'dv102_thw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.THW_F}" stroke="${C.THW_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.THW_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.THW_S}"/><text x="60" y="28" font-size="10" font-weight="bold" fill="${C.THW_S}" font-family="Arial">W</text><text x="60" y="60" font-size="7" fill="${C.THW_S}" font-family="Arial">THW</text></svg>`},
+
+thw_fgr_e:{name:'FGr Elektroversorgung THW',ref:'DV102 Anh.1.2',cat:'dv102_thw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.THW_F}" stroke="${C.THW_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.THW_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.THW_S}"/><text x="60" y="28" font-size="10" font-weight="bold" fill="${C.THW_S}" font-family="Arial">E</text><text x="60" y="60" font-size="7" fill="${C.THW_S}" font-family="Arial">THW</text></svg>`},
+
+thw_fgr_o:{name:'FGr Ortung THW',ref:'DV102 Anh.1.2',cat:'dv102_thw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.THW_F}" stroke="${C.THW_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.THW_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.THW_S}"/><text x="60" y="28" font-size="10" font-weight="bold" fill="${C.THW_S}" font-family="Arial">O</text><text x="60" y="60" font-size="7" fill="${C.THW_S}" font-family="Arial">THW</text></svg>`},
+
+thw_fgr_wp:{name:'FGr Wasserschaden/Pumpen THW',ref:'DV102 Anh.1.2',cat:'dv102_thw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.THW_F}" stroke="${C.THW_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.THW_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.THW_S}"/><text x="60" y="28" font-size="9" font-weight="bold" fill="${C.THW_S}" font-family="Arial">WP</text><text x="60" y="60" font-size="7" fill="${C.THW_S}" font-family="Arial">THW</text></svg>`},
+
+thw_fgr_tw:{name:'FGr Trinkwasser THW',ref:'DV102 Anh.1.2',cat:'dv102_thw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.THW_F}" stroke="${C.THW_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.THW_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.THW_S}"/><text x="60" y="28" font-size="9" font-weight="bold" fill="${C.THW_S}" font-family="Arial">TW</text><text x="60" y="60" font-size="7" fill="${C.THW_S}" font-family="Arial">THW</text></svg>`},
+
+thw_fgr_brb:{name:'FGr Brückenbau THW',ref:'DV102 Anh.1.2',cat:'dv102_thw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.THW_F}" stroke="${C.THW_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.THW_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.THW_S}"/><text x="60" y="27" font-size="8" font-weight="bold" fill="${C.THW_S}" font-family="Arial">BrB</text><text x="60" y="60" font-size="7" fill="${C.THW_S}" font-family="Arial">THW</text></svg>`},
+
+thw_fgr_oe:{name:'FGr Ölschaden THW',ref:'DV102 Anh.1.2',cat:'dv102_thw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.THW_F}" stroke="${C.THW_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.THW_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.THW_S}"/><text x="60" y="28" font-size="10" font-weight="bold" fill="${C.THW_S}" font-family="Arial">Ö</text><text x="60" y="60" font-size="7" fill="${C.THW_S}" font-family="Arial">THW</text></svg>`},
+
+thw_fgr_fk:{name:'FGr Führung/Kommunikation THW',ref:'DV102 Anh.1.2',cat:'dv102_thw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.THW_F}" stroke="${C.THW_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.THW_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.THW_S}"/><text x="60" y="27" font-size="8" font-weight="bold" fill="${C.THW_S}" font-family="Arial">FK</text><text x="60" y="60" font-size="7" fill="${C.THW_S}" font-family="Arial">THW</text></svg>`},
+
+thw_fgr_log:{name:'FGr Logistik THW',ref:'DV102 Anh.1.2',cat:'dv102_thw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="15" width="84" height="50" fill="${C.THW_F}" stroke="${C.THW_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.THW_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.THW_S}"/><text x="60" y="27" font-size="8" font-weight="bold" fill="${C.THW_S}" font-family="Arial">Log</text><text x="60" y="60" font-size="7" fill="${C.THW_S}" font-family="Arial">THW</text></svg>`},
+
+thw_seeba:{name:'SEEBA THW (Auslandseinsatz)',ref:'DV102 Anh.1.2',cat:'dv102_thw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="10" width="84" height="60" fill="${C.THW_F}" stroke="${C.THW_S}" stroke-width="2"/><line x1="8" y1="40" x2="92" y2="40" stroke="${C.THW_S}" stroke-width="1.5"/><circle cx="50" cy="40" r="8" fill="${C.THW_S}"/><line x1="8" y1="10" x2="8" y2="70" stroke="${C.THW_S}" stroke-width="2.5"/><line x1="92" y1="10" x2="92" y2="70" stroke="${C.THW_S}" stroke-width="2.5"/><text x="50" y="25" text-anchor="middle" font-size="9" font-weight="bold" fill="${C.THW_S}" font-family="Arial">SEEBA</text></svg>`},
+
+thw_mzb:{name:'Mehrzweckboot MZB THW',ref:'DV102 Anh.1.2',cat:'dv102_thw',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><path d="M12 46 Q50 24 88 46 L82 60 Q50 70 18 60 Z" fill="${C.THW_F}" stroke="${C.THW_S}" stroke-width="2"/><text x="50" y="50" text-anchor="middle" font-size="10" font-weight="bold" fill="${C.THW_S}" font-family="Arial">MZB</text></svg>`},
+
+/* ══ EIGENINTERPRETATIONEN ══
+   Angelehnt an FüSYS/KOBRA-Magnete (vgl. Bilder), KEINE offizielle DV102-Quelle.
+   Diese Zeichen weichen bewusst vom DV102-System ab (Rauten-Stil, Pfeil-Magnete). */
+ei_el_raute:{name:'[E] EL – Rautenstil (FüSYS)',ref:'Eigeninterpretation',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="50,4 96,40 50,76 4,40" fill="#FFD700" stroke="#000" stroke-width="2.5"/><text x="50" y="46" text-anchor="middle" font-size="18" font-weight="bold" fill="#000" font-family="Arial">EL</text></svg>`},
+
+ei_al_raute:{name:'[E] AL – Rautenstil (FüSYS)',ref:'Eigeninterpretation',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="50,4 96,40 50,76 4,40" fill="${f}" stroke="${s}" stroke-width="2.5"/><text x="50" y="46" text-anchor="middle" font-size="18" font-weight="bold" fill="${s}" font-family="Arial">AL</text></svg>`},
+
+ei_zf_raute:{name:'[E] ZF – Rautenstil (FüSYS)',ref:'Eigeninterpretation',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="50,4 96,40 50,76 4,40" fill="${f}" stroke="${s}" stroke-width="2.5"/><text x="50" y="46" text-anchor="middle" font-size="18" font-weight="bold" fill="${s}" font-family="Arial">ZF</text></svg>`},
+
+ei_gf_raute:{name:'[E] GF – Rautenstil 2 Punkte (FüSYS)',ref:'Eigeninterpretation',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="39" cy="8" r="5" fill="${s}"/><circle cx="61" cy="8" r="5" fill="${s}"/><polygon points="50,16 94,46 50,76 6,46" fill="${f}" stroke="${s}" stroke-width="2.5"/><text x="50" y="55" text-anchor="middle" font-size="18" font-weight="bold" fill="${s}" font-family="Arial">GF</text></svg>`},
+
+ei_tr_raute:{name:'[E] TR – Rautenstil 1 Punkt (FüSYS)',ref:'Eigeninterpretation',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="8" r="5" fill="${s}"/><polygon points="50,16 94,46 50,76 6,46" fill="${f}" stroke="${s}" stroke-width="2.5"/><text x="50" y="55" text-anchor="middle" font-size="18" font-weight="bold" fill="${s}" font-family="Arial">TR</text></svg>`},
+
+ei_mzf_raute:{name:'[E] MZF – Rautenstil 3 Punkte (FüSYS)',ref:'Eigeninterpretation',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="36" cy="8" r="4" fill="${s}"/><circle cx="50" cy="8" r="4" fill="${s}"/><circle cx="64" cy="8" r="4" fill="${s}"/><polygon points="50,16 94,46 50,76 6,46" fill="${f}" stroke="${s}" stroke-width="2.5"/><text x="50" y="55" text-anchor="middle" font-size="14" font-weight="bold" fill="${s}" font-family="Arial">MZF</text></svg>`},
+
+ei_loeschzug_pfeil:{name:'[E] Löschzug Pfeil-Magnet (FüSYS)',ref:'Eigeninterpretation',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg"><circle cx="44" cy="6" r="4" fill="${C.FW_F}"/><circle cx="57" cy="6" r="4" fill="${C.FW_F}"/><circle cx="70" cy="6" r="4" fill="${C.FW_F}"/><rect x="10" y="12" width="96" height="40" fill="${C.FW_F}" stroke="${C.FW_F}" stroke-width="1"/><polygon points="10,32 28,12 28,52" fill="#000"/><text x="70" y="36" text-anchor="middle" font-size="12" font-weight="bold" fill="${C.FW_S}" font-family="Arial">Löschzug</text></svg>`},
+
+ei_loeschgruppe_pfeil:{name:'[E] Löschgruppe Pfeil-Magnet (FüSYS)',ref:'Eigeninterpretation',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="6" r="4" fill="${C.FW_F}"/><circle cx="63" cy="6" r="4" fill="${C.FW_F}"/><rect x="10" y="12" width="96" height="40" fill="${C.FW_F}" stroke="${C.FW_F}" stroke-width="1"/><polygon points="10,32 28,12 28,52" fill="#000"/><text x="70" y="36" text-anchor="middle" font-size="11" font-weight="bold" fill="${C.FW_S}" font-family="Arial">Löschgruppe</text></svg>`},
+
+ei_bs_einheit_pfeil:{name:'[E] BS-Einheit Pfeil-Magnet (FüSYS)',ref:'Eigeninterpretation',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg"><circle cx="57" cy="6" r="4" fill="${C.FW_F}"/><rect x="10" y="12" width="96" height="40" fill="${C.FW_F}" stroke="${C.FW_F}" stroke-width="1"/><polygon points="10,32 28,12 28,52" fill="#000"/><text x="70" y="36" text-anchor="middle" font-size="11" font-weight="bold" fill="${C.FW_S}" font-family="Arial">BS-Einheit</text></svg>`},
+
+ei_elw_pfeil:{name:'[E] ELW Pfeil-Magnet rot (FüSYS)',ref:'Eigeninterpretation',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="96" height="42" fill="${C.FW_F}" stroke="${C.FW_F}" stroke-width="1"/><polygon points="10,31 28,10 28,52" fill="#000"/><text x="70" y="35" text-anchor="middle" font-size="16" font-weight="bold" fill="${C.FW_S}" font-family="Arial">ELW</text></svg>`},
+
+ei_lf_pfeil:{name:'[E] LF Pfeil-Magnet rot (FüSYS)',ref:'Eigeninterpretation',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="96" height="42" fill="${C.FW_F}" stroke="${C.FW_F}" stroke-width="1"/><polygon points="10,31 28,10 28,52" fill="#000"/><text x="70" y="37" text-anchor="middle" font-size="20" font-weight="bold" fill="${C.FW_S}" font-family="Arial">LF</text></svg>`},
+
+ei_hlf_pfeil:{name:'[E] HLF Pfeil-Magnet rot (FüSYS)',ref:'Eigeninterpretation',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="96" height="42" fill="${C.FW_F}" stroke="${C.FW_F}" stroke-width="1"/><polygon points="10,31 28,10 28,52" fill="#000"/><text x="70" y="36" text-anchor="middle" font-size="17" font-weight="bold" fill="${C.FW_S}" font-family="Arial">HLF</text></svg>`},
+
+ei_tlf_pfeil:{name:'[E] TLF Pfeil-Magnet rot (FüSYS)',ref:'Eigeninterpretation',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="96" height="42" fill="${C.FW_F}" stroke="${C.FW_F}" stroke-width="1"/><polygon points="10,31 28,10 28,52" fill="#000"/><text x="70" y="36" text-anchor="middle" font-size="17" font-weight="bold" fill="${C.FW_S}" font-family="Arial">TLF</text></svg>`},
+
+ei_dlk_pfeil:{name:'[E] DLK 23/12 Pfeil-Magnet (FüSYS)',ref:'Eigeninterpretation',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="96" height="42" fill="${C.FW_F}" stroke="${C.FW_F}" stroke-width="1"/><polygon points="10,31 28,10 28,52" fill="#000"/><text x="68" y="29" text-anchor="middle" font-size="13" font-weight="bold" fill="${C.FW_S}" font-family="Arial">DLK</text><text x="68" y="48" text-anchor="middle" font-size="12" fill="${C.FW_S}" font-family="Arial">23/12</text></svg>`},
+
+ei_rw_pfeil:{name:'[E] RW Pfeil-Magnet rot (FüSYS)',ref:'Eigeninterpretation',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="96" height="42" fill="${C.FW_F}" stroke="${C.FW_F}" stroke-width="1"/><polygon points="10,31 28,10 28,52" fill="#000"/><text x="70" y="37" text-anchor="middle" font-size="20" font-weight="bold" fill="${C.FW_S}" font-family="Arial">RW</text></svg>`},
+
+ei_nef_pfeil:{name:'[E] NEF Pfeil-Magnet (FüSYS)',ref:'Eigeninterpretation',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="96" height="42" fill="${C.HO_F}" stroke="#ccc" stroke-width="1"/><polygon points="10,31 28,10 28,52" fill="#333"/><text x="70" y="36" text-anchor="middle" font-size="16" font-weight="bold" fill="${C.HO_S}" font-family="Arial">NEF</text></svg>`},
+
+ei_rtw_pfeil:{name:'[E] RTW Pfeil-Magnet (FüSYS)',ref:'Eigeninterpretation',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="96" height="42" fill="${C.HO_F}" stroke="#ccc" stroke-width="1"/><polygon points="10,31 28,10 28,52" fill="#333"/><text x="70" y="36" text-anchor="middle" font-size="16" font-weight="bold" fill="${C.HO_S}" font-family="Arial">RTW</text></svg>`},
+
+ei_thw_pfeil:{name:'[E] THW Pfeil-Magnet blau (FüSYS)',ref:'Eigeninterpretation',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="96" height="42" fill="${C.THW_F}" stroke="${C.THW_F}" stroke-width="1"/><polygon points="10,31 28,10 28,52" fill="#000"/><text x="70" y="36" text-anchor="middle" font-size="16" font-weight="bold" fill="${C.THW_S}" font-family="Arial">THW</text></svg>`},
+
+ei_pol_pfeil:{name:'[E] Polizei Pfeil-Magnet grün (FüSYS)',ref:'Eigeninterpretation',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="96" height="42" fill="${C.POL_F}" stroke="${C.POL_F}" stroke-width="1"/><polygon points="10,31 28,10 28,52" fill="#000"/><text x="70" y="36" text-anchor="middle" font-size="14" font-weight="bold" fill="${C.POL_S}" font-family="Arial">Polizei</text></svg>`},
+
+ei_agt:{name:'[E] AGT-Überwachungsfeld',ref:'Eigeninterpretation (Praxis)',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="92" height="52" rx="4" fill="${f}" stroke="${s}" stroke-width="2"/><text x="50" y="18" text-anchor="middle" font-size="9" font-weight="bold" fill="${s}" font-family="Arial">AGT:</text><text x="50" y="38" text-anchor="middle" font-size="18" font-weight="bold" fill="${s}" font-family="Arial">__/__</text><text x="50" y="52" text-anchor="middle" font-size="8" fill="${s}" font-family="Arial">ein / aus</text></svg>`},
+
+ei_starke:{name:'[E] Stärkeangabe-Feld',ref:'DV102 §4.5 (Eigenform)',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="92" height="52" rx="4" fill="${f}" stroke="${s}" stroke-width="2"/><text x="50" y="24" text-anchor="middle" font-size="11" fill="${s}" font-family="Arial">_/_/_/_</text><text x="50" y="44" text-anchor="middle" font-size="8" fill="${s}" font-family="Arial">Fü/UF/MA/Ges.</text></svg>`},
+
+ei_funk_kanal:{name:'[E] Funk-Kanal-Feld',ref:'Eigeninterpretation (Praxis)',cat:'eigen',
+svg:(s,f)=>`<svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="92" height="52" rx="4" fill="${f}" stroke="${s}" stroke-width="2"/><text x="50" y="20" text-anchor="middle" font-size="8" font-weight="bold" fill="${s}" font-family="Arial">Funk-Kanal:</text><line x1="12" y1="38" x2="88" y2="38" stroke="${s}" stroke-width="1.5"/><text x="50" y="52" text-anchor="middle" font-size="7" fill="${s}" font-family="Arial">Abschnittsleiter:</text></svg>`},
+
+};
+
+/* ═══════════════════════════════════════════
+   KATEGORIEN-KONFIGURATION
+═══════════════════════════════════════════ */
+const CATS = [
+  { id:'dv102',     label:'§1 Grundzeichen',           color:'#4ade80', official:true  },
+  { id:'dv102_fa',  label:'§3 Fachaufgaben',            color:'#4ade80', official:true  },
+  { id:'dv102_eo',  label:'§4 Einheitsgrößen',          color:'#4ade80', official:true  },
+  { id:'dv102_fü',  label:'§5 Führungskräfte',          color:'#4ade80', official:true  },
+  { id:'dv102_fz',  label:'§6 Fahrzeuge / Mittel',      color:'#4ade80', official:true  },
+  { id:'dv102_ri',  label:'§7 Richtungen / Bewegung',   color:'#4ade80', official:true  },
+  { id:'dv102_lage',label:'Anh.1.9 Lagebild / Schaden', color:'#4ade80', official:true  },
+  { id:'dv102_fw',  label:'Anh.1.1+1.6 FW-Einheiten',  color:'#4ade80', official:true  },
+  { id:'dv102_san', label:'Anh.1.3 San / RD / HiOrg',  color:'#4ade80', official:true  },
+  { id:'dv102_thw', label:'Anh.1.2 THW-Einheiten',     color:'#4ade80', official:true  },
+  { id:'eigen',     label:'Eigeninterpretationen',      color:'#fbbf24', official:false },
+];
+
+/* ═══════════════════════════════════════════
+   APP STATE
+═══════════════════════════════════════════ */
+const state = {
+  format:'A4P', cols:3, rows:3,
+  magnetW:60, magnetH:40,
+  cells:[], selectedSym:null,
+  searchQuery:'',
+  strokeColor:'#000000', fillColor:'#ffffff',
+  textColor:'#000000', bgColor:'#ffffff',
+  fontSize:9, textPos:'below', labelText:'',
+};
+
+let editingCellIdx = null;
+let dragSymId = null;
+let tooltipTimer = null;
+const tooltip = document.getElementById('symTooltip');
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  initCells();
+  buildSymbolList();
+  rebuildCanvas();
+  setFormat('A4P');
+  setGrid(3,3);
+  initDrop();
+});
+
+/* ═══════════════════════════════════════════
+   SYMBOL LIST
+═══════════════════════════════════════════ */
+function buildSymbolList() {
+  const list = document.getElementById('symbolList');
+  list.innerHTML = '';
+  const q = state.searchQuery.toLowerCase();
+
+  CATS.forEach(cat => {
+    const items = Object.entries(SYM).filter(([id, s]) => {
+      if (s.cat !== cat.id) return false;
+      if (q && !s.name.toLowerCase().includes(q) && !s.ref.toLowerCase().includes(q)) return false;
+      return true;
+    });
+    if (!items.length) return;
+
+    const sec = document.createElement('div');
+    sec.className = 'cat-section';
+
+    const hdr = document.createElement('div');
+    hdr.className = 'cat-header';
+    hdr.innerHTML = `
+      <div class="cat-header-left">
+        <div class="cat-dot" style="background:${cat.color}"></div>
+        <span class="cat-title-text">${cat.label}</span>
+        <span class="cat-badge ${cat.official ? 'official' : 'eigen'}">${cat.official ? 'DV102' : 'Eigen'}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span class="cat-count">${items.length}</span>
+        <span class="cat-chevron">▼</span>
+      </div>`;
+    hdr.onclick = () => {
+      const body = sec.querySelector('.cat-body');
+      const chev = hdr.querySelector('.cat-chevron');
+      const open = body.classList.toggle('open');
+      chev.style.transform = open ? 'rotate(180deg)' : '';
+    };
+
+    const body = document.createElement('div');
+    body.className = 'cat-body' + (q ? ' open' : '');
+
+    const grid = document.createElement('div');
+    grid.className = 'sym-grid';
+
+    items.forEach(([id, sym]) => {
+      const item = document.createElement('div');
+      item.className = 'sym-item' + (state.selectedSym === id ? ' selected' : '');
+      const badge = cat.official ? 'official' : 'eigen';
+      item.innerHTML = `
+        <div class="sym-status ${badge}"></div>
+        ${sym.svg(state.strokeColor, state.fillColor)}
+        <span class="sym-item-label">${sym.name.replace(/^\[E\] /,'')}</span>`;
+      item.onclick = () => selectSymbol(id);
+      item.draggable = true;
+      item.addEventListener('dragstart', e => { dragSymId = id; e.dataTransfer.effectAllowed = 'copy'; });
+      item.addEventListener('dragend', () => { dragSymId = null; });
+      attachTooltip(item, sym);
+      grid.appendChild(item);
+    });
+
+    body.appendChild(grid);
+    sec.appendChild(hdr);
+    sec.appendChild(body);
+    list.appendChild(sec);
+  });
+
+  if (!list.children.length) {
+    list.innerHTML = '<div class="empty-state"><div class="es-ico">🔍</div><p>Keine Zeichen gefunden.</p></div>';
+  }
+}
+
+function filterSymbols(q) {
+  state.searchQuery = q;
+  buildSymbolList();
+}
+
+function selectSymbol(id) {
+  state.selectedSym = id;
+  buildSymbolList();
+  updateSymPreview();
+}
+
+/* ═══════════════════════════════════════════
+   INSPECTOR PREVIEW
+═══════════════════════════════════════════ */
+function updateSymPreview() {
+  const sec = document.getElementById('symPreviewSection');
+  if (!state.selectedSym) {
+    sec.innerHTML = '<div class="empty-state"><div class="es-ico">👆</div><p>Symbol wählen → Zelle klicken oder ziehen</p></div>';
+    return;
+  }
+  const sym = SYM[state.selectedSym];
+  const cat = CATS.find(c => c.id === sym.cat);
+  const isOfficial = cat?.official;
+  sec.innerHTML = `
+    <div class="sym-preview-box">
+      ${sym.svg(state.strokeColor, state.fillColor)}
+      <div class="sym-preview-name">${sym.name}</div>
+      <div class="sym-preview-ref">${sym.ref}</div>
+      <div>${isOfficial
+        ? '<span class="official-tag">✓ Offiziell DV 102</span>'
+        : '<span class="eigen-tag">⚠ Eigeninterpretation</span>'}</div>
+    </div>`;
+}
+
+/* ═══════════════════════════════════════════
+   CANVAS / GRID
+═══════════════════════════════════════════ */
+function initCells() {
+  state.cells = Array.from({length: state.cols * state.rows},
+    () => ({symId:null, label:'', textPos:'below'}));
+}
+
+function setFormat(fmt) {
+  state.format = fmt;
+  document.querySelectorAll('[id^=btnA4]').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById('btn'+fmt);
+  if (el) el.classList.add('active');
+  rebuildCanvas();
+}
+
+function setGrid(cols, rows) {
+  state.cols = cols; state.rows = rows;
+  const prev = state.cells;
+  state.cells = Array.from({length: cols * rows}, (_, i) =>
+    prev[i] || {symId:null, label:'', textPos:'below'});
+  document.querySelectorAll('[id^=btnGrid]').forEach(b => b.classList.remove('active'));
+  const key = `btnGrid${cols}${rows}`;
+  const el = document.getElementById(key);
+  if (el) el.classList.add('active');
+  rebuildCanvas();
+}
+
+function setMagnetSize(w, h, btn) {
+  state.magnetW = w; state.magnetH = h;
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  rebuildCanvas();
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function applyCustomSize() {
+  const w = parseInt(document.getElementById('customW').value, 10);
+  const h = parseInt(document.getElementById('customH').value, 10);
+  if (w > 0 && h > 0) { state.magnetW = w; state.magnetH = h; }
+  closeModal('customSizeModal');
+  rebuildCanvas();
+}
+
+function clearCanvas() {
+  state.cells = state.cells.map(() => ({symId:null, label:'', textPos:'below'}));
+  rebuildCanvas();
+}
+
+const MM2PX = 3.7795;
+
+function rebuildCanvas() {
+  const canvas = document.getElementById('printCanvas');
+  const {cols, rows, magnetW, magnetH, format, bgColor} = state;
+  const pageW_mm = format === 'A4L' ? 297 : 210;
+  const pageH_mm = format === 'A4L' ? 210 : 297;
+
+  const vw = window.innerWidth * 0.50;
+  const vh = window.innerHeight * 0.82;
+  const scale = Math.min(vh / (pageH_mm * MM2PX), vw / (pageW_mm * MM2PX));
+
+  const pageW = Math.round(pageW_mm * MM2PX * scale);
+  const pageH = Math.round(pageH_mm * MM2PX * scale);
+  const cellW = Math.round(magnetW * MM2PX * scale);
+  const cellH = Math.round(magnetH * MM2PX * scale);
+  const gridW = cols * cellW;
+  const gridH = rows * cellH;
+  const padX = Math.round((pageW - gridW) / 2);
+  const padY = Math.round((pageH - gridH) / 2);
+
+  canvas.style.cssText = `width:${pageW}px;height:${pageH}px;background:${bgColor};` +
+    `display:grid;grid-template-columns:repeat(${cols},${cellW}px);` +
+    `grid-template-rows:repeat(${rows},${cellH}px);` +
+    `padding:${padY}px ${padX}px;gap:0;`;
+  canvas.innerHTML = '';
+
+  for (let i = 0; i < cols * rows; i++) {
+    if (!state.cells[i]) state.cells[i] = {symId:null, label:'', textPos:'below'};
+    const cell = state.cells[i];
+    const div = document.createElement('div');
+    div.className = 'magnet-cell' + (cell.symId ? ' filled' : '');
+    div.dataset.idx = i;
+
+    if (cell.symId && SYM[cell.symId]) {
+      const sym = SYM[cell.symId];
+      const svgStr = sym.svg(state.strokeColor, state.fillColor);
+      const lbl = cell.label || '';
+      const pos = cell.textPos || 'below';
+      const fs = `${state.fontSize}px`;
+      const tc = state.textColor;
+      const labelEl = lbl && pos !== 'none'
+        ? `<div class="cell-lbl" style="font-size:${fs};color:${tc};">${esc(lbl)}</div>` : '';
+      div.innerHTML = `
+        <div class="placed-sign">
+          ${pos === 'above' ? labelEl : ''}
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;min-height:0;">${svgStr}</div>
+          ${pos === 'below' ? labelEl : ''}
+          <div class="cell-remove" onclick="event.stopPropagation();removeCell(${i})">✕</div>
+        </div>`;
+    } else {
+      div.innerHTML = '<div class="drop-hint">+ Zeichen platzieren</div>';
+    }
+
+    div.addEventListener('click', () => handleCellClick(i));
+    div.addEventListener('dblclick', e => { e.stopPropagation(); if (cell.symId) openCellEdit(i); });
+    div.addEventListener('contextmenu', e => { e.preventDefault(); if (cell.symId) openCellEdit(i); });
+    div.addEventListener('dragover', e => { e.preventDefault(); div.classList.add('drag-over'); });
+    div.addEventListener('dragleave', () => div.classList.remove('drag-over'));
+    div.addEventListener('drop', e => {
+      e.preventDefault(); div.classList.remove('drag-over');
+      if (dragSymId) {
+        state.cells[i] = {symId:dragSymId, label:state.labelText, textPos:state.textPos};
+        state.selectedSym = dragSymId;
+        updateSymPreview(); buildSymbolList(); rebuildCanvas();
+      }
+    });
+    canvas.appendChild(div);
+  }
+  updateCounter();
+  updatePrintInfo();
+}
+
+function initDrop() {/* cells get handlers in rebuildCanvas */}
+
+function handleCellClick(idx) {
+  if (!state.selectedSym) return;
+  state.cells[idx] = {symId:state.selectedSym, label:state.labelText, textPos:state.textPos};
+  rebuildCanvas();
+}
+
+function removeCell(idx) {
+  state.cells[idx] = {symId:null, label:'', textPos:'below'};
+  rebuildCanvas();
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ═══════════════════════════════════════════
+   CELL EDIT
+═══════════════════════════════════════════ */
+function openCellEdit(idx) {
+  editingCellIdx = idx;
+  const cell = state.cells[idx];
+  const sym = SYM[cell.symId];
+  document.getElementById('cellEditPreview').innerHTML = sym ? sym.svg('#000','#fff') : '';
+  document.getElementById('cellEditLabel').value = cell.label || '';
+  const pos = cell.textPos || 'below';
+  document.querySelectorAll('input[name="cep"]').forEach(r => r.checked = r.value === pos);
+  const hint = document.getElementById('cellEditSwapHint');
+  hint.textContent = state.selectedSym && state.selectedSym !== cell.symId
+    ? `↔ Symbol wechseln zu: ${SYM[state.selectedSym]?.name}`
+    : 'Wähle ein Symbol aus der Bibliothek um es zu wechseln.';
+  openModal('cellEditModal');
+}
+
+function saveCellEdit() {
+  if (editingCellIdx === null) return;
+  const lbl = document.getElementById('cellEditLabel').value.trim();
+  const pos = document.querySelector('input[name="cep"]:checked')?.value || 'below';
+  const cell = state.cells[editingCellIdx];
+  if (state.selectedSym && state.selectedSym !== cell.symId) cell.symId = state.selectedSym;
+  cell.label = lbl;
+  cell.textPos = pos;
+  closeModal('cellEditModal');
+  rebuildCanvas();
+}
+
+function deleteCellFromEdit() {
+  if (editingCellIdx !== null) removeCell(editingCellIdx);
+  closeModal('cellEditModal');
+}
+
+/* ═══════════════════════════════════════════
+   TOOLTIP
+═══════════════════════════════════════════ */
+function attachTooltip(el, sym) {
+  el.addEventListener('mouseenter', e => {
+    clearTimeout(tooltipTimer);
+    tooltipTimer = setTimeout(() => {
+      tooltip.innerHTML = sym.svg('#000','#fff') +
+        `<span style="font-weight:700;color:var(--text);font-size:.52rem;">${sym.name}</span>` +
+        `<span style="color:var(--teal);font-size:.44rem;font-family:'Share Tech Mono',monospace;">${sym.ref}</span>`;
+      tooltip.style.opacity = '1';
+      posTooltip(e);
+    }, 320);
+  });
+  el.addEventListener('mousemove', posTooltip);
+  el.addEventListener('mouseleave', () => { clearTimeout(tooltipTimer); tooltip.style.opacity = '0'; });
+}
+
+function posTooltip(e) {
+  tooltip.style.left = Math.min(e.clientX + 14, window.innerWidth - 130) + 'px';
+  tooltip.style.top = Math.max(e.clientY - 24, 4) + 'px';
+}
+
+/* ═══════════════════════════════════════════
+   COUNTER & PRINT INFO
+═══════════════════════════════════════════ */
+function updateCounter() {
+  const placed = state.cells.filter(c => c?.symId).length;
+  const total = state.cols * state.rows;
+  const el = document.getElementById('canvasCounter');
+  if (!el) return;
+  el.textContent = `${placed} / ${total}`;
+  el.style.color = placed === total ? '#4ade80' : placed > 0 ? '#f59e0b' : 'var(--text3)';
+}
+
+function updatePrintInfo() {
+  const {cols, rows, magnetW, magnetH, format} = state;
+  const pageW = format === 'A4L' ? 297 : 210;
+  const pageH = format === 'A4L' ? 210 : 297;
+  const placed = state.cells.filter(c => c?.symId).length;
+  const official = state.cells.filter(c => c?.symId && CATS.find(cat => cat.id === SYM[c.symId]?.cat)?.official).length;
+  const eigen = placed - official;
+  document.getElementById('printInfo').innerHTML =
+    `<strong>ℹ Druckinformation</strong>Format: ${format === 'A4L' ? 'A4 Querformat' : 'A4 Hochformat'} (${pageW}×${pageH} mm)
+Magnet: ${magnetW}×${magnetH} mm  |  Raster: ${cols}×${rows}
+Gesamt: ${cols*rows}  |  Befüllt: ${placed}
+Davon offiziell (DV102): ${official}
+Davon Eigeninterpretation: ${eigen}
+
+💡 300 DPI empfohlen für Magnete.
+Schnittrand 2–3 mm Überstand einplanen.`;
+}
+
+/* ═══════════════════════════════════════════
+   EXPORT / PRINT
+═══════════════════════════════════════════ */
+function printPage() { window.print(); }
+
+function exportSVG() {
+  const {cols, rows, magnetW, magnetH} = state;
+  const svgW = cols * magnetW, svgH = rows * magnetH;
+  let inner = '';
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const i = r * cols + c;
+      const cell = state.cells[i];
+      const x = c * magnetW, y = r * magnetH;
+      inner += `<rect x="${x}" y="${y}" width="${magnetW}" height="${magnetH}" fill="${state.bgColor}" stroke="#aaa" stroke-width="0.3" stroke-dasharray="2,1"/>`;
+
+      if (cell?.symId && SYM[cell.symId]) {
+        const sym = SYM[cell.symId];
+        const symW = magnetW * 0.76, symH = magnetH * 0.72;
+        const lbl = cell.label || '';
+        const pos = cell.textPos || 'below';
+        const lblH = lbl && pos !== 'none' ? 5 : 0;
+        let symY = y + (magnetH - symH - lblH) / 2;
+        if (pos === 'above') symY += lblH;
+        const symX = x + (magnetW - symW) / 2;
+        const svgContent = sym.svg(state.strokeColor, state.fillColor)
+          .replace(/<svg[^>]*>/, '').replace(/<\/svg>/, '');
+        inner += `<g transform="translate(${symX.toFixed(1)},${symY.toFixed(1)}) scale(${(symW/100).toFixed(3)},${(symH/80).toFixed(3)})">${svgContent}</g>`;
+        if (lbl && pos !== 'none') {
+          const ty = pos === 'above' ? y + 4 : y + magnetH - 1.5;
+          inner += `<text x="${x + magnetW/2}" y="${ty}" text-anchor="middle" font-family="Arial" font-size="3.5" fill="${state.textColor}">${esc(lbl)}</text>`;
+        }
+      }
+    }
+  }
+
+  const svg = `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${svgW}mm" height="${svgH}mm" viewBox="0 0 ${svgW} ${svgH}">\n` +
+    `  <title>Taktische Zeichen nach DV 102</title>\n${inner}\n</svg>`;
+  const blob = new Blob([svg], {type:'image/svg+xml'});
+  const a = Object.assign(document.createElement('a'), {href:URL.createObjectURL(blob), download:'tz-magnete-dv102.svg'});
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+/* ═══════════════════════════════════════════
+   BESTELLVORLAGE
+═══════════════════════════════════════════ */
+function openOrderModal() {
+  const {cols, rows, magnetW, magnetH, format} = state;
+  const placed = state.cells.filter(c => c?.symId);
+  const counts = {};
+  placed.forEach(c => {
+    const n = SYM[c.symId]?.name || c.symId;
+    counts[n] = (counts[n] || 0) + 1;
+  });
+  const symList = Object.entries(counts).map(([n,q]) => `  ${q}×  ${n}`).join('\n') || '  (keine Zeichen platziert)';
+  const official = placed.filter(c => CATS.find(cat=>cat.id===SYM[c.symId]?.cat)?.official).length;
+
+  document.getElementById('orderContent').textContent =
+`BESTELLVORLAGE – TAKTISCHE ZEICHEN MAGNETE (DV 102)
+${'─'.repeat(48)}
+Datum:          ${new Date().toLocaleDateString('de-DE')}
+Besteller:      _____________________________
+Organisation:   _____________________________
+
+DRUCKDATEN
+${'─'.repeat(48)}
+Datei:          tz-magnete-dv102.svg
+Dateiformat:    Vektorgrafik SVG (skalierbar)
+Mindest-DPI:    300 DPI bei Ausgabe
+Farbmodus:      CMYK bevorzugt
+
+MAGNETSPEZIFIKATION
+${'─'.repeat(48)}
+Größe/Magnet:   ${magnetW} × ${magnetH} mm
+Seitenformat:   ${format === 'A4L' ? 'A4 Querformat (297×210 mm)' : 'A4 Hochformat (210×297 mm)'}
+Raster:         ${cols} × ${rows} = ${cols*rows} Magnete/Seite
+Befüllt:        ${placed.length} von ${cols*rows}
+DV102-konform:  ${official} Zeichen
+Eigeninterpret: ${placed.length - official} Zeichen
+
+PLATZIERTE ZEICHEN
+${'─'.repeat(48)}
+${symList}
+
+FERTIGUNGSHINWEISE
+${'─'.repeat(48)}
+- Schnittrand (Bleed): mind. 2–3 mm
+- Material: Folienmagnete, flexibel (< 1 mm)
+- Oberfläche: Matt (empfohlen) oder Glanz
+- Menge: ________ Blätter / ________ Stück
+- Befestigung: Tafeln, Whiteboards, Fahrzeuge
+
+SVG-Datei als Anlage beifügen.
+Druckfreigabe vor Produktion einholen.`;
+
+  openModal('orderModal');
+}
+
+function copyOrderText(btn) {
+  navigator.clipboard.writeText(document.getElementById('orderContent').textContent).then(() => {
+    btn.textContent = '✓ Kopiert!';
+    setTimeout(() => btn.textContent = '📋 Kopieren', 2200);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   PROJEKT SPEICHERN / LADEN
+═══════════════════════════════════════════ */
+function saveProject() {
+  const data = JSON.stringify({version:2, ...state, savedAt:new Date().toISOString()}, null, 2);
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(new Blob([data], {type:'application/json'})),
+    download: `tz-projekt-${Date.now()}.json`
+  });
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+function loadProject(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const p = JSON.parse(e.target.result);
+      if (!p.version) throw new Error('Ungültiges Format');
+      ['format','cols','rows','magnetW','magnetH','strokeColor','fillColor',
+       'textColor','bgColor','fontSize','textPos','cells'].forEach(k => {
+        if (p[k] !== undefined) state[k] = p[k];
+      });
+      ['strokeColor','fillColor','textColor','bgColor','fontSize'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = state[id];
+      });
+      setFormat(state.format);
+      setGrid(state.cols, state.rows);
+      buildSymbolList();
+      rebuildCanvas();
+      alert('✓ Projekt geladen!');
+    } catch(err) { alert('Fehler: ' + err.message); }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+</script>
+</body>
+</html>

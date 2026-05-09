@@ -108,6 +108,19 @@ header{position:relative;z-index:10;border-bottom:1px solid var(--border);backgr
 footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:20px 32px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:.58rem;color:var(--text2);letter-spacing:2px;text-transform:uppercase;margin-top:20px;}
 footer span{color:var(--accent);}
 
+/* EXPERIMENTAL WARNING BANNER */
+.exp-banner{
+  position:relative;z-index:5;
+  background:linear-gradient(90deg,rgba(245,158,11,.08),rgba(245,158,11,.12),rgba(245,158,11,.08));
+  border-top:1px solid rgba(245,158,11,.3);
+  border-bottom:1px solid rgba(245,158,11,.3);
+  padding:10px 24px;
+  display:flex;align-items:center;gap:10px;
+  font-size:.68rem;line-height:1.5;color:rgba(245,158,11,.9);
+}
+.exp-banner-icon{font-size:1rem;flex-shrink:0;}
+.exp-banner b{color:#fbbf24;}
+
 /* ── NAV / LANG TOGGLE ── */
 .fw-nav-bar{
   display:flex;align-items:center;justify-content:flex-end;
@@ -144,6 +157,12 @@ footer span{color:var(--accent);}
 
 <div class="fw-nav-bar">
   <button class="fw-lang-btn" id="fw-lang-btn" onclick="indexToggleLang()">🌐 EN</button>
+</div>
+
+<!-- EXPERIMENTAL WARNING -->
+<div class="exp-banner">
+  <span class="exp-banner-icon">⚠️</span>
+  <span><b>Experimentell – nicht vollständig getestet.</b> Diese Tools befinden sich in aktiver Entwicklung. Funktionen können unvollständig oder fehlerhaft sein. Exportiere Projekte regelmäßig als JSON-Backup. Feedback &amp; Bugs bitte über den 🐛-Link melden.</span>
 </div>
 
 <main>
@@ -185,6 +204,7 @@ footer span{color:var(--accent);}
         <span class="tag">Mehrere Bilder</span>
         <span class="tag">PNG Export</span>
         <span class="tag">PDF Export</span>
+        <span class="tag" style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:#fbbf24;">⚠️ Experimentell</span>
       </div>
       <div class="card-cta">
         <span class="cta-label">Annotator öffnen</span>
@@ -210,6 +230,7 @@ footer span{color:var(--accent);}
         <span class="tag">Präfix-System</span>
         <span class="tag">Direktdruck</span>
         <span class="tag">Duplex</span>
+        <span class="tag" style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:#fbbf24;">⚠️ Experimentell</span>
       </div>
       <div class="card-cta">
         <span class="cta-label">Generator öffnen</span>
@@ -228,6 +249,7 @@ footer span{color:var(--accent);}
         <span class="tag">Export-Wizard</span>
         <span class="tag">Präfix-System</span>
         <span class="tag">Duplex-Druck</span>
+        <span class="tag" style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:#fbbf24;">⚠️ Experimentell</span>
       </div>
       <div class="card-cta">
         <span class="cta-label">Generator öffnen</span>
@@ -253,6 +275,7 @@ footer span{color:var(--accent);}
         <span class="tag">Shiny-Effekte</span>
         <span class="tag">Export-Wizard</span>
         <span class="tag">Stickerexport</span>
+        <span class="tag" style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:#fbbf24;">⚠️ Experimentell</span>
       </div>
       <div class="card-cta">
         <span class="cta-label">Generator öffnen</span>
@@ -266,7 +289,7 @@ footer span{color:var(--accent);}
 
 <footer>
   Feuerwehr Karten Suite &nbsp;·&nbsp; <span>100% Browser-basiert</span> &nbsp;·&nbsp; Kein Server &nbsp;·&nbsp; Keine Daten
-  &nbsp;·&nbsp; <a href="https://github.com/it4k4i/feuerwehr-karten/issues/new" target="_blank" rel="noopener" style="color:var(--text2);text-decoration:none;transition:color .15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">🐛 Bug melden</a>
+  &nbsp;·&nbsp; <a href="https://github.com/issues/new" target="_blank" rel="noopener" style="color:var(--text2);text-decoration:none;transition:color .15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">🐛 Bug melden</a>
 </footer>
 
 
