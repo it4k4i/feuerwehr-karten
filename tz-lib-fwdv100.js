@@ -287,6 +287,136 @@ svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
   ${t('AGT',45,52,9,FWS,'bold')}
 </svg>`},
 
+/* ═══════════════════════════════════════════
+   FwDV 3 – PERSONEN-SYMBOLE (Sitz-/Antreteordnung)
+
+   Grundform: Quadrat auf der Spitze (45°-Raute), weiß
+   Truppführer: oberste Spitze schwarz ausgefüllt
+   Gruppenführer: Truppführer + 2 Punkte oben
+   Beschriftung: Kürzel in der Mitte
+   Norm: FwDV 3 §3, Anlage Begriffe
+═══════════════════════════════════════════ */
+
+// Truppmann (weißes Diamant / Quadrat auf Spitze)
+fw3_truppmann:{name:'Truppmann (Tm)',ref:'FwDV 3 §3 Sitzordnung',cat:'fwdv3_person',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="45,4 82,30 45,56 8,30" fill="#FFFFFF" stroke="#000000" stroke-width="2"/>
+</svg>`},
+
+// Truppführer (Diamant, oberste Spitze schwarz)
+fw3_truppführer:{name:'Truppführer (TF)',ref:'FwDV 3 §3 Sitzordnung',cat:'fwdv3_person',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="45,4 82,30 45,56 8,30" fill="#FFFFFF" stroke="#000000" stroke-width="2"/>
+  <!-- Schwarze obere Spitze -->
+  <polygon points="45,4 66,20 45,24 24,20" fill="#000000"/>
+</svg>`},
+
+// Gruppenführer (Truppführer + 2 Punkte)
+fw3_gruppenführer:{name:'Gruppenführer (GF)',ref:'FwDV 3 §3 Sitzordnung',cat:'fwdv3_person',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  <!-- Größeres Quadrat für Gruppenführer (DV3: größer als normale TF-Raute) -->
+  <polygon points="45,2 84,30 45,58 6,30" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+  <!-- Schwarze obere Spitze -->
+  <polygon points="45,2 67,19 45,23 23,19" fill="#000000"/>
+  <!-- 2 Punkte über der Raute = Führungszeichen -->
+  <circle cx="36" cy="30" r="4" fill="#000000"/>
+  <circle cx="54" cy="30" r="4" fill="#000000"/>
+</svg>`},
+
+// Angriffstrupp (A)
+fw3_angriffstrupp:{name:'Angriffstrupp (A-Tr)',ref:'FwDV 3 §2 / §5',cat:'fwdv3_person',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="45,4 82,30 45,56 8,30" fill="#FFFFFF" stroke="#000000" stroke-width="2"/>
+  ${t('A',45,34,18,'#000000','bold')}
+</svg>`},
+
+// Angriffstruppführer
+fw3_atf:{name:'Angriffstruppführer (ATF)',ref:'FwDV 3 §2 / §5',cat:'fwdv3_person',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="45,4 82,30 45,56 8,30" fill="#FFFFFF" stroke="#000000" stroke-width="2"/>
+  <polygon points="45,4 66,20 45,24 24,20" fill="#000000"/>
+  ${t('A',45,36,16,'#000000','bold')}
+</svg>`},
+
+// Angriffstruppmann
+fw3_atm:{name:'Angriffstruppmann (ATM)',ref:'FwDV 3 §2 / §5',cat:'fwdv3_person',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="45,4 82,30 45,56 8,30" fill="#FFFFFF" stroke="#000000" stroke-width="2"/>
+  ${t('A',45,34,14,'#000000','normal')}
+</svg>`},
+
+// Wassertrupp (W)
+fw3_wassertrupp:{name:'Wassertrupp (W-Tr)',ref:'FwDV 3 §2 / §5',cat:'fwdv3_person',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="45,4 82,30 45,56 8,30" fill="#FFFFFF" stroke="#000000" stroke-width="2"/>
+  ${t('W',45,34,18,'#000000','bold')}
+</svg>`},
+
+// Wassertruppführer
+fw3_wtf:{name:'Wassertruppführer (WTF)',ref:'FwDV 3 §2 / §5',cat:'fwdv3_person',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="45,4 82,30 45,56 8,30" fill="#FFFFFF" stroke="#000000" stroke-width="2"/>
+  <polygon points="45,4 66,20 45,24 24,20" fill="#000000"/>
+  ${t('W',45,36,16,'#000000','bold')}
+</svg>`},
+
+// Schlauchtrupp (S)
+fw3_schlauchtrupp:{name:'Schlauchtrupp (S-Tr)',ref:'FwDV 3 §2 / §5',cat:'fwdv3_person',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="45,4 82,30 45,56 8,30" fill="#FFFFFF" stroke="#000000" stroke-width="2"/>
+  ${t('S',45,34,18,'#000000','bold')}
+</svg>`},
+
+// Schlauchtruppführer
+fw3_stf:{name:'Schlauchtruppführer (STF)',ref:'FwDV 3 §2 / §5',cat:'fwdv3_person',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="45,4 82,30 45,56 8,30" fill="#FFFFFF" stroke="#000000" stroke-width="2"/>
+  <polygon points="45,4 66,20 45,24 24,20" fill="#000000"/>
+  ${t('S',45,36,16,'#000000','bold')}
+</svg>`},
+
+// Melder (Me)
+fw3_melder:{name:'Melder (Me)',ref:'FwDV 3 §2 / §5',cat:'fwdv3_person',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="45,4 82,30 45,56 8,30" fill="#FFFFFF" stroke="#000000" stroke-width="2"/>
+  ${t('Me',45,34,14,'#000000','bold')}
+</svg>`},
+
+// Maschinist (Ma)
+fw3_maschinist:{name:'Maschinist (Ma)',ref:'FwDV 3 §2 / §5',cat:'fwdv3_person',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="45,4 82,30 45,56 8,30" fill="#FFFFFF" stroke="#000000" stroke-width="2"/>
+  ${t('Ma',45,34,14,'#000000','bold')}
+</svg>`},
+
+// Zugführer (Zug-Rautensymbol)
+fw3_zugführer:{name:'Zugführer (ZF)',ref:'FwDV 3 §2.4',cat:'fwdv3_person',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  <!-- Größte Raute: Zugführer -->
+  <polygon points="45,2 86,30 45,58 4,30" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+  <polygon points="45,2 68,18 45,22 22,18" fill="#000000"/>
+  <!-- 3 Punkte = Zug -->
+  <circle cx="30" cy="30" r="4" fill="#000000"/>
+  <circle cx="45" cy="30" r="4" fill="#000000"/>
+  <circle cx="60" cy="30" r="4" fill="#000000"/>
+</svg>`},
+
+// Staffelführer
+fw3_staffelführer:{name:'Staffelführer (StF)',ref:'FwDV 3 §2.2',cat:'fwdv3_person',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="45,3 83,30 45,57 7,30" fill="#FFFFFF" stroke="#000000" stroke-width="2.5"/>
+  <polygon points="45,3 67,19 45,23 23,19" fill="#000000"/>
+  <!-- 1 Punkt = Staffel -->
+  <circle cx="45" cy="30" r="4" fill="#000000"/>
+</svg>`},
+
+// Sondertrupp / Zugtrupp (Zf)
+fw3_zugtrupp:{name:'Zugtrupp (Ztr)',ref:'FwDV 3 §2.4',cat:'fwdv3_person',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="45,4 82,30 45,56 8,30" fill="#FFFFFF" stroke="#000000" stroke-width="2"/>
+  ${t('Ztr',45,34,13,'#000000','bold')}
+</svg>`},
+
 };
 
 Object.assign(window.SYM, LIB);
@@ -298,6 +428,7 @@ const newCats = [
   {id:'fwdv100_manv',  label:'FwDV 100 – MANV/Sichtung',              color:'#fb7185', official:true},
   {id:'fwdv100_einh',  label:'FwDV 3 – Einheiten',                    color:'#f87171', official:true},
   {id:'fwdv100_agt',   label:'FwDV 7 – Atemschutz',                   color:'#f87171', official:true},
+  {id:'fwdv3_person',  label:'FwDV 3 – Personen (Sitz-/Antreteordnung)', color:'#f87171', official:true},
 ];
 newCats.forEach(c => { if (!window.CATS.find(x=>x.id===c.id)) window.CATS.push(c); });
 
