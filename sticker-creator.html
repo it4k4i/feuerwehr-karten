@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sticker Creator – Feuerwehr Suite</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Barlow+Condensed:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0e0e12;--panel:#16161e;--panel2:#1e1e28;--panel3:#26263a;
+  --border:#2a2a3e;--border2:#383858;
+  --text:#e8e8f4;--text2:#7878a0;--text3:#444468;
+  --accent:#e63946;--purple:#a855f7;--teal:#06b6d4;--yellow:#fbbf24;
+}
+body.light-mode{
+  --bg:#f0f0f8;--panel:#ffffff;--panel2:#f5f5fc;--panel3:#eaeaf5;
+  --border:#d0d0e8;--border2:#b0b0d0;
+  --text:#1a1a2e;--text2:#5050a0;--text3:#8888b0;
+}
+body.light-mode .app-hdr{background:linear-gradient(90deg,#1a1a2e 0%,#252545 60%,#1a1a2e 100%);}
+body.light-mode .canvas-area{background:#ddddf0;}
+*{transition:background-color .18s,border-color .18s,color .1s;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Barlow Condensed',sans-serif;display:flex;flex-direction:column;}
+
+/* ── UNIFIED APP HEADER ── */
+.app-hdr{flex-shrink:0;z-index:30;background:linear-gradient(90deg,#07080d 0%,#0e1018 40%,#12141e 60%,#07080d 100%);border-bottom:1px solid rgba(255,255,255,.07);height:48px;display:flex;align-items:center;padding:0 14px;gap:8px;box-shadow:0 2px 12px rgba(0,0,0,.4);}
+.app-hdr-logo{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;}
+.app-hdr-title{font-family:'Oswald',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:2px;color:#fff;white-space:nowrap;}
+.app-hdr-sub{font-size:.42rem;color:rgba(255,255,255,.25);letter-spacing:1.5px;text-transform:uppercase;white-space:nowrap;}
+.app-hdr-sep{flex:1;}
+.app-hdr-nav{display:flex;align-items:center;gap:5px;}
+.app-hdr-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:5px;border:0.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.38);font-size:.5rem;font-weight:700;letter-spacing:.5px;text-decoration:none;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:inherit;}
+.app-hdr-btn:hover{border-color:rgba(255,255,255,.28);color:rgba(255,255,255,.85);background:rgba(255,255,255,.07);}
+.app-hdr-btn.home:hover{border-color:rgba(230,57,70,.5);color:#f87171;}
+.app-hdr-btn.bug:hover{border-color:rgba(251,191,36,.4);color:#fbbf24;}
+.app-hdr-badge{font-size:.44rem;font-weight:700;letter-spacing:.8px;padding:3px 8px;border-radius:10px;white-space:nowrap;}
+
+/* WARN */
+.warn-bar{flex-shrink:0;background:rgba(245,158,11,.06);border-bottom:1px solid rgba(245,158,11,.18);padding:5px 18px;font-size:.5rem;color:rgba(245,158,11,.8);display:flex;align-items:center;gap:7px;}
+
+/* LAYOUT */
+.app-body{display:grid;grid-template-columns:300px 1fr 280px;flex:1;min-height:0;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;}
+.sidebar::-webkit-scrollbar{width:3px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2);}
+.sb-sec{border-bottom:1px solid var(--border);padding:14px 16px;}
+.sb-title{font-size:.52rem;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.sb-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.fg{margin-bottom:9px;}
+.fg label{display:block;font-size:.5rem;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--text2);margin-bottom:3px;}
+.fg input[type=text],.fg input[type=number],.fg select,.fg textarea{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:5px;padding:5px 8px;color:var(--text);font-size:.68rem;font-family:'Barlow Condensed',sans-serif;outline:none;resize:vertical;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--purple);}
+.fg input[type=color]{width:100%;height:26px;background:var(--panel2);border:1px solid var(--border);border-radius:5px;padding:2px 3px;cursor:pointer;}
+.fg input[type=range]{width:100%;accent-color:var(--purple);}
+.range-row{display:flex;align-items:center;gap:8px;}
+.range-val{font-size:.6rem;color:var(--text2);min-width:28px;text-align:right;}
+
+/* Shape grid */
+.shape-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:4px;}
+.shape-btn{background:var(--panel2);border:1px solid var(--border);border-radius:6px;cursor:pointer;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .14s;}
+.shape-btn:hover{border-color:var(--border2);}
+.shape-btn.active{border-color:var(--purple);background:rgba(168,85,247,.1);}
+.shape-btn svg{width:36px;height:28px;}
+.shape-btn span{font-size:.38rem;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--text2);}
+.shape-btn.active span{color:var(--text);}
+
+/* Emblem grid */
+.em-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;}
+.em-btn{background:var(--panel2);border:1px solid var(--border);border-radius:5px;cursor:pointer;padding:6px 3px;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .12s;font-size:.9rem;}
+.em-btn:hover{border-color:var(--border2);}
+.em-btn.active{border-color:var(--purple);background:rgba(168,85,247,.1);}
+.em-btn span{font-size:.36rem;color:var(--text2);text-align:center;line-height:1.2;}
+
+/* Action btns */
+.act-btn{width:100%;padding:9px;border:none;border-radius:6px;cursor:pointer;font-size:.6rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif;transition:all .14s;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:6px;}
+.act-btn.primary{background:linear-gradient(135deg,var(--purple),#7c3aed);color:#fff;box-shadow:0 3px 12px rgba(168,85,247,.25);}
+.act-btn.primary:hover{box-shadow:0 5px 20px rgba(168,85,247,.4);transform:translateY(-1px);}
+.act-btn.sec{background:var(--panel2);border:1px solid var(--border);color:var(--text2);}
+.act-btn.sec:hover{border-color:var(--border2);color:var(--text);}
+.act-btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text3);}
+.act-btn.ghost:hover{color:var(--text2);}
+
+/* CENTER */
+.canvas-area{background:#111118;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:auto;position:relative;}
+.canvas-toolbar{position:absolute;top:10px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:5px;background:var(--panel);border:1px solid var(--border2);border-radius:20px;padding:4px 10px;z-index:10;white-space:nowrap;}
+.tb-btn{padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--panel2);color:var(--text2);font-size:.5rem;font-weight:700;letter-spacing:.6px;text-transform:uppercase;cursor:pointer;transition:all .12s;font-family:'Barlow Condensed',sans-serif;}
+.tb-btn:hover{border-color:var(--border2);color:var(--text);}
+.canvas-hint{position:absolute;bottom:16px;font-size:.5rem;color:var(--text3);letter-spacing:.5px;}
+
+/* RIGHT INSPECTOR */
+.inspector{background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
+.inspector::-webkit-scrollbar{width:3px;}
+.inspector::-webkit-scrollbar-thumb{background:var(--border2);}
+.insp-head{padding:10px 14px 8px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.insp-title{font-family:'Oswald',sans-serif;font-size:.68rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text2);}
+.insp-body{padding:12px 14px;flex:1;}
+.insp-sec{margin-bottom:14px;}
+.insp-sec-title{font-size:.46rem;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.insp-sec-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* Preview canvas wrapper */
+#previewWrap{position:relative;display:flex;align-items:center;justify-content:center;}
+#stickerCanvas{border-radius:6px;box-shadow:0 8px 40px rgba(0,0,0,.7);}
+
+/* Background pattern preview */
+.bg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:4px;}
+.bg-btn{height:32px;border-radius:5px;cursor:pointer;border:2px solid transparent;transition:all .12s;position:relative;overflow:hidden;}
+.bg-btn.active{border-color:var(--purple);}
+.bg-btn:hover{border-color:var(--border2);}
+</style>
+</head>
+<body>
+
+<header class="app-hdr">
+  <div class="app-hdr-logo" style="background:linear-gradient(135deg,#a855f7,#7c3aed);box-shadow:0 0 10px rgba(168,85,247,.3);">🎨</div>
+  <div>
+    <div class="app-hdr-title">STICKER CREATOR</div>
+    <div class="app-hdr-sub">Druckfertige Sticker erstellen · 300 DPI Export</div>
+  </div>
+  <div class="app-hdr-sep"></div>
+  <nav class="app-hdr-nav">
+    <span class="app-hdr-badge" style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:#fbbf24;">⚠ Experimentell</span>
+    <button class="app-hdr-btn" onclick="toggleTheme()" id="themeBtn" title="Dark/Light Mode">🌙</button>
+    <a class="app-hdr-btn bug" href="https://github.com/it4k4i/feuerwehr-karten/issues/new" target="_blank" rel="noopener">🐛 Bug melden</a>
+    <a class="app-hdr-btn home" href="index.html">🏠 Startseite</a>
+  </nav>
+</header>
+
+<div class="warn-bar">⚠️ <strong style="color:#fbbf24;">Experimentell</strong> – Sticker sind für den Druck bei externen Druckfirmen vorgesehen. Bitte Druckdaten vor der Bestellung prüfen. Schnittrand (Bleed) von mind. 2–3 mm einplanen.
+</div>
+
+<div class="app-body">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="sb-sec">
+      <div class="sb-title">Form</div>
+      <div class="shape-grid" id="shapeGrid">
+        <button class="shape-btn active" data-shape="circle" onclick="setShape('circle',this)">
+          <svg viewBox="0 0 36 28"><circle cx="18" cy="14" r="12" fill="none" stroke="#a855f7" stroke-width="2"/></svg>
+          <span>Rund</span>
+        </button>
+        <button class="shape-btn" data-shape="square" onclick="setShape('square',this)">
+          <svg viewBox="0 0 36 28"><rect x="6" y="6" width="24" height="24" rx="2" fill="none" stroke="#7878a0" stroke-width="2"/></svg>
+          <span>Quadrat</span>
+        </button>
+        <button class="shape-btn" data-shape="rounded" onclick="setShape('rounded',this)">
+          <svg viewBox="0 0 36 28"><rect x="4" y="6" width="28" height="20" rx="7" fill="none" stroke="#7878a0" stroke-width="2"/></svg>
+          <span>Abgerundet</span>
+        </button>
+        <button class="shape-btn" data-shape="oval" onclick="setShape('oval',this)">
+          <svg viewBox="0 0 36 28"><ellipse cx="18" cy="14" rx="14" ry="10" fill="none" stroke="#7878a0" stroke-width="2"/></svg>
+          <span>Oval</span>
+        </button>
+        <button class="shape-btn" data-shape="shield" onclick="setShape('shield',this)">
+          <svg viewBox="0 0 36 28"><path d="M18 4 L30 9 L30 18 Q30 24 18 26 Q6 24 6 18 L6 9 Z" fill="none" stroke="#7878a0" stroke-width="2"/></svg>
+          <span>Schild</span>
+        </button>
+        <button class="shape-btn" data-shape="hexagon" onclick="setShape('hexagon',this)">
+          <svg viewBox="0 0 36 28"><polygon points="18,3 30,10 30,20 18,27 6,20 6,10" fill="none" stroke="#7878a0" stroke-width="2"/></svg>
+          <span>Hexagon</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sb-title">Größe</div>
+      <div class="fg">
+        <label>Breite (mm)</label>
+        <input type="number" id="stkW" value="80" min="20" max="300" oninput="renderSticker()">
+      </div>
+      <div class="fg">
+        <label>Höhe (mm)</label>
+        <input type="number" id="stkH" value="80" min="20" max="300" oninput="renderSticker()">
+      </div>
+      <div class="fg">
+        <label>Schnittrand / Bleed (mm)</label>
+        <input type="number" id="stkBleed" value="3" min="0" max="10" oninput="renderSticker()">
+      </div>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sb-title">Hintergrund</div>
+      <div class="fg">
+        <label>Hintergrundfarbe</label>
+        <input type="color" id="bgColor" value="#dc2626" oninput="renderSticker()">
+      </div>
+      <div class="fg">
+        <label>Muster</label>
+        <div class="bg-grid" id="bgPatternGrid">
+          <div class="bg-btn active" data-pat="solid" style="background:#dc2626;" onclick="setPat('solid',this)" title="Uni"></div>
+          <div class="bg-btn" data-pat="gradient" style="background:linear-gradient(135deg,#dc2626,#7c3aed);" onclick="setPat('gradient',this)" title="Gradient"></div>
+          <div class="bg-btn" data-pat="stripes" style="background:repeating-linear-gradient(45deg,#dc2626,#dc2626 6px,#b91c1c 6px,#b91c1c 12px);" onclick="setPat('stripes',this)" title="Streifen"></div>
+          <div class="bg-btn" data-pat="dots" style="background:radial-gradient(circle,rgba(255,255,255,.15) 1px,transparent 1px) 0 0 / 8px 8px,#dc2626;" onclick="setPat('dots',this)" title="Punkte"></div>
+        </div>
+      </div>
+      <div class="fg" id="bgColor2Wrap" style="display:none;">
+        <label>Gradient-Farbe 2</label>
+        <input type="color" id="bgColor2" value="#7c3aed" oninput="renderSticker()">
+      </div>
+      <div class="fg">
+        <label>Rand-Farbe</label>
+        <input type="color" id="borderColor" value="#ffffff" oninput="renderSticker()">
+      </div>
+      <div class="fg">
+        <label>Rand-Stärke (px)</label>
+        <div class="range-row">
+          <input type="range" id="borderW" min="0" max="30" value="8" oninput="renderSticker();this.nextElementSibling.textContent=this.value">
+          <span class="range-val">8</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sb-title">Emblem / Icon</div>
+      <div class="em-grid" id="emblemGrid">
+        <button class="em-btn active" data-em="none" onclick="setEmblem('none',this)">∅<span>Kein</span></button>
+        <button class="em-btn" data-em="flame" onclick="setEmblem('flame',this)">🔥<span>Flamme</span></button>
+        <button class="em-btn" data-em="fw" onclick="setEmblem('fw',this)">⚑<span>FW-Wappen</span></button>
+        <button class="em-btn" data-em="star" onclick="setEmblem('star',this)">★<span>Stern</span></button>
+        <button class="em-btn" data-em="cross" onclick="setEmblem('cross',this)">✚<span>Kreuz</span></button>
+        <button class="em-btn" data-em="anchor" onclick="setEmblem('anchor',this)">⚓<span>Anker</span></button>
+        <button class="em-btn" data-em="shield" onclick="setEmblem('shield',this)">🛡<span>Schild</span></button>
+        <button class="em-btn" data-em="thw" onclick="setEmblem('thw',this)">⚙<span>THW</span></button>
+      </div>
+      <div class="fg" style="margin-top:8px;">
+        <label>Emblem-Farbe</label>
+        <input type="color" id="emblemColor" value="#ffffff" oninput="renderSticker()">
+      </div>
+      <div class="fg">
+        <label>Emblem-Größe</label>
+        <div class="range-row">
+          <input type="range" id="emblemSize" min="10" max="80" value="40" oninput="renderSticker();this.nextElementSibling.textContent=this.value+'%'">
+          <span class="range-val">40%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sb-title">Text</div>
+      <div class="fg">
+        <label>Haupttext</label>
+        <input type="text" id="mainText" value="FEUERWEHR" placeholder="Haupttext" oninput="renderSticker()">
+      </div>
+      <div class="fg">
+        <label>Subtext</label>
+        <input type="text" id="subText" value="" placeholder="z.B. Musterstadt" oninput="renderSticker()">
+      </div>
+      <div class="fg">
+        <label>Bogentext (oben)</label>
+        <input type="text" id="arcTextTop" value="" placeholder="z.B. Freiwillige Feuerwehr" oninput="renderSticker()">
+      </div>
+      <div class="fg">
+        <label>Bogentext (unten)</label>
+        <input type="text" id="arcTextBot" value="" placeholder="z.B. seit 1892" oninput="renderSticker()">
+      </div>
+      <div class="fg">
+        <label>Text-Farbe</label>
+        <input type="color" id="textColor" value="#ffffff" oninput="renderSticker()">
+      </div>
+      <div class="fg">
+        <label>Schrift</label>
+        <select id="fontFam" onchange="renderSticker()">
+          <option value="Oswald">Oswald (Modern)</option>
+          <option value="Barlow Condensed">Barlow Condensed</option>
+          <option value="Impact">Impact (Klassisch)</option>
+          <option value="Arial">Arial</option>
+          <option value="Share Tech Mono">Share Tech Mono (Tech)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sb-title">Eigenes Bild</div>
+      <div class="fg">
+        <label>Hintergrundbild / Foto</label>
+        <div id="imgUploadArea" style="border:1.5px dashed var(--border2);border-radius:6px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .15s;position:relative;" onclick="document.getElementById('bgImgFile').click()" ondragover="event.preventDefault();this.style.borderColor='var(--purple)'" ondragleave="this.style.borderColor='var(--border2)'" ondrop="handleImgDrop(event)">
+          <div id="imgUploadIcon" style="font-size:1.4rem;margin-bottom:4px;">🖼</div>
+          <div id="imgUploadLabel" style="font-size:.5rem;color:var(--text2);">Bild hier ablegen oder klicken<br><span style="font-size:.44rem;color:var(--text3);">PNG, JPG, SVG</span></div>
+          <input type="file" id="bgImgFile" accept="image/*" style="display:none" onchange="loadBgImage(this)">
+        </div>
+      </div>
+      <div class="fg" id="imgOpacityWrap" style="display:none;">
+        <label>Bild-Deckkraft</label>
+        <div class="range-row">
+          <input type="range" id="imgOpacity" min="5" max="100" value="100" oninput="renderSticker();this.nextElementSibling.textContent=this.value+'%'">
+          <span class="range-val">100%</span>
+        </div>
+      </div>
+      <div class="fg" id="imgFitWrap" style="display:none;">
+        <label>Bild-Anpassung</label>
+        <select id="imgFit" onchange="renderSticker()">
+          <option value="cover">Ausfüllen (Cover)</option>
+          <option value="contain">Einpassen (Contain)</option>
+          <option value="fill">Strecken</option>
+          <option value="center">Zentriert (Originalgröße)</option>
+        </select>
+      </div>
+      <button class="act-btn ghost" id="imgRemoveBtn" onclick="removeBgImage()" style="display:none;">✕ Bild entfernen</button>
+    </div>
+      <div class="fg">
+        <label>Export-DPI</label>
+        <select id="exportDPI" onchange="renderSticker()">
+          <option value="150">150 DPI (Vorschau)</option>
+          <option value="300" selected>300 DPI (Druckqualität)</option>
+          <option value="600">600 DPI (High-Res)</option>
+        </select>
+      </div>
+      <button class="act-btn primary" onclick="exportSticker()">⬇ PNG Exportieren (300 DPI)</button>
+      <button class="act-btn sec" onclick="copyOrderInfo()">📋 Bestellinfo kopieren</button>
+      <button class="act-btn ghost" onclick="resetToDefaults()">↺ Zurücksetzen</button>
+    </div>
+
+  </aside>
+
+  <!-- CENTER CANVAS -->
+  <main class="canvas-area">
+    <div class="canvas-toolbar">
+      <button class="tb-btn" onclick="changeZoom(-0.25)">−</button>
+      <span id="zoomLabel" style="font-size:.5rem;color:var(--text2);padding:0 5px;cursor:pointer;" onclick="setPreviewZoom(1)">100%</span>
+      <button class="tb-btn" onclick="changeZoom(+0.25)">+</button>
+      <div style="width:1px;height:14px;background:var(--border);margin:0 4px;"></div>
+      <button class="tb-btn" onclick="toggleCheckerboard()">⬛ Hintergrund</button>
+    </div>
+    <div id="previewWrap">
+      <canvas id="stickerCanvas"></canvas>
+    </div>
+    <div class="canvas-hint">Strg + Mausrad zum Zoomen · Doppelklick für 100%</div>
+  </main>
+
+  <!-- RIGHT INSPECTOR -->
+  <aside class="inspector">
+    <div class="insp-head"><div class="insp-title">ℹ Druckinfo</div></div>
+    <div class="insp-body">
+      <div class="insp-sec">
+        <div class="insp-sec-title">Abmessungen</div>
+        <div id="sizeInfo" style="font-size:.58rem;color:var(--text2);line-height:2;font-family:'Share Tech Mono',monospace;background:var(--panel2);border:1px solid var(--border);border-radius:5px;padding:8px 10px;"></div>
+      </div>
+      <div class="insp-sec">
+        <div class="insp-sec-title">Druckhinweise</div>
+        <div style="font-size:.54rem;color:var(--text2);line-height:1.8;background:rgba(14,165,233,.04);border:1px solid rgba(14,165,233,.14);border-radius:5px;padding:8px 10px;">
+          <strong style="color:rgba(14,165,233,.8);display:block;margin-bottom:4px;">📋 Checkliste Druckfirma</strong>
+          ✓ PNG mit 300 DPI exportieren<br>
+          ✓ Schnittrand (Bleed): 2–3 mm<br>
+          ✓ CMYK-Modus prüfen lassen<br>
+          ✓ Druckvorlage bestätigen lassen<br>
+          ✓ Material: Folie / Vinylsticker<br>
+          ✓ Oberflächenfinish: Matt oder Glanz<br>
+          ✓ Konturschnitt möglich (SVG-Pfad anfragen)
+        </div>
+      </div>
+      <div class="insp-sec">
+        <div class="insp-sec-title">Vorlagen-Tipps</div>
+        <div style="font-size:.54rem;color:var(--text2);line-height:1.8;">
+          <div style="background:var(--panel2);border:1px solid var(--border);border-radius:5px;padding:7px 9px;margin-bottom:6px;cursor:pointer;" onclick="loadPreset('helm')">
+            🪖 <strong>Helm-Sticker</strong><br><span style="font-size:.48rem;">Rund, 60mm, FW-Wappen</span>
+          </div>
+          <div style="background:var(--panel2);border:1px solid var(--border);border-radius:5px;padding:7px 9px;margin-bottom:6px;cursor:pointer;" onclick="loadPreset('fahrzeug')">
+            🚒 <strong>Fahrzeug-Sticker</strong><br><span style="font-size:.48rem;">Oval quer, 120×60mm</span>
+          </div>
+          <div style="background:var(--panel2);border:1px solid var(--border);border-radius:5px;padding:7px 9px;margin-bottom:6px;cursor:pointer;" onclick="loadPreset('thw')">
+            🔵 <strong>THW-Sticker</strong><br><span style="font-size:.48rem;">Rund, 80mm, blau</span>
+          </div>
+          <div style="background:var(--panel2);border:1px solid var(--border);border-radius:5px;padding:7px 9px;cursor:pointer;" onclick="loadPreset('rd')">
+            🏥 <strong>Rettungsdienst</strong><br><span style="font-size:.48rem;">Abgerundet, weiß/orange</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<script>
+'use strict';
+
+// ── DARK / LIGHT MODE ──
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('stk_theme', isLight ? 'light' : 'dark');
+  const btn = document.getElementById('themeBtn');
+  if (btn) btn.textContent = isLight ? '☀' : '🌙';
+}
+if (localStorage.getItem('stk_theme') === 'light') {
+  document.body.classList.add('light-mode');
+  window.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('themeBtn'); if (btn) btn.textContent = '☀';
+  });
+}
+
+/* ── State ── */
+const S = {
+  shape: 'circle',
+  emblem: 'none',
+  bgPat: 'solid',
+  previewZoom: 0.5,
+  showChecker: true,
+  bgImage: null,       // HTMLImageElement | null
+  bgImageSrc: null,    // data URL
+};
+
+/* ── Image upload ── */
+function loadBgImage(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      S.bgImage = img; S.bgImageSrc = e.target.result;
+      showImgControls(true);
+      renderSticker();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+function handleImgDrop(e) {
+  e.preventDefault();
+  document.getElementById('imgUploadArea').style.borderColor = 'var(--border2)';
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    const fakeInput = { files: [file] };
+    loadBgImage(fakeInput);
+  }
+}
+function removeBgImage() {
+  S.bgImage = null; S.bgImageSrc = null;
+  showImgControls(false);
+  renderSticker();
+}
+function showImgControls(show) {
+  ['imgOpacityWrap','imgFitWrap','imgRemoveBtn'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = show ? 'block' : 'none';
+  });
+  const icon  = document.getElementById('imgUploadIcon');
+  const label = document.getElementById('imgUploadLabel');
+  if (show) {
+    if (icon)  icon.textContent  = '✓';
+    if (label) label.innerHTML   = '<span style="color:#4ade80;font-size:.5rem;">Bild geladen</span><br><span style="font-size:.44rem;color:var(--text3);">Klicken zum Ersetzen</span>';
+  } else {
+    if (icon)  icon.textContent  = '🖼';
+    if (label) label.innerHTML   = 'Bild hier ablegen oder klicken<br><span style="font-size:.44rem;color:var(--text3);">PNG, JPG, SVG</span>';
+  }
+}
+
+function _drawBgImage(ctx2, cx, cy, rx, ry) {
+  if (!S.bgImage) return;
+  const opacity = (parseInt(g('imgOpacity').value)||100) / 100;
+  const fit = g('imgFit').value || 'cover';
+  ctx2.save();
+  buildShapePath(ctx2, cx, cy, rx, ry, S.shape);
+  ctx2.clip();
+  ctx2.globalAlpha = opacity;
+  const W = rx*2, H = ry*2, iw = S.bgImage.naturalWidth, ih = S.bgImage.naturalHeight;
+  let dx=cx-rx, dy=cy-ry, dw=W, dh=H;
+  if (fit === 'cover') {
+    const scale = Math.max(W/iw, H/ih);
+    dw = iw*scale; dh = ih*scale;
+    dx = cx - dw/2; dy = cy - dh/2;
+  } else if (fit === 'contain') {
+    const scale = Math.min(W/iw, H/ih);
+    dw = iw*scale; dh = ih*scale;
+    dx = cx - dw/2; dy = cy - dh/2;
+  } else if (fit === 'center') {
+    dw = iw; dh = ih; dx = cx-iw/2; dy = cy-ih/2;
+  }
+  ctx2.drawImage(S.bgImage, dx, dy, dw, dh);
+  ctx2.globalAlpha = 1;
+  ctx2.restore();
+}
+
+/* ── Canvas refs ── */
+const canvas = document.getElementById('stickerCanvas');
+const ctx = canvas.getContext('2d');
+
+/* ── Helpers ── */
+const g = id => document.getElementById(id);
+const gv = id => g(id).value;
+const gn = id => parseFloat(gv(id)) || 0;
+function mm2px(mm, dpi) { return mm / 25.4 * dpi; }
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16), g2 = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return [r, g2, b];
+}
+
+/* ── Shape builders ── */
+function buildShapePath(ctx2, cx, cy, rx, ry, shape, radius=0) {
+  ctx2.beginPath();
+  switch(shape) {
+    case 'circle': ctx2.arc(cx, cy, Math.min(rx,ry), 0, Math.PI*2); break;
+    case 'square': ctx2.roundRect(cx-rx, cy-ry, rx*2, ry*2, rx*0.05); break;
+    case 'rounded': ctx2.roundRect(cx-rx, cy-ry, rx*2, ry*2, rx*0.22); break;
+    case 'oval': ctx2.ellipse(cx, cy, rx, ry, 0, 0, Math.PI*2); break;
+    case 'shield': {
+      const x=cx-rx, y=cy-ry, w=rx*2, h=ry*2;
+      ctx2.moveTo(cx, y);
+      ctx2.lineTo(x+w, y+h*0.38);
+      ctx2.lineTo(x+w, y+h*0.62);
+      ctx2.quadraticCurveTo(x+w, y+h*0.88, cx, y+h);
+      ctx2.quadraticCurveTo(x, y+h*0.88, x, y+h*0.62);
+      ctx2.lineTo(x, y+h*0.38);
+      ctx2.closePath();
+      break;
+    }
+    case 'hexagon': {
+      const sides=6, a=Math.PI/3;
+      ctx2.moveTo(cx+Math.min(rx,ry)*Math.cos(a*0-Math.PI/6), cy+Math.min(rx,ry)*Math.sin(a*0-Math.PI/6));
+      for(let i=1;i<6;i++) ctx2.lineTo(cx+Math.min(rx,ry)*Math.cos(a*i-Math.PI/6), cy+Math.min(rx,ry)*Math.sin(a*i-Math.PI/6));
+      ctx2.closePath();
+      break;
+    }
+    default: ctx2.arc(cx, cy, Math.min(rx,ry), 0, Math.PI*2);
+  }
+}
+
+/* ── Emblem drawers ── */
+function drawEmblem(ctx2, cx, cy, size, color, emblem) {
+  ctx2.fillStyle = color;
+  ctx2.strokeStyle = color;
+  ctx2.lineWidth = size * 0.04;
+  ctx2.textAlign = 'center';
+  ctx2.textBaseline = 'middle';
+  switch(emblem) {
+    case 'flame': {
+      ctx2.font = `${size*0.8}px serif`;
+      ctx2.fillText('🔥', cx, cy);
+      break;
+    }
+    case 'fw': {
+      // Stylized FW emblem - Maltese cross / fire brigade symbol
+      const r = size * 0.4;
+      for(let i=0;i<4;i++){
+        ctx2.save();
+        ctx2.translate(cx,cy);
+        ctx2.rotate(i*Math.PI/2);
+        ctx2.beginPath();
+        ctx2.moveTo(-r*0.2, -r);
+        ctx2.lineTo(r*0.2, -r);
+        ctx2.lineTo(r*0.5, -r*0.5);
+        ctx2.lineTo(r*0.2, -r*0.3);
+        ctx2.lineTo(r*0.2, r*0.2);
+        ctx2.lineTo(-r*0.2, r*0.2);
+        ctx2.lineTo(-r*0.2, -r*0.3);
+        ctx2.lineTo(-r*0.5, -r*0.5);
+        ctx2.closePath();
+        ctx2.fill();
+        ctx2.restore();
+      }
+      break;
+    }
+    case 'star': {
+      ctx2.beginPath();
+      for(let i=0;i<5;i++){
+        const a=i*Math.PI*2/5-Math.PI/2;
+        const bi=(i+0.5)*Math.PI*2/5-Math.PI/2;
+        if(i===0) ctx2.moveTo(cx+size*0.45*Math.cos(a), cy+size*0.45*Math.sin(a));
+        else ctx2.lineTo(cx+size*0.45*Math.cos(a), cy+size*0.45*Math.sin(a));
+        ctx2.lineTo(cx+size*0.18*Math.cos(bi), cy+size*0.18*Math.sin(bi));
+      }
+      ctx2.closePath();
+      ctx2.fill();
+      break;
+    }
+    case 'cross': {
+      const arm=size*0.38, thick=size*0.14;
+      ctx2.fillRect(cx-arm, cy-thick, arm*2, thick*2);
+      ctx2.fillRect(cx-thick, cy-arm, thick*2, arm*2);
+      break;
+    }
+    case 'anchor': {
+      ctx2.font = `${size*0.75}px serif`;
+      ctx2.fillText('⚓', cx, cy);
+      break;
+    }
+    case 'shield': {
+      const sw=size*0.5, sh=size*0.6;
+      ctx2.beginPath();
+      ctx2.moveTo(cx, cy-sh/2);
+      ctx2.lineTo(cx+sw/2, cy-sh*0.1);
+      ctx2.quadraticCurveTo(cx+sw/2, cy+sh*0.3, cx, cy+sh/2);
+      ctx2.quadraticCurveTo(cx-sw/2, cy+sh*0.3, cx-sw/2, cy-sh*0.1);
+      ctx2.closePath();
+      ctx2.fill();
+      break;
+    }
+    case 'thw': {
+      // THW gear symbol
+      ctx2.font = `bold ${size*0.75}px sans-serif`;
+      ctx2.fillText('⚙', cx, cy);
+      break;
+    }
+  }
+}
+
+/* ── Arc text ── */
+function drawArcText(ctx2, text, cx, cy, r, startAngle, dir, color, font, size) {
+  if (!text.trim()) return;
+  ctx2.save();
+  ctx2.fillStyle = color;
+  ctx2.font = `700 ${size}px ${font}`;
+  ctx2.textAlign = 'center';
+  ctx2.textBaseline = 'middle';
+  const charCount = text.length;
+  const totalAngle = (charCount * size * 0.7) / r;
+  const charAngle = totalAngle / charCount * dir;
+  let angle = startAngle - (totalAngle/2) * dir;
+  for (const ch of text) {
+    ctx2.save();
+    ctx2.translate(cx, cy);
+    ctx2.rotate(angle + charAngle/2);
+    ctx2.translate(0, -r);
+    ctx2.rotate(dir > 0 ? 0 : Math.PI);
+    ctx2.fillText(ch, 0, 0);
+    ctx2.restore();
+    angle += charAngle;
+  }
+  ctx2.restore();
+}
+
+/* ── Main render ── */
+function renderSticker() {
+  const dpi = parseInt(gv('exportDPI')) || 300;
+  const wMm = gn('stkW') || 80;
+  const hMm = gn('stkH') || 80;
+  const bleedMm = gn('stkBleed') || 0;
+  const totalWmm = wMm + bleedMm * 2;
+  const totalHmm = hMm + bleedMm * 2;
+
+  // Use 150dpi for preview canvas for performance
+  const previewDpi = 150;
+  const pw = Math.round(mm2px(totalWmm, previewDpi));
+  const ph = Math.round(mm2px(totalHmm, previewDpi));
+  canvas.width = pw;
+  canvas.height = ph;
+
+  const bleedPx = mm2px(bleedMm, previewDpi);
+  const cx = pw / 2, cy = ph / 2;
+  const rx = pw/2 - bleedPx*0.5;
+  const ry = ph/2 - bleedPx*0.5;
+
+  // Checkerboard background (bleed area)
+  if (S.showChecker) {
+    const sq = 12;
+    for (let y=0;y<ph;y+=sq) for (let x=0;x<pw;x+=sq) {
+      ctx.fillStyle = (Math.floor(x/sq)+Math.floor(y/sq))%2===0 ? '#2a2a3a' : '#1a1a28';
+      ctx.fillRect(x, y, sq, sq);
+    }
+  } else {
+    ctx.fillStyle = '#222';
+    ctx.fillRect(0, 0, pw, ph);
+  }
+
+  // Clip to shape
+  ctx.save();
+  buildShapePath(ctx, cx, cy, rx, ry, S.shape);
+  ctx.clip();
+
+  // Background
+  const bgC = gv('bgColor');
+  const bgC2 = gv('bgColor2');
+  if (S.bgPat === 'solid') {
+    ctx.fillStyle = bgC;
+    ctx.fillRect(0, 0, pw, ph);
+  } else if (S.bgPat === 'gradient') {
+    const grad = ctx.createLinearGradient(0, 0, pw, ph);
+    grad.addColorStop(0, bgC);
+    grad.addColorStop(1, bgC2);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, pw, ph);
+  } else if (S.bgPat === 'stripes') {
+    ctx.fillStyle = bgC;
+    ctx.fillRect(0, 0, pw, ph);
+    const [r2,g2,b2] = hexToRgb(bgC);
+    ctx.fillStyle = `rgba(${Math.max(0,r2-30)},${Math.max(0,g2-30)},${Math.max(0,b2-30)},1)`;
+    const strW = pw * 0.07;
+    for (let x=-ph; x<pw+ph; x+=strW*2) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0); ctx.lineTo(x+strW, 0);
+      ctx.lineTo(x+strW+ph, ph); ctx.lineTo(x+ph, ph);
+      ctx.closePath(); ctx.fill();
+    }
+  } else if (S.bgPat === 'dots') {
+    ctx.fillStyle = bgC;
+    ctx.fillRect(0, 0, pw, ph);
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    const ds = pw * 0.06, dr = pw * 0.012;
+    for (let y=ds/2;y<ph;y+=ds) for (let x=ds/2;x<pw;x+=ds) {
+      ctx.beginPath(); ctx.arc(x,y,dr,0,Math.PI*2); ctx.fill();
+    }
+  }
+
+  ctx.restore();
+
+  // Custom background image (drawn on top of bg color/pattern, clipped to shape)
+  if (S.bgImage) _drawBgImage(ctx, cx, cy, rx, ry);
+  const bw = parseInt(gv('borderW')) || 0;
+  if (bw > 0) {
+    ctx.save();
+    buildShapePath(ctx, cx, cy, rx, ry, S.shape);
+    ctx.strokeStyle = gv('borderColor');
+    ctx.lineWidth = bw * (pw / (mm2px(totalWmm, 96)));
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Emblem
+  if (S.emblem !== 'none') {
+    const emSize = (Math.min(rx, ry) * 2) * (gn('emblemSize') / 100);
+    let emY = cy;
+    if (gv('mainText').trim() || gv('subText').trim()) emY = cy - Math.min(ry,rx)*0.18;
+    drawEmblem(ctx, cx, emY, emSize, gv('emblemColor'), S.emblem);
+  }
+
+  // Main text
+  const fontFam = gv('fontFam');
+  const tc = gv('textColor');
+  if (gv('mainText').trim()) {
+    ctx.save();
+    let fs = Math.min(rx, ry) * 0.32;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = tc;
+    // Auto-size
+    do {
+      ctx.font = `900 ${fs}px ${fontFam}`;
+      if (ctx.measureText(gv('mainText')).width < rx * 1.7) break;
+      fs -= 2;
+    } while(fs > 8);
+    const hasEmb = S.emblem !== 'none';
+    const textY = hasEmb ? cy + Math.min(rx,ry)*0.3 : cy + (gv('subText').trim() ? -Math.min(rx,ry)*0.08 : 0);
+    // Text shadow for readability
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = fs * 0.2;
+    ctx.fillText(gv('mainText').toUpperCase(), cx, textY);
+    ctx.restore();
+  }
+
+  if (gv('subText').trim()) {
+    ctx.save();
+    const fs2 = Math.min(rx, ry) * 0.14;
+    ctx.font = `600 ${fs2}px ${fontFam}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = tc;
+    ctx.globalAlpha = 0.82;
+    ctx.shadowColor = 'rgba(0,0,0,0.4)';
+    ctx.shadowBlur = fs2*0.2;
+    const hasMain = gv('mainText').trim();
+    const hasEmb = S.emblem !== 'none';
+    let subY = cy + (hasMain ? Math.min(rx,ry)*0.22 : 0) + (hasEmb ? Math.min(rx,ry)*0.14 : 0);
+    ctx.fillText(gv('subText'), cx, subY);
+    ctx.restore();
+  }
+
+  // Arc texts
+  const arcR = Math.min(rx, ry) * 0.82;
+  if (gv('arcTextTop').trim()) {
+    const arcFs = Math.min(rx, ry) * 0.1;
+    drawArcText(ctx, gv('arcTextTop').toUpperCase(), cx, cy, arcR, -Math.PI/2, 1, tc, fontFam, arcFs);
+  }
+  if (gv('arcTextBot').trim()) {
+    const arcFs = Math.min(rx, ry) * 0.1;
+    drawArcText(ctx, gv('arcTextBot').toUpperCase(), cx, cy, arcR, Math.PI/2, -1, tc, fontFam, arcFs);
+  }
+
+  // Bleed guide line
+  if (bleedMm > 0) {
+    ctx.save();
+    ctx.setLineDash([4,3]);
+    ctx.strokeStyle = 'rgba(168,85,247,0.5)';
+    ctx.lineWidth = 1;
+    buildShapePath(ctx, cx, cy, rx, ry, S.shape);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Update canvas display with zoom
+  const wrap = document.getElementById('previewWrap');
+  canvas.style.transform = `scale(${S.previewZoom})`;
+  canvas.style.transformOrigin = 'center center';
+  wrap.style.width = (pw * S.previewZoom) + 'px';
+  wrap.style.height = (ph * S.previewZoom) + 'px';
+  g('zoomLabel').textContent = Math.round(S.previewZoom * 100) + '%';
+
+  // Update size info
+  g('sizeInfo').textContent =
+    `Breite:    ${wMm} mm\nHöhe:     ${hMm} mm\nBleed:    ${bleedMm} mm\nGesamt:  ${totalWmm}×${totalHmm} mm\nExport:  ${Math.round(mm2px(totalWmm,300))}×${Math.round(mm2px(totalHmm,300))} px\nDPI:     300`;
+}
+
+/* ── Export at full DPI ── */
+async function exportSticker() {
+  const dpi = 300;
+  const wMm = gn('stkW') || 80;
+  const hMm = gn('stkH') || 80;
+  const bleedMm = gn('stkBleed') || 0;
+  const totalWmm = wMm + bleedMm * 2;
+  const totalHmm = hMm + bleedMm * 2;
+  const pw = Math.round(mm2px(totalWmm, dpi));
+  const ph = Math.round(mm2px(totalHmm, dpi));
+
+  // Off-screen canvas at full res
+  const oc = document.createElement('canvas');
+  oc.width = pw; oc.height = ph;
+  const oc2 = oc.getContext('2d');
+  const bleedPx = mm2px(bleedMm, dpi);
+  const cx = pw/2, cy = ph/2, rx = pw/2-bleedPx*0.5, ry = ph/2-bleedPx*0.5;
+
+  // White background for export (no checkerboard)
+  oc2.fillStyle = '#ffffff';
+  oc2.fillRect(0, 0, pw, ph);
+
+  // Draw background
+  const bgC = gv('bgColor'), bgC2 = gv('bgColor2');
+  oc2.save();
+  buildShapePath(oc2, cx, cy, rx, ry, S.shape);
+  oc2.clip();
+  if (S.bgPat === 'solid') { oc2.fillStyle=bgC; oc2.fillRect(0,0,pw,ph); }
+  else if (S.bgPat === 'gradient') {
+    const grad=oc2.createLinearGradient(0,0,pw,ph); grad.addColorStop(0,bgC); grad.addColorStop(1,bgC2);
+    oc2.fillStyle=grad; oc2.fillRect(0,0,pw,ph);
+  } else if (S.bgPat === 'stripes') {
+    oc2.fillStyle=bgC; oc2.fillRect(0,0,pw,ph);
+    const [r2,g2,b2]=hexToRgb(bgC); oc2.fillStyle=`rgb(${Math.max(0,r2-30)},${Math.max(0,g2-30)},${Math.max(0,b2-30)})`;
+    const strW=pw*0.07;
+    for(let x=-ph;x<pw+ph;x+=strW*2){oc2.beginPath();oc2.moveTo(x,0);oc2.lineTo(x+strW,0);oc2.lineTo(x+strW+ph,ph);oc2.lineTo(x+ph,ph);oc2.closePath();oc2.fill();}
+  } else if (S.bgPat === 'dots') {
+    oc2.fillStyle=bgC; oc2.fillRect(0,0,pw,ph);
+    oc2.fillStyle='rgba(255,255,255,0.15)';
+    const ds=pw*0.06,dr=pw*0.012;
+    for(let y=ds/2;y<ph;y+=ds) for(let x=ds/2;x<pw;x+=ds){oc2.beginPath();oc2.arc(x,y,dr,0,Math.PI*2);oc2.fill();}
+  }
+  oc2.restore();
+
+  const bw = (parseInt(gv('borderW'))||0) * (pw/mm2px(totalWmm,96));
+  if (bw>0) { oc2.save(); buildShapePath(oc2,cx,cy,rx,ry,S.shape); oc2.strokeStyle=gv('borderColor'); oc2.lineWidth=bw; oc2.stroke(); oc2.restore(); }
+
+  // Custom bg image at full resolution
+  if (S.bgImage) {
+    const opacity = (parseInt(gv('imgOpacity'))||100)/100;
+    const fit = gv('imgFit')||'cover';
+    oc2.save(); buildShapePath(oc2,cx,cy,rx,ry,S.shape); oc2.clip();
+    oc2.globalAlpha=opacity;
+    const W=rx*2,H=ry*2,iw=S.bgImage.naturalWidth,ih=S.bgImage.naturalHeight;
+    let dx=cx-rx,dy=cy-ry,dw=W,dh=H;
+    if(fit==='cover'){const sc=Math.max(W/iw,H/ih);dw=iw*sc;dh=ih*sc;dx=cx-dw/2;dy=cy-dh/2;}
+    else if(fit==='contain'){const sc=Math.min(W/iw,H/ih);dw=iw*sc;dh=ih*sc;dx=cx-dw/2;dy=cy-dh/2;}
+    else if(fit==='center'){dw=iw;dh=ih;dx=cx-iw/2;dy=cy-ih/2;}
+    oc2.drawImage(S.bgImage,dx,dy,dw,dh);
+    oc2.globalAlpha=1; oc2.restore();
+  }
+
+  if (S.emblem!=='none') {
+    const emSize=(Math.min(rx,ry)*2)*(gn('emblemSize')/100);
+    const emY = (gv('mainText').trim()||gv('subText').trim()) ? cy-Math.min(ry,rx)*0.18 : cy;
+    drawEmblem(oc2,cx,emY,emSize,gv('emblemColor'),S.emblem);
+  }
+
+  const fontFam=gv('fontFam'), tc=gv('textColor');
+  if (gv('mainText').trim()) {
+    oc2.save();
+    let fs=Math.min(rx,ry)*0.32; oc2.textAlign='center'; oc2.textBaseline='middle'; oc2.fillStyle=tc;
+    do{ oc2.font=`900 ${fs}px ${fontFam}`; if(oc2.measureText(gv('mainText')).width<rx*1.7) break; fs-=2; }while(fs>8);
+    const textY=(S.emblem!=='none')?cy+Math.min(rx,ry)*0.3:cy+(gv('subText').trim()?-Math.min(rx,ry)*0.08:0);
+    oc2.shadowColor='rgba(0,0,0,0.5)'; oc2.shadowBlur=fs*0.2;
+    oc2.fillText(gv('mainText').toUpperCase(),cx,textY); oc2.restore();
+  }
+  if (gv('subText').trim()) {
+    oc2.save(); const fs2=Math.min(rx,ry)*0.14; oc2.font=`600 ${fs2}px ${fontFam}`;
+    oc2.textAlign='center'; oc2.textBaseline='middle'; oc2.fillStyle=tc; oc2.globalAlpha=0.82;
+    oc2.shadowColor='rgba(0,0,0,0.4)'; oc2.shadowBlur=fs2*0.2;
+    const subY=cy+(gv('mainText').trim()?Math.min(rx,ry)*0.22:0)+((S.emblem!=='none')?Math.min(rx,ry)*0.14:0);
+    oc2.fillText(gv('subText'),cx,subY); oc2.restore();
+  }
+  const arcR=Math.min(rx,ry)*0.82;
+  if (gv('arcTextTop').trim()) drawArcText(oc2,gv('arcTextTop').toUpperCase(),cx,cy,arcR,-Math.PI/2,1,tc,fontFam,Math.min(rx,ry)*0.1);
+  if (gv('arcTextBot').trim()) drawArcText(oc2,gv('arcTextBot').toUpperCase(),cx,cy,arcR,Math.PI/2,-1,tc,fontFam,Math.min(rx,ry)*0.1);
+
+  // Download
+  oc.toBlob(blob=>{
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=`sticker_${gv('mainText')||'fw'}_${wMm}x${hMm}mm_300dpi.png`;
+    a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),10000);
+  },'image/png');
+}
+
+function copyOrderInfo() {
+  const text =
+`STICKER BESTELLVORLAGE
+${'─'.repeat(36)}
+Datum:        ${new Date().toLocaleDateString('de-DE')}
+Besteller:    _____________________
+
+DRUCKDATEN
+Datei:        sticker_*.png
+Format:       PNG, 300 DPI
+Farbmodus:    RGB (CMYK auf Anfrage)
+
+ABMESSUNGEN
+Sticker:      ${gn('stkW')} × ${gn('stkH')} mm
+Bleed:        ${gn('stkBleed')} mm
+Gesamt:       ${gn('stkW')+gn('stkBleed')*2} × ${gn('stkH')+gn('stkBleed')*2} mm
+Form:         ${S.shape}
+
+MATERIAL-WUNSCH
+Material:     Vinylfolie / Foliensticker
+Oberfläche:   □ Matt  □ Glanz
+Menge:        ________ Stück
+Konturschnitt: □ Ja  □ Nein
+
+HINWEISE
+- Bitte Druckdaten vor Produktion freigeben
+- PNG-Datei als Anlage beifügen
+- Bleed (${gn('stkBleed')} mm) ist bereits eingerechnet`;
+
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('button[onclick="copyOrderInfo()"]');
+    if(btn){btn.textContent='✓ Kopiert!'; setTimeout(()=>btn.textContent='📋 Bestellinfo kopieren',2200);}
+  });
+}
+
+/* ── Controls ── */
+function setShape(shape, btn) {
+  S.shape = shape;
+  document.querySelectorAll('.shape-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSticker();
+}
+
+function setEmblem(em, btn) {
+  S.emblem = em;
+  document.querySelectorAll('.em-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSticker();
+}
+
+function setPat(pat, btn) {
+  S.bgPat = pat;
+  document.querySelectorAll('.bg-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  g('bgColor2Wrap').style.display = pat==='gradient' ? 'block' : 'none';
+  renderSticker();
+}
+
+function setPreviewZoom(z) {
+  S.previewZoom = Math.max(0.15, Math.min(3, z));
+  renderSticker();
+}
+function changeZoom(delta) { setPreviewZoom(S.previewZoom + delta); }
+
+function toggleCheckerboard() { S.showChecker = !S.showChecker; renderSticker(); }
+
+function resetToDefaults() {
+  g('bgColor').value='#dc2626'; g('bgColor2').value='#7c3aed';
+  g('borderColor').value='#ffffff'; g('borderW').value=8;
+  g('mainText').value='FEUERWEHR'; g('subText').value='';
+  g('arcTextTop').value=''; g('arcTextBot').value='';
+  g('textColor').value='#ffffff'; g('emblemColor').value='#ffffff';
+  g('emblemSize').value=40; g('fontFam').value='Oswald';
+  g('stkW').value=80; g('stkH').value=80; g('stkBleed').value=3;
+  setShape('circle', document.querySelector('.shape-btn[data-shape="circle"]'));
+  setEmblem('none', document.querySelector('.em-btn[data-em="none"]'));
+  setPat('solid', document.querySelector('.bg-btn[data-pat="solid"]'));
+  renderSticker();
+}
+
+/* ── Presets ── */
+function loadPreset(name) {
+  const presets = {
+    helm: { shape:'circle', em:'fw', bgC:'#dc2626', pat:'gradient', bgC2:'#991b1b', border:'#ffffff', bw:10, main:'FEUERWEHR', sub:'', arcTop:'FREIWILLIGE FEUERWEHR', arcBot:'', w:60, h:60, tc:'#ffffff' },
+    fahrzeug: { shape:'oval', em:'flame', bgC:'#dc2626', pat:'solid', bgC2:'#991b1b', border:'#ffdd00', bw:8, main:'FW', sub:'Musterstadt', arcTop:'', arcBot:'', w:120, h:60, tc:'#ffffff' },
+    thw: { shape:'circle', em:'thw', bgC:'#003399', pat:'gradient', bgC2:'#001a66', border:'#ffdd00', bw:10, main:'THW', sub:'', arcTop:'TECHNISCHES HILFSWERK', arcBot:'', w:80, h:80, tc:'#ffffff' },
+    rd: { shape:'rounded', em:'cross', bgC:'#f97316', pat:'solid', bgC2:'#ea580c', border:'#ffffff', bw:8, main:'RETTUNG', sub:'112', arcTop:'', arcBot:'', w:100, h:65, tc:'#ffffff' },
+  };
+  const p = presets[name]; if (!p) return;
+  g('bgColor').value=p.bgC; g('bgColor2').value=p.bgC2;
+  g('borderColor').value=p.border; g('borderW').value=p.bw;
+  g('mainText').value=p.main; g('subText').value=p.sub;
+  g('arcTextTop').value=p.arcTop||''; g('arcTextBot').value=p.arcBot||'';
+  g('textColor').value=p.tc; g('stkW').value=p.w; g('stkH').value=p.h;
+  setShape(p.shape, document.querySelector(`.shape-btn[data-shape="${p.shape}"]`));
+  setEmblem(p.em, document.querySelector(`.em-btn[data-em="${p.em}"]`));
+  setPat(p.pat, document.querySelector(`.bg-btn[data-pat="${p.pat}"]`));
+  g('bgColor2Wrap').style.display = p.pat==='gradient' ? 'block' : 'none';
+  renderSticker();
+}
+
+/* ── Init ── */
+canvas.addEventListener('wheel', e => {
+  if (e.ctrlKey||e.metaKey) { e.preventDefault(); changeZoom(e.deltaY<0?0.1:-0.1); }
+},{passive:false});
+canvas.addEventListener('dblclick', () => setPreviewZoom(0.5));
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+  if (e.key==='+') changeZoom(0.25);
+  if (e.key==='-') changeZoom(-0.25);
+});
+
+// Set initial preview zoom based on typical sticker size
+S.previewZoom = 0.5;
+renderSticker();
+</script>
+</body>
+</html>

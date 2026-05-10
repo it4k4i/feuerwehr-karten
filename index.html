@@ -13,6 +13,12 @@
   --text:#e8eaf0;--text2:#6a7a99;
   --accent:#e63946;--yellow:#ffd600;--teal:#06b6d4;
 }
+body.light-mode{
+  --bg:#f2f4fa;--panel:#ffffff;--border:#d0d4e0;
+  --text:#0d0f18;--text2:#5060a0;
+}
+body.light-mode header{background:linear-gradient(90deg,#0d1020,#181d38 40%,#0d1020);}
+*{transition:background-color .2s,border-color .18s,color .1s;}
 body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-serif;min-height:100vh;overflow-x:hidden;}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 20% 20%,rgba(230,57,70,.06) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(255,214,0,.04) 0%,transparent 60%);pointer-events:none;z-index:0;}
 body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-gradient(-45deg,transparent,transparent 40px,rgba(255,255,255,.012) 40px,rgba(255,255,255,.012) 41px);pointer-events:none;z-index:0;}
@@ -152,6 +158,7 @@ footer span{color:var(--accent);}
     <p>Generator Suite</p>
   </div>
   <div class="header-badge">Kostenlos &amp; offline</div>
+  <button onclick="toggleTheme()" id="themeBtn" title="Dark/Light Mode" style="margin-left:8px;padding:5px 10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:rgba(255,255,255,.5);font-size:.7rem;cursor:pointer;transition:all .15s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'">🌙</button>
 </header>
 
 
@@ -260,6 +267,52 @@ footer span{color:var(--accent);}
 
   </div>
 
+  <!-- TAKTISCHE ZEICHEN -->
+  <div class="section-label"><span>⚑ Taktische Zeichen</span></div>
+  <div class="cards" style="padding-bottom:48px;">
+    <a href="taktische-zeichen-dv102.html" class="tool-card" style="border-color:rgba(220,38,38,.3);--accent-col:#dc2626;">
+      <div class="card-icon-wrap" style="background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.25);">⚑</div>
+      <div class="card-content">
+        <h3>Taktische Zeichen Generator</h3>
+        <p>Erstelle Magnetbögen mit Taktischen Zeichen nach DV 102, FwDV 102 und THW DV 1-102. Alle BOS-Organisationen (FW, THW, Polizei, RD). Undo/Redo, Zoom, Mehrseiten, eigene Zeichen hochladen.</p>
+      </div>
+      <div class="card-tags">
+        <span class="tag">DV 102 offiziell</span>
+        <span class="tag">FW / THW / RD / Pol</span>
+        <span class="tag">SVG Export</span>
+        <span class="tag">Magnet-Druck</span>
+        <span class="tag" style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:#fbbf24;">⚠️ Experimentell</span>
+      </div>
+      <div class="card-cta">
+        <span class="cta-label">Generator öffnen</span>
+        <div class="cta-arrow">→</div>
+      </div>
+    </a>
+  </div>
+
+  <!-- STICKER CREATOR -->
+  <div class="section-label"><span>🎨 Sticker Creator</span></div>
+  <div class="cards" style="padding-bottom:64px;">
+    <a href="sticker-creator.html" class="tool-card" style="border-color:rgba(168,85,247,.3);">
+      <div class="card-icon-wrap" style="background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.25);">🎨</div>
+      <div class="card-content">
+        <h3>Sticker Creator</h3>
+        <p>Erstelle stylische Feuerwehr-Sticker für den Bestell-Druck – verschiedene Formen, Hintergründe, Texte und Embleme. Export als druckfertiges PNG (300 DPI). Ideal für Helme, Fahrzeuge und Ausrüstung.</p>
+      </div>
+      <div class="card-tags">
+        <span class="tag">Rund / Eckig / Oval</span>
+        <span class="tag">300 DPI Export</span>
+        <span class="tag">Bestellfertig</span>
+        <span class="tag">Custom Text &amp; Icon</span>
+        <span class="tag" style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:#fbbf24;">⚠️ Experimentell</span>
+      </div>
+      <div class="card-cta">
+        <span class="cta-label">Creator öffnen</span>
+        <div class="cta-arrow">→</div>
+      </div>
+    </a>
+  </div>
+
   <!-- FAHRZEUG KARTEN -->
   <div class="section-label"><span>🚒 Fahrzeug Karten</span></div>
   <div class="cards" style="padding-bottom:64px;">
@@ -333,6 +386,20 @@ function applyIndexLang(){
   if(wfDesc) wfDesc.textContent = T.wfDesc;
   // Update html lang
   document.documentElement.lang = indexLang;
+}
+
+// ── DARK / LIGHT MODE ──
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('idx_theme', isLight ? 'light' : 'dark');
+  const btn = document.getElementById('themeBtn');
+  if (btn) btn.textContent = isLight ? '☀' : '🌙';
+}
+if (localStorage.getItem('idx_theme') === 'light') {
+  document.body.classList.add('light-mode');
+  window.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('themeBtn'); if (btn) btn.textContent = '☀';
+  });
 }
 
 function indexToggleLang(){

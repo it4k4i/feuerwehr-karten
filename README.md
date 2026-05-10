@@ -1,64 +1,61 @@
-# 🔥 Feuerwehr Gerätekunde Karten Generator
+# 🔥 BOS Ausbildungstools Suite
 
-Erstelle professionelle Pokémon-style Gerätekunde-Karten für die Feuerwehr — kostenlos, ohne Anmeldung, direkt im Browser.
+Browser-basierte Werkzeuge für Feuerwehr, THW, Rettungsdienst und Polizei – Gerätekunde-Karten, Fahrzeugkarten, Taktische Zeichen, Bild-Annotator und Sticker Creator. Pokémon-Style Karten, offizielle Taktische Zeichen nach DV 102 und druckfertige Exporte. Kein Backend, kein Login – läuft vollständig im Browser.
 
-**👉 [Jetzt öffnen](https://it4k4i.github.io/feuerwehr-karten)**
+**👉 [Jetzt öffnen (GitHub Pages)](https://it4k4i.github.io/feuerwehr-karten)**  
 **👉 [Jetzt öffnen (Cloudflare)](https://feuerwehr-karten.fabian98.workers.dev/)**
-
 
 ---
 
-## Features
+## Tools
 
-- 🃏 Pokémon-Style Karten mit Foto, Name und Kategorie
-- 🎨 Vollständig anpassbare Kategorien (Farben, Schrift, Ausrichtung)
-- 📦 Mehrere Karten auf einmal (Fotos, Liste oder CSV)
-- 🖨 Drucken auf DIN A4 (beidseitig, 9 Karten pro Seite)
-- 🏭 Profi-Export für Plastikkarten-Druckfirmen (300 DPI, CR80, A6, Custom)
-- 💾 Projekte als JSON speichern und laden
-- 🔄 Eigene Rückseite hochladbar
+### 🪓 Gerätekunde Karten Generator (V3)
+Pokémon-Style Karten für Feuerwehrgeräte. CSV-Import, Fahrzeug-Präfix-System, Export-Wizard mit Direktdruck, Papier-, Profi- (300 DPI) und Sticker-Export. Mehrere Dateien → automatisch als ZIP. Rückwärtskompatibel.
 
-## Kartengröße
+### 🚒 Fahrzeug Karten Generator
+Karten im Trading-Card-Stil für Feuerwehrfahrzeuge. Shiny-Hologrammeffekte, Fahrzeugstatistiken, Export-Wizard. Mehrere Karten → automatisch als ZIP.
 
-| Format | Maße | Verwendung |
-|--------|------|-----------|
-| Pokémon | 63 × 88 mm | Standard-Spielkarte |
-| CR80 | 85,6 × 54 mm | Standard EC-/Plastikkarte |
-| A6 | 105 × 148 mm | Große Lernkarte |
-| Custom | frei wählbar | Beliebig |
+### ⚑ Taktische Zeichen Generator
+Magnetbögen mit Taktischen Zeichen nach DV 102 / FwDV 102 / THW DV 1-102 für alle BOS-Einheiten (Feuerwehr, THW, Rettungsdienst, Polizei). Undo/Redo (Strg+Z), Zoom, Mehrseiten, eigene Zeichen hochladen, Autosave, SVG-Export.
+
+### 🖊️ Bild-Annotator
+Fotos mit Pfeilen, Labels, Formen und Texten beschriften. Mehrere Bilder gleichzeitig, Export als PNG oder PDF. Undo/Redo (Strg+Z), Zoom (Strg+Mausrad), skalierte Pfeile, Schrift-Anpassung pro Element.
+
+### 🎨 Sticker Creator
+Stylische Sticker für den Druckdruck erstellen – verschiedene Formen (Rund, Oval, Schild, Hexagon …), Hintergründe, Texte, Embleme und Bogentext. Export als druckfertiges PNG (300 DPI) mit Bestellvorlage.
+
+---
+
+## Features (Übersicht)
+
+| Feature | Gerätekunde | Fahrzeug | Takt. Zeichen | Annotator | Sticker |
+|---------|:-----------:|:--------:|:-------------:|:---------:|:-------:|
+| Kein Backend / Login | ✅ | ✅ | ✅ | ✅ | ✅ |
+| ZIP bei mehreren Dateien | ✅ | ✅ | — | — | — |
+| 300 DPI Export | ✅ | ✅ | ✅ (SVG) | — | ✅ |
+| Undo / Redo | — | — | ✅ | ✅ | — |
+| Zoom | — | — | ✅ | ✅ | ✅ |
+| Autosave | ✅ | — | ✅ | ✅ | — |
+| Mehrseiten | ✅ | — | ✅ | ✅ | — |
+
+---
 
 ## Lokale Nutzung
 
-Einfach `index.html` herunterladen und im Browser öffnen — kein Server, kein Backend, keine Installation nötig.
+Alle HTML-Dateien herunterladen und im Browser öffnen – kein Server nötig.
 
-## Deployment
+---
 
-### GitHub Pages
-1. Fork dieses Repository
-2. Gehe zu **Settings → Pages**
-3. Source: `main` Branch, `/ (root)`
-4. Fertig — automatisch unter `https://USERNAME.github.io/feuerwehr-karten` erreichbar
+## Hinweis Taktische Zeichen
 
-### Cloudflare Pages
-1. [Cloudflare Pages](https://pages.cloudflare.com) öffnen
-2. **Create a project → Upload assets**
-3. `index.html` hochladen
-4. Fertig — sofort weltweit verfügbar
+> ⚠️ Offizielle Zeichen (grüner Punkt) entsprechen DV 102 / FwDV 102 / THW DV 1-102. Eigeninterpretationen (gelber Punkt) sind kein Ersatz für offizielle Vorschriften.
 
-### Eigener Server
-```bash
-# Nginx — einfachste Variante
-docker run -p 80:80 -v $(pwd)/index.html:/usr/share/nginx/html/index.html nginx:alpine
-```
+---
 
 ## Lizenz
 
-
-
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
 
-- ✅ Kostenlos für private, gemeinnützige und Feuerwehr-Nutzung
+- ✅ Kostenlos für private, gemeinnützige und BOS-Nutzung
 - ✅ Weitergabe und Anpassung erlaubt (mit Namensnennung)
 - ❌ Kommerzielle Nutzung nur mit schriftlicher Genehmigung
-
-Kontakt für kommerzielle Anfragen: GitHub Issues

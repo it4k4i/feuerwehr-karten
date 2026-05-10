@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="de">
-<html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,85 +13,175 @@
   --text:#e2e6f2;--text2:#6e7c96;--text3:#404c62;
   --accent:#e63946;--teal:#0ea5e9;--green:#22c55e;--yellow:#f59e0b;
 }
+/* Light mode overrides */
+body.light-mode{
+  --bg:#f0f2f7;--panel:#ffffff;--panel2:#f5f7fc;--panel3:#eaecf4;
+  --border:#d1d5e0;--border2:#b8bdd0;
+  --text:#1a1d2e;--text2:#4a5270;--text3:#8892aa;
+}
+body.light-mode .app-hdr{
+  background:linear-gradient(90deg,#1a1d2e 0%,#252840 40%,#2a2e48 60%,#1a1d2e 100%);
+}
+body.light-mode #printCanvas{
+  box-shadow:0 0 0 1px rgba(0,0,0,.1),0 4px 24px rgba(0,0,0,.15);
+}
+body.light-mode .magnet-cell{border-color:rgba(0,0,0,.2);}
+body.light-mode .canvas-area{background:#dde1ed;}
+*{transition:background-color .18s,border-color .18s,color .1s;}
 html,body{height:100%;overflow:hidden;}
 body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-serif;display:flex;flex-direction:column;}
 
-/* HEADER */
-.hdr{flex-shrink:0;z-index:20;position:relative;background:linear-gradient(90deg,#07080c,#10131a 50%,#07080c);border-bottom:1px solid var(--border2);height:54px;display:flex;align-items:center;padding:0 18px;gap:12px;}
-.hdr-logo{width:32px;height:32px;background:linear-gradient(135deg,#dc2626,#991b1b);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 0 14px rgba(220,38,38,.4);}
-.hdr-title{font-family:'Oswald',sans-serif;font-weight:700;font-size:1rem;letter-spacing:2.5px;background:linear-gradient(90deg,#fff 40%,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.hdr-sub{font-size:.46rem;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-top:1px;}
-.hdr-spacer{flex:1;}
-.hdr-norm{font-size:.52rem;font-weight:700;letter-spacing:1px;color:#60a5fa;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:3px 9px;}
+/* ── UNIFIED APP HEADER ── */
+.app-hdr{flex-shrink:0;z-index:30;background:linear-gradient(90deg,#07080d 0%,#0e1018 40%,#12141e 60%,#07080d 100%);border-bottom:1px solid rgba(255,255,255,.07);height:48px;display:flex;align-items:center;padding:0 14px;gap:8px;box-shadow:0 2px 12px rgba(0,0,0,.4);}
+.app-hdr-logo{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;}
+.app-hdr-title{font-family:'Oswald',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:2px;color:#fff;white-space:nowrap;}
+.app-hdr-sub{font-size:.42rem;color:rgba(255,255,255,.25);letter-spacing:1.5px;text-transform:uppercase;white-space:nowrap;}
+.app-hdr-sep{flex:1;}
+.app-hdr-nav{display:flex;align-items:center;gap:5px;}
+.app-hdr-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:5px;border:0.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.38);font-size:.5rem;font-weight:700;letter-spacing:.5px;text-decoration:none;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:inherit;}
+.app-hdr-btn:hover{border-color:rgba(255,255,255,.28);color:rgba(255,255,255,.85);background:rgba(255,255,255,.07);}
+.app-hdr-btn.home:hover{border-color:rgba(230,57,70,.5);color:#f87171;}
+.app-hdr-btn.bug:hover{border-color:rgba(251,191,36,.4);color:#fbbf24;}
+.app-hdr-badge{font-size:.44rem;font-weight:700;letter-spacing:.8px;padding:3px 8px;border-radius:10px;white-space:nowrap;}
 
 /* LAYOUT */
 .app-body{display:grid;grid-template-columns:270px 1fr 286px;flex:1;min-height:0;overflow:hidden;position:relative;z-index:1;}
 
-/* LEFT SIDEBAR */
-.sidebar{background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+/* LEFT SIDEBAR – no horizontal overflow */
+.sidebar{background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-width:0;}
 .sb-head{padding:10px 12px 8px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .sb-search{display:flex;align-items:center;gap:7px;background:var(--panel2);border:1px solid var(--border2);border-radius:7px;padding:5px 9px;}
-.sb-search input{background:none;border:none;outline:none;color:var(--text);font-size:.7rem;width:100%;font-family:'Libre Franklin',sans-serif;}
+.sb-search input{background:none;border:none;outline:none;color:var(--text);font-size:.7rem;width:100%;font-family:'Libre Franklin',sans-serif;min-width:0;}
 .sb-search input::placeholder{color:var(--text3);}
-.symbol-list-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+.symbol-list-scroll{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;min-width:0;}
 .symbol-list-scroll::-webkit-scrollbar{width:3px;}
 .symbol-list-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 
 /* Category accordion */
-.cat-section{border-bottom:1px solid var(--border);}
-.cat-header{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;cursor:pointer;user-select:none;transition:background .12s;}
+.cat-section{border-bottom:1px solid var(--border);min-width:0;}
+.cat-header{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;cursor:pointer;user-select:none;transition:background .12s;min-width:0;}
 .cat-header:hover{background:rgba(255,255,255,.02);}
-.cat-header-left{display:flex;align-items:center;gap:7px;}
-.cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.cat-title-text{font-size:.56rem;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:var(--text);}
-.cat-badge{font-size:.44rem;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:3px;}
+.cat-header-left{display:flex;align-items:center;gap:5px;min-width:0;overflow:hidden;}
+.cat-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.cat-title-text{font-size:.5rem;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cat-badge{font-size:.4rem;font-weight:700;padding:1px 4px;border-radius:3px;margin-left:2px;flex-shrink:0;}
 .cat-badge.official{background:rgba(34,197,94,.1);color:#4ade80;border:1px solid rgba(34,197,94,.2);}
 .cat-badge.eigen{background:rgba(245,158,11,.1);color:#fbbf24;border:1px solid rgba(245,158,11,.2);}
-.cat-count{font-size:.46rem;color:var(--text3);background:var(--panel2);border-radius:8px;padding:1px 5px;}
-.cat-chevron{font-size:.55rem;color:var(--text3);transition:transform .15s;}
-.cat-body{display:none;padding:4px 8px 8px;}
+.cat-count{font-size:.42rem;color:var(--text3);background:var(--panel2);border-radius:8px;padding:1px 4px;flex-shrink:0;}
+.cat-chevron{font-size:.5rem;color:var(--text3);transition:transform .15s;flex-shrink:0;}
+.cat-body{display:none;padding:4px 6px 8px;min-width:0;}
 .cat-body.open{display:block;}
 
-/* Symbol grid */
-.sym-subgroup{font-size:.44rem;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:6px 4px 3px;display:flex;align-items:center;gap:5px;}
+/* Symbol grid – 3 cols, items shrink to fit sidebar width */
+.sym-subgroup{font-size:.42rem;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:var(--text3);padding:5px 2px 3px;display:flex;align-items:center;gap:5px;}
 .sym-subgroup::after{content:'';flex:1;height:1px;background:var(--border);}
-.sym-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:4px;}
-.sym-item{background:var(--panel2);border:1px solid var(--border);border-radius:6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 3px 4px;transition:all .14s;user-select:none;position:relative;}
+.sym-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:3px;min-width:0;}
+.sym-item{background:var(--panel2);border:1px solid var(--border);border-radius:5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 2px 3px;transition:all .14s;user-select:none;position:relative;min-width:0;overflow:hidden;}
 .sym-item:hover{border-color:var(--border2);background:var(--panel3);transform:translateY(-1px);}
 .sym-item:active{transform:scale(.96);}
 .sym-item.selected{border-color:var(--accent);background:rgba(230,57,70,.08);}
-.sym-item svg{width:46px;height:38px;}
-.sym-item-label{font-size:.38rem;font-weight:700;letter-spacing:.2px;text-transform:uppercase;color:var(--text2);text-align:center;line-height:1.2;padding:0 2px;}
+/* SVG scales to fill the cell width */
+.sym-item svg{width:100%;max-width:54px;height:auto;aspect-ratio:5/4;display:block;}
+.sym-item-label{font-size:.34rem;font-weight:700;letter-spacing:.1px;text-transform:uppercase;color:var(--text2);text-align:center;line-height:1.2;padding:0 1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
 .sym-item:hover .sym-item-label{color:var(--text);}
-.sym-item .sym-status{position:absolute;top:2px;right:2px;width:5px;height:5px;border-radius:50%;}
+.sym-item .sym-status{position:absolute;top:2px;right:2px;width:5px;height:5px;border-radius:50%;flex-shrink:0;}
 .sym-status.official{background:#4ade80;}
 .sym-status.eigen{background:#fbbf24;}
 
 /* CENTER CANVAS */
 .canvas-area{background:var(--panel2);display:flex;flex-direction:column;overflow:hidden;}
-.canvas-toolbar{flex-shrink:0;background:var(--panel);border-bottom:1px solid var(--border);padding:7px 12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-.tb-lbl{font-size:.5rem;color:var(--text3);font-weight:700;letter-spacing:.8px;text-transform:uppercase;}
-.tb-btn{display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:5px;border:1px solid var(--border);background:var(--panel2);color:var(--text2);font-size:.55rem;font-weight:700;letter-spacing:.7px;text-transform:uppercase;cursor:pointer;transition:all .12s;font-family:'Libre Franklin',sans-serif;}
+.canvas-toolbar{flex-shrink:0;background:var(--panel);border-bottom:1px solid var(--border);padding:6px 10px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.tb-lbl{font-size:.46rem;color:var(--text3);font-weight:700;letter-spacing:.8px;text-transform:uppercase;}
+.tb-btn{display:flex;align-items:center;gap:3px;padding:3px 7px;border-radius:4px;border:1px solid var(--border);background:var(--panel2);color:var(--text2);font-size:.5rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;transition:all .12s;font-family:'Libre Franklin',sans-serif;}
 .tb-btn:hover{border-color:var(--border2);color:var(--text);}
 .tb-btn.active{border-color:var(--teal);color:var(--teal);background:rgba(14,165,233,.07);}
 .tb-btn.red{background:rgba(220,38,38,.1);border-color:rgba(220,38,38,.35);color:#f87171;}
 .tb-btn.green{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.3);color:#4ade80;}
-.tb-sep{width:1px;height:18px;background:var(--border);margin:0 1px;}
-#canvasCounter{font-size:.54rem;font-weight:700;color:var(--text3);}
-.canvas-wrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:auto;padding:20px;}
-#printCanvas{background:#fff;border-radius:3px;box-shadow:0 0 0 1px rgba(255,255,255,.06),0 8px 40px rgba(0,0,0,.6);}
+.tb-sep{width:1px;height:16px;background:var(--border);margin:0 1px;}
+#canvasCounter{font-size:.5rem;font-weight:700;color:var(--text3);}
+
+/* Scroll container */
+.canvas-wrap{
+  flex:1;
+  overflow:auto;
+  display:flex;
+  align-items:center;    /* vertical center when canvas fits */
+  justify-content:center; /* horizontal center always */
+  padding:20px;
+}
+/* Zoom wrapper: sized to the SCALED canvas so scroll works correctly */
+#canvasZoomWrap{
+  flex-shrink:0;
+  position:relative;
+  /* width/height set by JS = pageW*zoom, pageH*zoom */
+}
+/* Canvas: transform-origin top-left; JS sets width/height to zoom level via wrapper */
+#printCanvas{
+  background:#fff;
+  border-radius:3px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.06),0 8px 40px rgba(0,0,0,.6);
+  transform-origin:top left;
+  position:absolute;
+  top:0; left:0;
+  /* width/height set by JS to real page size; transform scales visually */
+}
 
 /* Magnet cells */
-.magnet-cell{position:relative;border:1px dashed rgba(0,0,0,.13);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .12s;overflow:hidden;}
+.magnet-cell{
+  position:relative;
+  border:1px dashed rgba(0,0,0,.13);
+  cursor:pointer;
+  transition:background .12s;
+  overflow:hidden;
+  /* Grid cells need explicit sizing so children can use height:100% */
+  display:flex;
+  align-items:stretch;
+  justify-content:stretch;
+}
 .magnet-cell:hover{background:rgba(59,130,246,.05);}
 .magnet-cell.drag-over{background:rgba(59,130,246,.15)!important;outline:2px dashed #3b82f6;}
-.drop-hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;font-size:.42rem;color:rgba(0,0,0,.2);letter-spacing:.6px;text-transform:uppercase;font-weight:700;pointer-events:none;}
+.drop-hint{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;font-size:.42rem;color:rgba(0,0,0,.2);
+  letter-spacing:.6px;text-transform:uppercase;font-weight:700;pointer-events:none;
+}
 .magnet-cell:hover .drop-hint{opacity:1;}
 .magnet-cell.filled .drop-hint{display:none;}
-.placed-sign{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;}
-.placed-sign svg{max-width:86%;max-height:86%;}
-.cell-lbl{font-family:'Share Tech Mono',monospace;text-align:center;line-height:1.2;padding:0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
-.cell-remove{position:absolute;top:2px;right:2px;width:13px;height:13px;background:rgba(220,38,38,.85);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transition:opacity .12s;font-size:.48rem;color:#fff;z-index:5;line-height:1;}
+
+/* placed-sign fills the cell completely */
+.placed-sign{
+  flex:1;
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  padding:3px;
+  gap:2px;
+  min-height:0;
+  overflow:hidden;
+}
+/* SVG fills available space inside the cell */
+.placed-sign .sym-svg-wrap{
+  flex:1;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:0;
+  overflow:hidden;
+}
+.placed-sign .sym-svg-wrap svg{
+  width:100%;
+  height:100%;
+  max-width:100%;
+  max-height:100%;
+  display:block;
+}
+.cell-lbl{font-family:'Share Tech Mono',monospace;text-align:center;line-height:1.2;padding:0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;flex-shrink:0;}
+.cell-remove{position:absolute;top:2px;right:2px;width:14px;height:14px;background:rgba(220,38,38,.85);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transition:opacity .12s;font-size:.48rem;color:#fff;z-index:5;line-height:1;}
 .magnet-cell:hover .cell-remove{opacity:1;}
 
 /* RIGHT INSPECTOR */
@@ -164,8 +253,14 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
   .hdr,.sidebar,.inspector,.canvas-toolbar{display:none!important;}
   body{overflow:visible!important;height:auto!important;}
   .app-body,.canvas-area{display:block!important;overflow:visible!important;}
-  .canvas-wrap{padding:0!important;overflow:visible!important;}
-  #printCanvas{box-shadow:none!important;border-radius:0!important;}
+  .canvas-wrap{padding:0!important;overflow:visible!important;display:block!important;}
+  #canvasZoomWrap{width:auto!important;height:auto!important;display:block!important;}
+  #printCanvas{
+    transform:none!important;   /* exact 1:1 for print */
+    position:static!important;
+    box-shadow:none!important;
+    border-radius:0!important;
+  }
   .magnet-cell{border:1px dashed #bbb!important;}
   .cell-remove,.drop-hint{display:none!important;}
   @page{margin:0;}
@@ -173,12 +268,25 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
 </style>
 </head>
 <body>
-<header class="hdr">
-  <div class="hdr-logo">⚑</div>
-  <div><div class="hdr-title">TAKTISCHE ZEICHEN GENERATOR</div><div class="hdr-sub">DV 102 · FwDV 102 · THW DV 1-102 – Grün = Offiziell · Gelb = Eigeninterpretation</div></div>
-  <div class="hdr-spacer"></div>
-  <div class="hdr-norm">📋 DV 102 / Stand 2023</div>
+<header class="app-hdr">
+  <div class="app-hdr-logo" style="background:linear-gradient(135deg,#dc2626,#991b1b);box-shadow:0 0 10px rgba(220,38,38,.3);">⚑</div>
+  <div>
+    <div class="app-hdr-title">TAKTISCHE ZEICHEN GENERATOR</div>
+    <div class="app-hdr-sub">DV 102 · FwDV 102 · THW DV 1-102 · NATO APP-6D</div>
+  </div>
+  <div class="app-hdr-sep"></div>
+  <nav class="app-hdr-nav">
+    <span class="app-hdr-badge" style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);color:#60a5fa;">📋 DV 102 / Stand 2023</span>
+    <button class="app-hdr-btn" onclick="toggleTheme()" id="themeBtn" title="Dark/Light Mode">🌙</button>
+    <a class="app-hdr-btn bug" href="https://github.com/it4k4i/feuerwehr-karten/issues/new" target="_blank" rel="noopener">🐛 Bug melden</a>
+    <a class="app-hdr-btn home" href="index.html">🏠 Startseite</a>
+  </nav>
 </header>
+
+<!-- WARNING BAR -->
+<div style="background:rgba(245,158,11,.08);border-bottom:1px solid rgba(245,158,11,.2);padding:5px 18px;font-size:.54rem;color:rgba(245,158,11,.85);flex-shrink:0;display:flex;align-items:center;gap:7px;">
+  ⚠️ <strong style="color:#fbbf24;">Wichtiger Hinweis:</strong> Taktische Zeichen nach DV 102 sind normiert. Grüne Punkte = offizielle Zeichen. Gelbe Punkte = Eigeninterpretationen. Bitte immer aktuelle Dienstvorschrift beachten. Kein Ersatz für Ausbildung.
+</div>
 <div class="app-body">
   <aside class="sidebar">
     <div class="sb-head">
@@ -203,14 +311,30 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
       <button class="tb-btn" id="btnGrid35" onclick="setGrid(3,5)">3×5</button>
       <button class="tb-btn" id="btnGrid24" onclick="setGrid(2,4)">2×4</button>
       <div class="tb-sep"></div>
+      <span class="tb-lbl">Seite:</span>
+      <button class="tb-btn" id="btnPrevPage" onclick="tzPrevPage()" title="Vorherige Seite">◀</button>
+      <span id="tzPageLabel" style="font-size:.5rem;color:var(--text2);padding:0 4px;">1/1</span>
+      <button class="tb-btn" id="btnNextPage" onclick="tzNextPage()" title="Nächste Seite">▶</button>
+      <button class="tb-btn" onclick="tzAddPage()" title="Seite hinzufügen">＋</button>
+      <button class="tb-btn" style="color:#f87171" onclick="tzDeletePage()" title="Seite löschen">🗑</button>
+      <div class="tb-sep"></div>
+      <span class="tb-lbl">Zoom:</span>
+      <button class="tb-btn" onclick="tzZoomStep(-0.15)" title="Verkleinern (−)">−</button>
+      <span id="tzZoomLabel" style="font-size:.5rem;color:var(--text2);padding:0 3px;cursor:pointer;" onclick="tzSetZoom(1)" title="Zoom zurücksetzen">100%</span>
+      <button class="tb-btn" onclick="tzZoomStep(+0.15)" title="Vergrößern (+)">+</button>
+      <div class="tb-sep"></div>
+      <button class="tb-btn" id="btnUndo" onclick="tzUndo()" title="Rückgängig (Strg+Z)" disabled>↩</button>
+      <button class="tb-btn" id="btnRedo" onclick="tzRedo()" title="Wiederholen (Strg+Y)" disabled>↪</button>
+      <div class="tb-sep"></div>
       <button class="tb-btn" onclick="clearCanvas()">🗑 Leeren</button>
       <button class="tb-btn red" onclick="printPage()">🖨 Drucken</button>
       <button class="tb-btn green" onclick="exportSVG()">💾 SVG</button>
       <button class="tb-btn" onclick="openOrderModal()">🛒 Bestellung</button>
+      <button class="tb-btn" style="background:rgba(168,85,247,.12);border-color:rgba(168,85,247,.35);color:#c084fc;" onclick="openModal('libModal')">📚 Bibliotheken</button>
       <div class="tb-sep"></div>
       <span id="canvasCounter">0 / 9</span>
     </div>
-    <div class="canvas-wrap"><div id="printCanvas"></div></div>
+    <div class="canvas-wrap"><div id="canvasZoomWrap"><div id="printCanvas"></div></div></div>
   </main>
   <aside class="inspector">
     <div class="insp-head"><div class="insp-title">⚙ Einstellungen</div></div>
@@ -268,10 +392,33 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
         <button class="action-btn fire" onclick="printPage()">🖨 Drucken / als PDF</button>
         <button class="action-btn info" onclick="exportSVG()">💾 SVG Export (druckfertig)</button>
         <button class="action-btn ghost" onclick="openOrderModal()">🛒 Bestellvorlage Magnete</button>
+        <div style="border-top:1px solid var(--border);margin:6px 0;"></div>
         <button class="action-btn ghost" onclick="saveProject()">📁 Projekt speichern</button>
         <button class="action-btn ghost" onclick="document.getElementById('loadFile').click()">📂 Projekt laden</button>
         <input type="file" id="loadFile" accept=".json" style="display:none" onchange="loadProject(this)">
+        <div style="border-top:1px solid var(--border);margin:6px 0;"></div>
+        <button class="action-btn info" onclick="document.getElementById('uploadSymFile').click()">⬆ Eigenes Zeichen hochladen (SVG/PNG)</button>
+        <input type="file" id="uploadSymFile" accept=".svg,image/svg+xml,.png,image/png" style="display:none" onchange="uploadCustomSymbol(this)">
+        <p style="font-size:.46rem;color:var(--text3);line-height:1.5;padding:4px 0;">SVG oder PNG hochladen. Eigene Zeichen werden im Browser gespeichert und erscheinen in der Kategorie „Eigene Zeichen".</p>
       </div>
+    </div>
+  </aside>
+</div>
+
+<!-- LIBRARY SELECTOR MODAL -->
+<div class="modal-overlay" id="libModal">
+  <div class="modal" style="max-width:520px;">
+    <h3>📚 ZEICHENBIBLIOTHEKEN LADEN</h3>
+    <p style="font-size:.58rem;color:var(--text2);margin-bottom:14px;line-height:1.7;">
+      Die Kern-Bibliothek (DV 102) ist immer aktiv. Weitere Bibliotheken werden per Checkbox zugeladen und erscheinen sofort in der Zeichenliste.<br>
+      <span style="color:var(--yellow);">⚠ Bibliotheken benötigen eine Internetverbindung beim ersten Laden.</span>
+    </p>
+    <div id="libList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
+    <div class="modal-btns">
+      <button class="mbtn cancel" onclick="closeModal('libModal')">Schließen</button>
+    </div>
+  </div>
+</div>
     </div>
   </aside>
 </div>
@@ -342,6 +489,8 @@ const C = {
   POL_F:'#15803d', POL_S:'#ffffff',
   SONST_F:'#ea580c', SONST_S:'#000000',
 };
+// Expose globally so JS libraries can access color constants
+window.TZ_COLORS = C;
 
 /* ═══════════════════════════════════════════
    KATEGORIEN
@@ -918,7 +1067,184 @@ const CATS = [
   { id:'dv102_san', label:'Anh.1.3 San / RD / HiOrg',  color:'#4ade80', official:true  },
   { id:'dv102_thw', label:'Anh.1.2 THW-Einheiten',     color:'#4ade80', official:true  },
   { id:'eigen',     label:'Eigeninterpretationen',      color:'#fbbf24', official:false },
+  { id:'user',      label:'Eigene Zeichen',             color:'#a78bfa', official:false },
 ];
+// Expose globally so JS libraries can extend them
+window.SYM = SYM;
+window.CATS = CATS;
+
+/* ═══════════════════════════════════════════
+   BIBLIOTHEKS-LOADER
+═══════════════════════════════════════════ */
+const TZ_LIBS = [
+  {
+    id: 'fwdv100',
+    name: 'FwDV 100 / FwDV 3 / FwDV 7',
+    desc: 'Führung, Einsatzabschnitte, MANV, Einheiten, AGT, Logistik',
+    file: 'tz-lib-fwdv100.js',
+    color: '#f87171',
+    count: '~45 Zeichen',
+    org: '🔴 Feuerwehr',
+  },
+  {
+    id: 'polizei',
+    name: 'PDV 100 – Polizei',
+    desc: 'Führung, Fahrzeuge, Einheiten, Sperren, Ermittlung, BPol, Zoll',
+    file: 'tz-lib-polizei.js',
+    color: '#4ade80',
+    count: '~35 Zeichen',
+    org: '🟢 Polizei',
+  },
+  {
+    id: 'thw',
+    name: 'THW DV 1-100 – alle Fachgruppen',
+    desc: 'Alle 16 Fachgruppen (B, E, FK, I, IuK, Log, N, O, ÖL, R, Spr, SB, TW, W, WP, SP), Führung, Fahrzeuge',
+    file: 'tz-lib-thw.js',
+    color: '#60a5fa',
+    count: '~40 Zeichen',
+    org: '🔵 THW',
+  },
+  {
+    id: 'rettungsdienst',
+    name: 'Rettungsdienst (DIN 13050 / DIN EN 1789)',
+    desc: 'RTW, NEF, KTW, ITW, RTH, Einheiten, HiOrgs (DRK, ASB, MHD, JUH, DLRG), Sanitätsdienst Bw',
+    file: 'tz-lib-rettungsdienst.js',
+    color: '#fb7185',
+    count: '~35 Zeichen',
+    org: '🏥 Rettungsdienst',
+  },
+  {
+    id: 'militar',
+    name: 'Militär – NATO APP-6D / ZDv 1-15',
+    desc: 'Truppengattungen, Einheitsgrößen (Trupp–Division), Logistik, Sanitätsdienst, Bundeswehr-Spezial, Feindzeichen',
+    file: 'tz-lib-militar.js',
+    color: '#9ca3af',
+    count: '~40 Zeichen',
+    org: '⚙ Bundeswehr / NATO',
+  },
+  {
+    id: 'katschutz',
+    name: 'Katastrophenschutz / BBK',
+    desc: 'KatS-Stäbe, Warnung, Notunterkünfte, CBRN/ABC-Schutz, Zivilschutz, BBK, Evakuierung',
+    file: 'tz-lib-katschutz.js',
+    color: '#c084fc',
+    count: '~30 Zeichen',
+    org: '🟣 KatS / BBK',
+  },
+];
+
+// Track which libs are loaded in THIS session (injected into DOM)
+const _tzLoadedLibs  = new Set(JSON.parse(localStorage.getItem('tz_loaded_libs') || '[]'));
+const _tzInjectedLibs = new Set(); // scripts actually injected this session
+
+function tzSaveLoadedLibs() {
+  localStorage.setItem('tz_loaded_libs', JSON.stringify([..._tzLoadedLibs]));
+}
+
+function tzLoadLib(libId) {
+  const lib = TZ_LIBS.find(l => l.id === libId);
+  if (!lib) return Promise.reject(new Error(`Unbekannte Bibliothek: ${libId}`));
+  // Already injected in this session → resolve immediately
+  if (_tzInjectedLibs.has(libId)) return Promise.resolve();
+  // Ensure global registry exists before loading
+  if (!window.SYM)  window.SYM  = SYM;
+  if (!window.CATS) window.CATS = CATS;
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = lib.file;
+    script.onload = () => {
+      _tzInjectedLibs.add(libId);
+      _tzLoadedLibs.add(libId);
+      tzSaveLoadedLibs();
+      resolve();
+    };
+    script.onerror = () => {
+      const msg = `Bibliothek "${lib.name}" konnte nicht geladen werden.\n\nStelle sicher, dass die Datei "${lib.file}" im selben Ordner wie die HTML-Datei liegt.`;
+      reject(new Error(msg));
+    };
+    document.head.appendChild(script);
+  });
+}
+
+async function tzToggleLib(libId, checked) {
+  if (!checked) {
+    // Can't unload in same session
+    alert('Bibliotheken können während der Sitzung nicht entladen werden.\nSeite neu laden zum Zurücksetzen.');
+    const cb = document.getElementById(`lib-cb-${libId}`);
+    if (cb) cb.checked = true;
+    return;
+  }
+  const btn = document.getElementById(`lib-btn-${libId}`);
+  if (btn) { btn.textContent = '⏳ Lädt…'; btn.disabled = true; }
+  try {
+    await tzLoadLib(libId);
+    buildSymbolList();
+    updateSymPreview();
+    if (btn) {
+      btn.textContent = '✓ Aktiv';
+      btn.style.cssText += ';background:rgba(74,222,128,.08);border-color:rgba(74,222,128,.4);color:#4ade80;';
+    }
+  } catch(e) {
+    console.error('[TZ-Lib]', e);
+    alert(e.message);
+    _tzLoadedLibs.delete(libId);
+    tzSaveLoadedLibs();
+    const cb = document.getElementById(`lib-cb-${libId}`);
+    if (cb) cb.checked = false;
+    if (btn) { btn.textContent = '✗ Fehler'; btn.disabled = false; btn.style.color = '#f87171'; }
+  }
+}
+
+function tzBuildLibModal() {
+  const list = document.getElementById('libList');
+  if (!list) return;
+  list.innerHTML = '';
+  TZ_LIBS.forEach(lib => {
+    const loaded = _tzInjectedLibs.has(lib.id);
+    const saved  = _tzLoadedLibs.has(lib.id);
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--panel2);border:1px solid var(--border);border-radius:7px;transition:border-color .15s;';
+    div.innerHTML = `
+      <div style="flex-shrink:0;padding-top:2px;">
+        <input type="checkbox" id="lib-cb-${lib.id}" ${(loaded||saved)?'checked':''} style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;"
+          onchange="tzToggleLib('${lib.id}', this.checked)">
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px;flex-wrap:wrap;">
+          <span style="font-size:.62rem;font-weight:700;color:var(--text);">${lib.name}</span>
+          <span style="font-size:.44rem;font-weight:700;padding:1px 6px;border-radius:3px;background:rgba(255,255,255,.06);border:1px solid var(--border2);color:${lib.color};">${lib.org}</span>
+          <span style="font-size:.44rem;color:var(--text3);">${lib.count}</span>
+        </div>
+        <div style="font-size:.52rem;color:var(--text2);line-height:1.5;">${lib.desc}</div>
+        ${saved && !loaded ? '<div style="font-size:.44rem;color:#fbbf24;margin-top:3px;">⚠ Wird beim nächsten Start automatisch geladen</div>' : ''}
+      </div>
+      <button id="lib-btn-${lib.id}"
+        onclick="if(!document.getElementById('lib-cb-${lib.id}').checked){document.getElementById('lib-cb-${lib.id}').checked=true;tzToggleLib('${lib.id}',true);}"
+        style="flex-shrink:0;padding:4px 10px;border-radius:5px;border:1px solid ${loaded?'rgba(74,222,128,.4)':'var(--border2)'};background:${loaded?'rgba(74,222,128,.08)':'var(--panel)'};color:${loaded?'#4ade80':'var(--text2)'};font-size:.5rem;font-weight:700;letter-spacing:.5px;cursor:${loaded?'default':'pointer'};font-family:inherit;"
+        ${loaded?'disabled':''}>
+        ${loaded ? '✓ Aktiv' : '+ Laden'}
+      </button>`;
+    list.appendChild(div);
+  });
+}
+
+// Auto-load previously activated libs on startup
+async function tzAutoLoadLibs() {
+  const toLoad = [..._tzLoadedLibs];
+  if (!toLoad.length) return;
+  for (const libId of toLoad) {
+    try {
+      await tzLoadLib(libId);
+    } catch(e) {
+      console.warn(`[TZ-Lib] Auto-load failed for ${libId}:`, e.message);
+      // Don't remove from saved list – user may be offline
+    }
+  }
+  if (_tzInjectedLibs.size > 0) {
+    buildSymbolList();
+    updateSymPreview();
+  }
+}
 
 /* ═══════════════════════════════════════════
    APP STATE
@@ -933,33 +1259,332 @@ const state = {
   fontSize:9, textPos:'below', labelText:'',
 };
 
+// Multi-page support
+let tzPages = [{ cells: [] }]; // array of {cells:[]}
+let tzCurrentPage = 0;
+
+// Zoom – always start at 100%
+let tzZoom = 1;
+
+// Undo/Redo
+const tzUndoStack = [];
+const tzRedoStack = [];
+const TZ_UNDO_MAX = 50;
+
+// Custom user symbols (stored in localStorage)
+let userSymbols = {}; // {id: {name, ref, cat:'user', svgData, isImage, imgSrc}}
+
 let editingCellIdx = null;
 let dragSymId = null;
 let tooltipTimer = null;
 const tooltip = document.getElementById('symTooltip');
 
+/* ── Undo helpers ── */
+function tzSnapshot() {
+  return {
+    pages: JSON.parse(JSON.stringify(tzPages)),
+    currentPage: tzCurrentPage,
+    format: state.format, cols: state.cols, rows: state.rows,
+    magnetW: state.magnetW, magnetH: state.magnetH,
+    strokeColor: state.strokeColor, fillColor: state.fillColor,
+    textColor: state.textColor, bgColor: state.bgColor,
+    fontSize: state.fontSize, textPos: state.textPos, labelText: state.labelText,
+  };
+}
+function tzPushUndo() {
+  tzUndoStack.push(tzSnapshot());
+  if (tzUndoStack.length > TZ_UNDO_MAX) tzUndoStack.shift();
+  tzRedoStack.length = 0;
+  tzUpdateUndoBtns();
+}
+function tzApplySnapshot(snap) {
+  tzPages = JSON.parse(JSON.stringify(snap.pages));
+  tzCurrentPage = Math.min(snap.currentPage, tzPages.length - 1);
+  state.format = snap.format; state.cols = snap.cols; state.rows = snap.rows;
+  state.magnetW = snap.magnetW; state.magnetH = snap.magnetH;
+  state.strokeColor = snap.strokeColor; state.fillColor = snap.fillColor;
+  state.textColor = snap.textColor; state.bgColor = snap.bgColor;
+  state.fontSize = snap.fontSize; state.textPos = snap.textPos; state.labelText = snap.labelText;
+  // Sync cells from current page
+  state.cells = tzPages[tzCurrentPage]?.cells || [];
+}
+function tzUndo() {
+  if (!tzUndoStack.length) return;
+  tzRedoStack.push(tzSnapshot());
+  tzApplySnapshot(tzUndoStack.pop());
+  tzUpdateUndoBtns();
+  rebuildCanvas(); buildSymbolList(); updateSymPreview(); tzUpdatePageLabel();
+}
+function tzRedo() {
+  if (!tzRedoStack.length) return;
+  tzUndoStack.push(tzSnapshot());
+  tzApplySnapshot(tzRedoStack.pop());
+  tzUpdateUndoBtns();
+  rebuildCanvas(); buildSymbolList(); updateSymPreview(); tzUpdatePageLabel();
+}
+function tzUpdateUndoBtns() {
+  const u = document.getElementById('btnUndo');
+  const r = document.getElementById('btnRedo');
+  if (u) u.disabled = tzUndoStack.length === 0;
+  if (r) r.disabled = tzRedoStack.length === 0;
+}
+
+/* ── Zoom ── */
+function tzSetZoom(z) {
+  tzZoom = Math.max(0.2, Math.min(3, z));
+  _applyCanvasZoom();
+  const lbl = document.getElementById('tzZoomLabel');
+  if (lbl) lbl.textContent = Math.round(tzZoom * 100) + '%';
+}
+function tzZoomStep(delta) { tzSetZoom(tzZoom + delta); }
+
+function _applyCanvasZoom() {
+  const canvas = document.getElementById('printCanvas');
+  const wrap   = document.getElementById('canvasZoomWrap');
+  if (!canvas || !wrap) return;
+
+  // Read the real (unscaled) canvas dimensions from its style
+  const pageW = parseInt(canvas.style.width)  || 794;
+  const pageH = parseInt(canvas.style.height) || 1123;
+
+  // Scale the canvas visually
+  canvas.style.transform = `scale(${tzZoom})`;
+
+  // Size the wrapper to the SCALED dimensions so the scroll container
+  // knows the real occupied space and centers it correctly
+  const scaledW = Math.round(pageW * tzZoom);
+  const scaledH = Math.round(pageH * tzZoom);
+  wrap.style.width  = scaledW + 'px';
+  wrap.style.height = scaledH + 'px';
+
+  // Update label
+  const lbl = document.getElementById('tzZoomLabel');
+  if (lbl) lbl.textContent = Math.round(tzZoom * 100) + '%';
+}
+
+/* ── Multi-page ── */
+function tzSyncCurrentPage() {
+  if (!tzPages[tzCurrentPage]) tzPages[tzCurrentPage] = { cells: [] };
+  tzPages[tzCurrentPage].cells = state.cells;
+}
+function tzLoadPage(idx) {
+  tzSyncCurrentPage();
+  tzCurrentPage = idx;
+  if (!tzPages[tzCurrentPage]) tzPages[tzCurrentPage] = { cells: [] };
+  // Make sure cells array length matches grid
+  const needed = state.cols * state.rows;
+  while (tzPages[tzCurrentPage].cells.length < needed) tzPages[tzCurrentPage].cells.push({symId:null,label:'',textPos:'below'});
+  state.cells = tzPages[tzCurrentPage].cells;
+  rebuildCanvas();
+  tzUpdatePageLabel();
+}
+function tzAddPage() {
+  tzPushUndo();
+  tzSyncCurrentPage();
+  const needed = state.cols * state.rows;
+  const newCells = Array.from({length: needed}, () => ({symId:null,label:'',textPos:'below'}));
+  tzPages.push({cells: newCells});
+  tzCurrentPage = tzPages.length - 1;
+  state.cells = tzPages[tzCurrentPage].cells;
+  rebuildCanvas();
+  tzUpdatePageLabel();
+  tzAutoSave();
+}
+function tzDeletePage() {
+  if (tzPages.length <= 1) { alert('Mindestens eine Seite muss vorhanden sein.'); return; }
+  if (!confirm(`Seite ${tzCurrentPage + 1} löschen?`)) return;
+  tzPushUndo();
+  tzPages.splice(tzCurrentPage, 1);
+  tzCurrentPage = Math.min(tzCurrentPage, tzPages.length - 1);
+  state.cells = tzPages[tzCurrentPage]?.cells || [];
+  rebuildCanvas();
+  tzUpdatePageLabel();
+  tzAutoSave();
+}
+function tzPrevPage() { if (tzCurrentPage > 0) tzLoadPage(tzCurrentPage - 1); }
+function tzNextPage() { if (tzCurrentPage < tzPages.length - 1) tzLoadPage(tzCurrentPage + 1); }
+function tzUpdatePageLabel() {
+  const el = document.getElementById('tzPageLabel');
+  if (el) el.textContent = `${tzCurrentPage + 1}/${tzPages.length}`;
+  const prev = document.getElementById('btnPrevPage');
+  const next = document.getElementById('btnNextPage');
+  if (prev) prev.disabled = tzCurrentPage === 0;
+  if (next) next.disabled = tzCurrentPage >= tzPages.length - 1;
+}
+
+/* ── Custom symbol upload ── */
+function uploadCustomSymbol(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  const isSVG = file.type === 'image/svg+xml' || file.name.endsWith('.svg');
+  reader.onload = e => {
+    const id = 'user_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+    const name = file.name.replace(/\.[^.]+$/, '').replace(/_/g,' ');
+    if (isSVG) {
+      // Embed SVG content directly
+      const raw = e.target.result;
+      userSymbols[id] = { name, ref:'Benutzerdefiniert', cat:'user', svgData: raw, isImage: false };
+    } else {
+      // PNG: embed as <image> inside SVG
+      userSymbols[id] = { name, ref:'Benutzerdefiniert', cat:'user', imgSrc: e.target.result, isImage: true };
+    }
+    tzSaveUserSymbols();
+    buildSymbolList();
+    selectSymbol(id);
+  };
+  if (isSVG) reader.readAsText(file);
+  else reader.readAsDataURL(file);
+  input.value = '';
+}
+function tzSaveUserSymbols() {
+  try { localStorage.setItem('tz_user_syms', JSON.stringify(userSymbols)); } catch(e) {}
+}
+function tzLoadUserSymbols() {
+  try {
+    const raw = localStorage.getItem('tz_user_syms');
+    if (raw) userSymbols = JSON.parse(raw);
+  } catch(e) { userSymbols = {}; }
+  // Add user symbols to SYM registry
+  Object.entries(userSymbols).forEach(([id, sym]) => {
+    SYM[id] = { name: sym.name, ref: sym.ref, cat: 'user', svg: buildUserSvgFn(sym) };
+  });
+}
+function buildUserSvgFn(sym) {
+  if (sym.isImage) {
+    return (s, f) => `<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><image href="${sym.imgSrc}" x="0" y="0" width="100" height="80" preserveAspectRatio="xMidYMid meet"/></svg>`;
+  } else {
+    // Wrap the uploaded SVG content so it fits in 100×80 viewBox
+    const inner = sym.svgData
+      .replace(/<\?xml[^?]*\?>/gi, '')
+      .replace(/<!DOCTYPE[^>]*>/gi, '')
+      .replace(/<svg[^>]*>([\s\S]*?)<\/svg>/i, '$1');
+    return (s, f) => `<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><g transform="scale(0.8) translate(12,10)">${inner}</g></svg>`;
+  }
+}
+
+/* ── AutoSave (localStorage, debounced) ── */
+let _tzSaveTimer = null;
+function tzAutoSave() {
+  clearTimeout(_tzSaveTimer);
+  _tzSaveTimer = setTimeout(() => {
+    try {
+      tzSyncCurrentPage();
+      const data = {
+        version: 3,
+        pages: JSON.parse(JSON.stringify(tzPages)),
+        currentPage: tzCurrentPage,
+        format: state.format, cols: state.cols, rows: state.rows,
+        magnetW: state.magnetW, magnetH: state.magnetH,
+        strokeColor: state.strokeColor, fillColor: state.fillColor,
+        textColor: state.textColor, bgColor: state.bgColor,
+        fontSize: state.fontSize, textPos: state.textPos, labelText: state.labelText,
+        savedAt: new Date().toISOString(),
+      };
+      localStorage.setItem('tz_autosave', JSON.stringify(data));
+    } catch(e) {}
+  }, 1500);
+}
+function tzLoadAutoSave() {
+  try {
+    const raw = localStorage.getItem('tz_autosave');
+    if (!raw) return false;
+    const p = JSON.parse(raw);
+    if (!p.version) return false;
+    return p;
+  } catch(e) { return false; }
+}
+
 /* ═══════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════
+   DARK / LIGHT MODE
+═══════════════════════════════════════════ */
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('tz_theme', isLight ? 'light' : 'dark');
+  const btn = document.getElementById('themeBtn');
+  if (btn) btn.textContent = isLight ? '☀' : '🌙';
+}
+// Apply saved theme on load
+(function(){
+  if (localStorage.getItem('tz_theme') === 'light') {
+    document.body.classList.add('light-mode');
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('themeBtn');
+      if (btn) btn.textContent = '☀';
+    });
+  }
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
-  initCells();
+  tzLoadUserSymbols();
+  // Try restore autosave
+  const saved = tzLoadAutoSave();
+  if (saved && saved.pages) {
+    tzApplySnapshot(saved);
+    // Restore inspector fields
+    ['strokeColor','fillColor','textColor','bgColor','fontSize'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = state[id];
+    });
+    // Restore textPos radio
+    const tpEl = document.querySelector(`input[name="tp"][value="${state.textPos}"]`);
+    if (tpEl) tpEl.checked = true;
+  } else {
+    initCells();
+    tzPages = [{ cells: state.cells }];
+  }
   buildSymbolList();
   rebuildCanvas();
-  setFormat('A4P');
-  setGrid(3,3);
-  initDrop();
+  setFormat(state.format);
+  setGrid(state.cols, state.rows);
+  tzUpdatePageLabel();
+  tzUpdateUndoBtns();
+  tzBuildLibModal();
+  // Auto-load previously activated libs
+  tzAutoLoadLibs();
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if ((e.ctrlKey||e.metaKey) && e.key === 'z' && !e.shiftKey) { e.preventDefault(); tzUndo(); }
+    if ((e.ctrlKey||e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) { e.preventDefault(); tzRedo(); }
+    if (e.key === '+' || e.key === '=') { e.preventDefault(); tzZoomStep(0.1); }
+    if (e.key === '-') { e.preventDefault(); tzZoomStep(-0.1); }
+    if (e.key === '0') { e.preventDefault(); tzSetZoom(1); }
+  });
+
+  // Wheel zoom on canvas
+  const canvasWrap = document.querySelector('.canvas-wrap');
+  if (canvasWrap) {
+    canvasWrap.addEventListener('wheel', e => {
+      if (e.ctrlKey || e.metaKey) { e.preventDefault(); tzZoomStep(e.deltaY < 0 ? 0.1 : -0.1); }
+    }, {passive: false});
+  }
 });
 
 /* ═══════════════════════════════════════════
    SYMBOL LIST
 ═══════════════════════════════════════════ */
+
+// Track which categories are open - persist across rebuilds
+const openCats = new Set(['dv102','dv102_fa','dv102_fw','eigen','user']);
+
 function buildSymbolList() {
   const list = document.getElementById('symbolList');
+  // Preserve scroll position
+  const scrollTop = list.scrollTop;
   list.innerHTML = '';
   const q = state.searchQuery.toLowerCase();
 
+  // Merge user symbols into a view of SYM
+  const allSyms = { ...SYM };
+  Object.entries(userSymbols).forEach(([id, sym]) => {
+    if (!allSyms[id]) allSyms[id] = { name: sym.name, ref: sym.ref, cat: 'user', svg: buildUserSvgFn(sym) };
+  });
+
   CATS.forEach(cat => {
-    const items = Object.entries(SYM).filter(([id, s]) => {
+    const items = Object.entries(allSyms).filter(([id, s]) => {
       if (s.cat !== cat.id) return false;
       if (q && !s.name.toLowerCase().includes(q) && !s.ref.toLowerCase().includes(q)) return false;
       return true;
@@ -969,27 +1594,31 @@ function buildSymbolList() {
     const sec = document.createElement('div');
     sec.className = 'cat-section';
 
+    const isOpen = q ? true : openCats.has(cat.id);
+
     const hdr = document.createElement('div');
     hdr.className = 'cat-header';
     hdr.innerHTML = `
       <div class="cat-header-left">
         <div class="cat-dot" style="background:${cat.color}"></div>
         <span class="cat-title-text">${cat.label}</span>
-        <span class="cat-badge ${cat.official ? 'official' : 'eigen'}">${cat.official ? 'DV102' : 'Eigen'}</span>
+        <span class="cat-badge ${cat.id === 'user' ? 'eigen' : (cat.official ? 'official' : 'eigen')}">${cat.id === 'user' ? 'Eigen' : (cat.official ? 'DV102' : 'Eigen')}</span>
       </div>
       <div style="display:flex;align-items:center;gap:6px;">
         <span class="cat-count">${items.length}</span>
-        <span class="cat-chevron">▼</span>
+        <span class="cat-chevron" style="transform:${isOpen ? 'rotate(180deg)' : ''}">▼</span>
       </div>`;
+
     hdr.onclick = () => {
       const body = sec.querySelector('.cat-body');
       const chev = hdr.querySelector('.cat-chevron');
-      const open = body.classList.toggle('open');
-      chev.style.transform = open ? 'rotate(180deg)' : '';
+      const nowOpen = body.classList.toggle('open');
+      chev.style.transform = nowOpen ? 'rotate(180deg)' : '';
+      if (nowOpen) openCats.add(cat.id); else openCats.delete(cat.id);
     };
 
     const body = document.createElement('div');
-    body.className = 'cat-body' + (q ? ' open' : '');
+    body.className = 'cat-body' + (isOpen ? ' open' : '');
 
     const grid = document.createElement('div');
     grid.className = 'sym-grid';
@@ -997,18 +1626,49 @@ function buildSymbolList() {
     items.forEach(([id, sym]) => {
       const item = document.createElement('div');
       item.className = 'sym-item' + (state.selectedSym === id ? ' selected' : '');
-      const badge = cat.official ? 'official' : 'eigen';
+      const badge = (cat.id === 'user' || !cat.official) ? 'eigen' : 'official';
+      // Render SVG inline for correct preview
+      const svgHtml = sym.svg(state.strokeColor, state.fillColor);
       item.innerHTML = `
         <div class="sym-status ${badge}"></div>
-        ${sym.svg(state.strokeColor, state.fillColor)}
+        ${svgHtml}
         <span class="sym-item-label">${sym.name.replace(/^\[E\] /,'')}</span>`;
-      item.onclick = () => selectSymbol(id);
+      item.onclick = (e) => {
+        e.stopPropagation(); // prevent closing parent
+        selectSymbol(id);
+      };
       item.draggable = true;
-      item.addEventListener('dragstart', e => { dragSymId = id; e.dataTransfer.effectAllowed = 'copy'; });
+      item.addEventListener('dragstart', e => {
+        dragSymId = id;
+        e.dataTransfer.effectAllowed = 'copy';
+        // Keep sidebar from reacting
+        e.stopPropagation();
+      });
       item.addEventListener('dragend', () => { dragSymId = null; });
       attachTooltip(item, sym);
       grid.appendChild(item);
     });
+
+    // Delete button for user symbols
+    if (cat.id === 'user') {
+      items.forEach(([id]) => {
+        const item = grid.querySelector(`.sym-item:last-child`);
+        // Add delete button to each user item
+      });
+      // Add delete per item inside loop above — rebuild using different approach
+      // Actually we already have them, add a delete button per user sym item
+      Array.from(grid.children).forEach((item, idx) => {
+        const [id] = items[idx];
+        const delBtn = document.createElement('div');
+        delBtn.style.cssText = 'position:absolute;top:2px;left:2px;width:13px;height:13px;background:rgba(220,38,38,.85);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.48rem;color:#fff;z-index:5;line-height:1;opacity:0;transition:opacity .12s;';
+        delBtn.textContent = '✕';
+        delBtn.onclick = (e) => { e.stopPropagation(); deleteUserSymbol(id); };
+        item.style.position = 'relative';
+        item.addEventListener('mouseenter', () => delBtn.style.opacity = '1');
+        item.addEventListener('mouseleave', () => delBtn.style.opacity = '0');
+        item.appendChild(delBtn);
+      });
+    }
 
     body.appendChild(grid);
     sec.appendChild(hdr);
@@ -1019,6 +1679,18 @@ function buildSymbolList() {
   if (!list.children.length) {
     list.innerHTML = '<div class="empty-state"><div class="es-ico">🔍</div><p>Keine Zeichen gefunden.</p></div>';
   }
+  // Restore scroll
+  list.scrollTop = scrollTop;
+}
+
+function deleteUserSymbol(id) {
+  if (!confirm('Eigenes Zeichen löschen?')) return;
+  delete userSymbols[id];
+  delete SYM[id];
+  tzSaveUserSymbols();
+  if (state.selectedSym === id) state.selectedSym = null;
+  buildSymbolList();
+  updateSymPreview();
 }
 
 function filterSymbols(q) {
@@ -1038,20 +1710,29 @@ function selectSymbol(id) {
 function updateSymPreview() {
   const sec = document.getElementById('symPreviewSection');
   if (!state.selectedSym) {
-    sec.innerHTML = '<div class="empty-state"><div class="es-ico">👆</div><p>Symbol wählen → Zelle klicken oder ziehen</p></div>';
+    sec.innerHTML = '<div class="empty-state"><div class="es-ico">👆</div><p>Symbol wählen → Zelle klicken oder ziehen<br><br>🟢 Grüner Punkt = offiziell DV 102<br>🟡 Gelber Punkt = Eigeninterpretation<br>🟣 Lila Punkt = Eigenes Zeichen</p></div>';
     return;
   }
   const sym = SYM[state.selectedSym];
+  if (!sym) {
+    sec.innerHTML = '<div class="empty-state"><div class="es-ico">❓</div><p>Symbol nicht gefunden.</p></div>';
+    return;
+  }
   const cat = CATS.find(c => c.id === sym.cat);
   const isOfficial = cat?.official;
+  const isUser = sym.cat === 'user';
+  // Render the actual SVG with current colors for accurate preview
+  const svgHtml = sym.svg(state.strokeColor, state.fillColor);
   sec.innerHTML = `
     <div class="sym-preview-box">
-      ${sym.svg(state.strokeColor, state.fillColor)}
+      ${svgHtml}
       <div class="sym-preview-name">${sym.name}</div>
       <div class="sym-preview-ref">${sym.ref}</div>
-      <div>${isOfficial
-        ? '<span class="official-tag">✓ Offiziell DV 102</span>'
-        : '<span class="eigen-tag">⚠ Eigeninterpretation</span>'}</div>
+      <div>${isUser
+        ? '<span class="eigen-tag">👤 Eigenes Zeichen</span>'
+        : isOfficial
+          ? '<span class="official-tag">✓ Offiziell DV 102</span>'
+          : '<span class="eigen-tag">⚠ Eigeninterpretation</span>'}</div>
     </div>`;
 }
 
@@ -1061,6 +1742,7 @@ function updateSymPreview() {
 function initCells() {
   state.cells = Array.from({length: state.cols * state.rows},
     () => ({symId:null, label:'', textPos:'below'}));
+  if (tzPages.length > 0) tzPages[tzCurrentPage] = {cells: state.cells};
 }
 
 function setFormat(fmt) {
@@ -1069,18 +1751,24 @@ function setFormat(fmt) {
   const el = document.getElementById('btn'+fmt);
   if (el) el.classList.add('active');
   rebuildCanvas();
+  tzAutoSave();
 }
 
 function setGrid(cols, rows) {
   state.cols = cols; state.rows = rows;
-  const prev = state.cells;
-  state.cells = Array.from({length: cols * rows}, (_, i) =>
-    prev[i] || {symId:null, label:'', textPos:'below'});
+  const needed = cols * rows;
+  // Resize each page's cells array
+  tzPages.forEach((pg, idx) => {
+    const prev = pg.cells || [];
+    pg.cells = Array.from({length: needed}, (_, i) => prev[i] || {symId:null, label:'', textPos:'below'});
+  });
+  state.cells = tzPages[tzCurrentPage]?.cells || [];
   document.querySelectorAll('[id^=btnGrid]').forEach(b => b.classList.remove('active'));
   const key = `btnGrid${cols}${rows}`;
   const el = document.getElementById(key);
   if (el) el.classList.add('active');
   rebuildCanvas();
+  tzAutoSave();
 }
 
 function setMagnetSize(w, h, btn) {
@@ -1090,7 +1778,10 @@ function setMagnetSize(w, h, btn) {
   rebuildCanvas();
 }
 
-function openModal(id) { document.getElementById(id).classList.add('open'); }
+function openModal(id) {
+  if (id === 'libModal') tzBuildLibModal();
+  document.getElementById(id).classList.add('open');
+}
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 function applyCustomSize() {
@@ -1102,8 +1793,12 @@ function applyCustomSize() {
 }
 
 function clearCanvas() {
+  if (!confirm('Alle Zeichen auf dieser Seite löschen?')) return;
+  tzPushUndo();
   state.cells = state.cells.map(() => ({symId:null, label:'', textPos:'below'}));
+  tzSyncCurrentPage();
   rebuildCanvas();
+  tzAutoSave();
 }
 
 const MM2PX = 3.7795;
@@ -1114,14 +1809,11 @@ function rebuildCanvas() {
   const pageW_mm = format === 'A4L' ? 297 : 210;
   const pageH_mm = format === 'A4L' ? 210 : 297;
 
-  const vw = window.innerWidth * 0.50;
-  const vh = window.innerHeight * 0.82;
-  const scale = Math.min(vh / (pageH_mm * MM2PX), vw / (pageW_mm * MM2PX));
-
-  const pageW = Math.round(pageW_mm * MM2PX * scale);
-  const pageH = Math.round(pageH_mm * MM2PX * scale);
-  const cellW = Math.round(magnetW * MM2PX * scale);
-  const cellH = Math.round(magnetH * MM2PX * scale);
+  // Render at full real-world mm→px size; zoom is applied via CSS transform
+  const pageW = Math.round(pageW_mm * MM2PX);
+  const pageH = Math.round(pageH_mm * MM2PX);
+  const cellW = Math.round(magnetW * MM2PX);
+  const cellH = Math.round(magnetH * MM2PX);
   const gridW = cols * cellW;
   const gridH = rows * cellH;
   const padX = Math.round((pageW - gridW) / 2);
@@ -1130,10 +1822,14 @@ function rebuildCanvas() {
   canvas.style.cssText = `width:${pageW}px;height:${pageH}px;background:${bgColor};` +
     `display:grid;grid-template-columns:repeat(${cols},${cellW}px);` +
     `grid-template-rows:repeat(${rows},${cellH}px);` +
-    `padding:${padY}px ${padX}px;gap:0;`;
+    `padding:${padY}px ${padX}px;gap:0;flex-shrink:0;`;
   canvas.innerHTML = '';
 
-  for (let i = 0; i < cols * rows; i++) {
+  // Sync cells length to grid
+  const needed = cols * rows;
+  while (state.cells.length < needed) state.cells.push({symId:null,label:'',textPos:'below'});
+
+  for (let i = 0; i < needed; i++) {
     if (!state.cells[i]) state.cells[i] = {symId:null, label:'', textPos:'below'};
     const cell = state.cells[i];
     const div = document.createElement('div');
@@ -1152,7 +1848,7 @@ function rebuildCanvas() {
       div.innerHTML = `
         <div class="placed-sign">
           ${pos === 'above' ? labelEl : ''}
-          <div style="flex:1;display:flex;align-items:center;justify-content:center;min-height:0;">${svgStr}</div>
+          <div class="sym-svg-wrap">${svgStr}</div>
           ${pos === 'below' ? labelEl : ''}
           <div class="cell-remove" onclick="event.stopPropagation();removeCell(${i})">✕</div>
         </div>`;
@@ -1168,28 +1864,40 @@ function rebuildCanvas() {
     div.addEventListener('drop', e => {
       e.preventDefault(); div.classList.remove('drag-over');
       if (dragSymId) {
+        tzPushUndo();
         state.cells[i] = {symId:dragSymId, label:state.labelText, textPos:state.textPos};
         state.selectedSym = dragSymId;
+        tzSyncCurrentPage();
         updateSymPreview(); buildSymbolList(); rebuildCanvas();
+        tzAutoSave();
       }
     });
     canvas.appendChild(div);
   }
   updateCounter();
   updatePrintInfo();
+  // Apply zoom (updates wrapper size so scroll is correct)
+  _applyCanvasZoom();
+  // Update zoom label
+  const zlbl = document.getElementById('tzZoomLabel');
+  if (zlbl) zlbl.textContent = Math.round(tzZoom * 100) + '%';
 }
-
-function initDrop() {/* cells get handlers in rebuildCanvas */}
 
 function handleCellClick(idx) {
   if (!state.selectedSym) return;
+  tzPushUndo();
   state.cells[idx] = {symId:state.selectedSym, label:state.labelText, textPos:state.textPos};
+  tzSyncCurrentPage();
   rebuildCanvas();
+  tzAutoSave();
 }
 
 function removeCell(idx) {
+  tzPushUndo();
   state.cells[idx] = {symId:null, label:'', textPos:'below'};
+  tzSyncCurrentPage();
   rebuildCanvas();
+  tzAutoSave();
 }
 
 function esc(s) {
@@ -1216,14 +1924,17 @@ function openCellEdit(idx) {
 
 function saveCellEdit() {
   if (editingCellIdx === null) return;
+  tzPushUndo();
   const lbl = document.getElementById('cellEditLabel').value.trim();
   const pos = document.querySelector('input[name="cep"]:checked')?.value || 'below';
   const cell = state.cells[editingCellIdx];
   if (state.selectedSym && state.selectedSym !== cell.symId) cell.symId = state.selectedSym;
   cell.label = lbl;
   cell.textPos = pos;
+  tzSyncCurrentPage();
   closeModal('cellEditModal');
   rebuildCanvas();
+  tzAutoSave();
 }
 
 function deleteCellFromEdit() {
@@ -1287,7 +1998,25 @@ Schnittrand 2–3 mm Überstand einplanen.`;
 /* ═══════════════════════════════════════════
    EXPORT / PRINT
 ═══════════════════════════════════════════ */
-function printPage() { window.print(); }
+function printPage() {
+  // Remove zoom transform before printing so output is 1:1
+  const canvas = document.getElementById('printCanvas');
+  const wrap   = document.getElementById('canvasZoomWrap');
+  const prevT = canvas.style.transform;
+  const prevWW = wrap.style.width;
+  const prevWH = wrap.style.height;
+  canvas.style.transform = 'none';
+  canvas.style.position  = 'static';
+  wrap.style.width  = canvas.style.width;
+  wrap.style.height = canvas.style.height;
+  window.print();
+  setTimeout(() => {
+    canvas.style.transform = prevT;
+    canvas.style.position  = 'absolute';
+    wrap.style.width  = prevWW;
+    wrap.style.height = prevWH;
+  }, 800);
+}
 
 function exportSVG() {
   const {cols, rows, magnetW, magnetH} = state;
@@ -1395,7 +2124,15 @@ function copyOrderText(btn) {
    PROJEKT SPEICHERN / LADEN
 ═══════════════════════════════════════════ */
 function saveProject() {
-  const data = JSON.stringify({version:2, ...state, savedAt:new Date().toISOString()}, null, 2);
+  tzSyncCurrentPage();
+  const data = JSON.stringify({
+    version: 3,
+    pages: tzPages,
+    currentPage: tzCurrentPage,
+    ...state,
+    cells: undefined, // cells are in pages
+    savedAt: new Date().toISOString()
+  }, null, 2);
   const a = Object.assign(document.createElement('a'), {
     href: URL.createObjectURL(new Blob([data], {type:'application/json'})),
     download: `tz-projekt-${Date.now()}.json`
@@ -1410,18 +2147,29 @@ function loadProject(input) {
     try {
       const p = JSON.parse(e.target.result);
       if (!p.version) throw new Error('Ungültiges Format');
+      // New multi-page format (v3+)
+      if (p.pages) {
+        tzPages = p.pages;
+        tzCurrentPage = Math.min(p.currentPage || 0, tzPages.length - 1);
+      }
       ['format','cols','rows','magnetW','magnetH','strokeColor','fillColor',
        'textColor','bgColor','fontSize','textPos','cells'].forEach(k => {
         if (p[k] !== undefined) state[k] = p[k];
       });
+      // Sync cells from current page
+      if (p.pages) state.cells = tzPages[tzCurrentPage]?.cells || state.cells;
       ['strokeColor','fillColor','textColor','bgColor','fontSize'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = state[id];
       });
+      const tpEl = document.querySelector(`input[name="tp"][value="${state.textPos}"]`);
+      if (tpEl) tpEl.checked = true;
       setFormat(state.format);
       setGrid(state.cols, state.rows);
       buildSymbolList();
       rebuildCanvas();
+      tzUpdatePageLabel();
+      tzAutoSave();
       alert('✓ Projekt geladen!');
     } catch(err) { alert('Fehler: ' + err.message); }
     input.value = '';

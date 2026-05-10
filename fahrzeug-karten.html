@@ -12,6 +12,12 @@
   --border:#1e2230;--text:#dde3f0;--text2:#5a6480;
   --accent:#e8352a;--gold:#f5c842;
 }
+body.light-mode{
+  --bg:#f0f1f8;--panel:#ffffff;--panel2:#f5f6fc;
+  --border:#d0d4e0;--text:#0a0c18;--text2:#4a5070;
+}
+body.light-mode .app-hdr{background:linear-gradient(90deg,#0a0c18 0%,#151830 60%,#0a0c18 100%);}
+*{transition:background-color .18s,border-color .18s,color .1s;}
 body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;}
 .app{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
 .hdr{background:linear-gradient(90deg,#060709,#0d0f16 40%,#060709);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
@@ -421,43 +427,40 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
 .sports-serial{font-size:calc(var(--cw)*0.033);color:rgba(255,255,255,.3);}
 
 /* Home + Lang buttons */
-.hdr-home{
-  display:inline-flex;align-items:center;gap:4px;
-  background:transparent;border:1px solid var(--border);border-radius:6px;
-  padding:4px 10px;color:var(--text2);font-size:.7rem;
-  cursor:pointer;transition:all .15s;
-  font-family:'Rajdhani',sans-serif;
-  text-decoration:none;
-}
-.hdr-home:hover{border-color:#fff;color:#fff;}
-.hdr-lang{
-  padding:4px 10px;background:transparent;border:1px solid var(--border);
-  border-radius:6px;color:var(--text2);font-size:.7rem;
-  cursor:pointer;transition:all .15s;font-family:'Rajdhani',sans-serif;
-}
-.hdr-lang:hover{border-color:#fff;color:#fff;}
+/* ── UNIFIED APP HEADER ── */
+.app-hdr{flex-shrink:0;z-index:30;background:linear-gradient(90deg,#07080d 0%,#0e1018 40%,#12141e 60%,#07080d 100%);border-bottom:1px solid rgba(255,255,255,.07);height:48px;display:flex;align-items:center;padding:0 14px;gap:8px;box-shadow:0 2px 12px rgba(0,0,0,.4);}
+.app-hdr-logo{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;}
+.app-hdr-title{font-family:'Oswald',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:2px;color:#fff;white-space:nowrap;}
+.app-hdr-sub{font-size:.42rem;color:rgba(255,255,255,.25);letter-spacing:1.5px;text-transform:uppercase;white-space:nowrap;}
+.app-hdr-sep{flex:1;}
+.app-hdr-nav{display:flex;align-items:center;gap:5px;}
+.app-hdr-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:5px;border:0.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.38);font-size:.5rem;font-weight:700;letter-spacing:.5px;text-decoration:none;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:inherit;}
+.app-hdr-btn:hover{border-color:rgba(255,255,255,.28);color:rgba(255,255,255,.85);background:rgba(255,255,255,.07);}
+.app-hdr-btn.home:hover{border-color:rgba(230,57,70,.5);color:#f87171;}
+.app-hdr-btn.bug:hover{border-color:rgba(251,191,36,.4);color:#fbbf24;}
+.app-hdr-badge{font-size:.44rem;font-weight:700;letter-spacing:.8px;padding:3px 8px;border-radius:10px;white-space:nowrap;}
 
 </style>
 </head>
 <body>
 <div class="app">
 
-<div class="hdr">
-  <div class="hdr-logo">🚒</div>
+<header class="app-hdr">
+  <div class="app-hdr-logo" style="background:linear-gradient(135deg,#dc2626,#991b1b);box-shadow:0 0 10px rgba(220,38,38,.3);">🚒</div>
   <div>
-    <div class="hdr-title">FAHRZEUG KARTEN</div>
-    <div class="hdr-sub">POKÉMON · YUGIOH · MAGIC · QUARTET · DBS · F&B · WS · SPORTS</div>
+    <div class="app-hdr-title">FAHRZEUG KARTEN</div>
+    <div class="app-hdr-sub">Pokémon · YuGiOh · Magic · Quartet · Sports</div>
   </div>
-  <div class="hdr-right">
-    <a class="hdr-home" href="index.html">🏠</a>
-    <a href="https://github.com/issues/new" target="_blank" rel="noopener"
-       style="display:inline-flex;align-items:center;gap:4px;background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text2);font-size:.62rem;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.5px;text-decoration:none;transition:all .15s;"
-       onmouseover="this.style.borderColor='rgba(255,255,255,.4)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">🐛 Bug melden</a>
-    <button class="hdr-lang" id="fzLangBtn" onclick="fzToggleLang()">🌐 EN</button>
-    <div class="autosave"><div class="asdot" id="asDot"></div><span id="asTxt">Bereit</span></div>
-    <div class="cnt-badge"><span class="num" id="hdrCnt">0</span><span class="lbl">KARTEN</span></div>
-  </div>
-</div>
+  <div class="app-hdr-sep"></div>
+  <nav class="app-hdr-nav">
+    <div class="autosave"><div class="asdot" id="asDot"></div><span id="asTxt" style="font-size:.44rem;">Bereit</span></div>
+    <span class="app-hdr-badge" style="background:rgba(255,255,255,.05);border:0.5px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);"><span class="num" id="hdrCnt">0</span> Karten</span>
+    <button class="app-hdr-btn" id="fzLangBtn" onclick="fzToggleLang()">🌐 EN</button>
+    <button class="app-hdr-btn" onclick="toggleTheme()" id="themeBtn" title="Dark/Light Mode">🌙</button>
+    <a class="app-hdr-btn bug" href="https://github.com/it4k4i/feuerwehr-karten/issues/new" target="_blank" rel="noopener">🐛 Bug melden</a>
+    <a class="app-hdr-btn home" href="index.html">🏠 Startseite</a>
+  </nav>
+</header>
 
 <div class="body">
 <div class="sidebar">
@@ -1183,6 +1186,20 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;mi
 
 <script>
 /* ════════ STATE ════════ */
+// ── DARK / LIGHT MODE ──
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('fz_theme', isLight ? 'light' : 'dark');
+  const btn = document.getElementById('themeBtn');
+  if (btn) btn.textContent = isLight ? '☀' : '🌙';
+}
+if (localStorage.getItem('fz_theme') === 'light') {
+  document.body.classList.add('light-mode');
+  window.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('themeBtn'); if (btn) btn.textContent = '☀';
+  });
+}
+
 let cards = [];
 let categories = [
   {id:'c1',name:'ELW 1',    c1:'#1d4ed8',c2:'#3b82f6',txt:'#fff'},
@@ -1798,14 +1815,41 @@ function cycleSize(){
 async function exportAll(){
   if(!cards.length){alert('Keine Karten vorhanden!');return;}
   showStatus('Exportiere…');
-  for(let i=0;i<cards.length;i++){
-    const cv=await renderCardCanvas(cards[i]);
+  if(cards.length === 1){
+    const cv=await renderCardCanvas(cards[0]);
     const a=document.createElement('a');
     a.href=cv.toDataURL('image/png');
-    a.download=`${cards[i].serial.replace('#','')}_${cards[i].name.replace(/[^a-z0-9äöü]/gi,'_')}.png`;
+    a.download=`${cards[0].serial.replace('#','')}_${cards[0].name.replace(/[^a-z0-9äöü]/gi,'_')}.png`;
     a.click();
-    document.getElementById('statusTxt').textContent=`Export ${i+1}/${cards.length}…`;
-    await new Promise(r=>setTimeout(r,80));
+  } else {
+    // Multiple files → ZIP
+    let JSZipLib;
+    try {
+      if(window.JSZip){ JSZipLib=window.JSZip; }
+      else {
+        JSZipLib = await new Promise((res,rej)=>{
+          const s=document.createElement('script');
+          s.src='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+          s.onload=()=>res(window.JSZip); s.onerror=()=>rej(new Error('JSZip nicht geladen'));
+          document.head.appendChild(s);
+        });
+      }
+    } catch(e){ alert('ZIP-Export benötigt Internetverbindung für JSZip.'); hideStatus(); return; }
+    const zip = new JSZipLib();
+    for(let i=0;i<cards.length;i++){
+      document.getElementById('statusTxt').textContent=`Rendere ${i+1}/${cards.length}…`;
+      const cv=await renderCardCanvas(cards[i]);
+      const blob=await new Promise(res=>cv.toBlob(b=>res(b),'image/png'));
+      zip.file(`${cards[i].serial.replace('#','')}_${cards[i].name.replace(/[^a-z0-9äöü]/gi,'_')}.png`, blob);
+      await new Promise(r=>setTimeout(r,30));
+    }
+    document.getElementById('statusTxt').textContent='ZIP erstellen…';
+    const blob=await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=`fahrzeug-karten-export-${new Date().toISOString().slice(0,10)}.zip`;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),10000);
   }
   hideStatus();
 }

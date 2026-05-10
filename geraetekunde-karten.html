@@ -226,7 +226,7 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
     <div><h1>FEUERWEHR KARTEN</h1><p data-i18n="subtitle">Gerätekunde · Pokémon Edition</p></div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
       <a class="hdr-home" href="index.html" title="Gerätekunde V2 – Startseite">🏠</a>
-      <a href="https://github.com/issues/new" target="_blank" rel="noopener"
+      <a href="https://github.com/it4k4i/feuerwehr-karten/issues/new" target="_blank" rel="noopener"
          style="display:inline-flex;align-items:center;gap:4px;background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text2);font-size:.7rem;cursor:pointer;transition:all .15s;font-family:'Libre Franklin',sans-serif;text-decoration:none;"
          onmouseover="this.style.borderColor='#fff';this.style.color='#fff'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">🐛 Bug melden</a>
       <button onclick="toggleLang()" id="langBtn" style="background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text2);font-size:.7rem;cursor:pointer;font-family:'Libre Franklin',sans-serif;transition:all .15s;" onmouseover="this.style.borderColor='#fff';this.style.color='#fff'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">🌐 EN</button>
@@ -327,7 +327,6 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
           <button class="btn-ghost" onclick="clearBrowserSave()" style="margin-top:4px;">🗑 <span data-i18n="clearAutosave">Browser-Autosave löschen</span></button>
           <input type="file" id="loadInput" accept=".json,.zip" style="display:none;" onchange="loadProject(this)" />
           <p style="font-size:.58rem;color:var(--text2);margin-top:6px;line-height:1.5;" data-i18n="saveHint">JSON: alles in einer Datei. ZIP: JSON + Bilder als separate Dateien, deutlich kleiner. Der Browser speichert automatisch beim Arbeiten.</p>
-          <p style="font-size:.58rem;color:rgba(245,158,11,.85);margin-top:6px;line-height:1.5;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-radius:4px;padding:5px 7px;">⚠️ <strong style="color:#fbbf24;">Experimentell</strong> – nicht vollständig getestet. Regelmäßig als JSON/ZIP sichern!</p>
         </div>
       </div>
 
@@ -573,7 +572,6 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
     <p data-i18n="warnText">Diese App speichert deine Daten <strong>nur im Browser</strong>.<br>
     Beim Löschen des Browser-Caches oder auf einem anderen Gerät sind deine Karten weg.<br><br>
     <strong>Speichere dein Projekt regelmäßig</strong> als JSON oder ZIP auf deinem Computer!</p>
-    <p style="font-size:.72rem;color:rgba(245,158,11,.9);margin-top:10px;padding:6px 10px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:6px;line-height:1.5;">⚠️ Diese App ist <strong style="color:#fbbf24;">experimentell</strong> und nicht vollständig getestet.</p>
     <label class="warn-check">
       <input type="checkbox" id="warnDontShow" />
       <span data-i18n="warnDontShow">Nicht mehr anzeigen</span>

@@ -16,6 +16,12 @@
   --border:#2e3240;--text:#e8eaf0;--text2:#8892aa;
   --accent:#e63946;--yellow:#ffd600;
 }
+body.light-mode{
+  --bg:#f2f3f8;--panel:#ffffff;--panel2:#f5f6fb;
+  --border:#d0d4e0;--text:#1a1c28;--text2:#5a6080;
+}
+body.light-mode .app-hdr{background:linear-gradient(90deg,#1a1c28 0%,#252840 60%,#1a1c28 100%);}
+*{transition:background-color .18s,border-color .18s,color .1s;}
 body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-serif;min-height:100vh;}
 /* ---- layout ---- */
 .screen-ui{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
@@ -245,15 +251,18 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
 .warn-btn:hover{filter:brightness(1.1);}
 
 /* Home button in header */
-.hdr-home{
-  display:inline-flex;align-items:center;gap:4px;
-  background:transparent;border:1px solid var(--border);border-radius:6px;
-  padding:4px 10px;color:var(--text2);font-size:.7rem;
-  cursor:pointer;transition:all .15s;
-  font-family:'Libre Franklin',sans-serif;
-  text-decoration:none;
-}
-.hdr-home:hover{border-color:#fff;color:#fff;}
+/* ── UNIFIED APP HEADER ── */
+.app-hdr{flex-shrink:0;z-index:30;background:linear-gradient(90deg,#07080d 0%,#0e1018 40%,#12141e 60%,#07080d 100%);border-bottom:1px solid rgba(255,255,255,.07);height:48px;display:flex;align-items:center;padding:0 14px;gap:8px;box-shadow:0 2px 12px rgba(0,0,0,.4);}
+.app-hdr-logo{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;}
+.app-hdr-title{font-family:'Oswald',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:2px;color:#fff;white-space:nowrap;}
+.app-hdr-sub{font-size:.42rem;color:rgba(255,255,255,.25);letter-spacing:1.5px;text-transform:uppercase;white-space:nowrap;}
+.app-hdr-sep{flex:1;}
+.app-hdr-nav{display:flex;align-items:center;gap:5px;}
+.app-hdr-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:5px;border:0.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.38);font-size:.5rem;font-weight:700;letter-spacing:.5px;text-decoration:none;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:inherit;}
+.app-hdr-btn:hover{border-color:rgba(255,255,255,.28);color:rgba(255,255,255,.85);background:rgba(255,255,255,.07);}
+.app-hdr-btn.home:hover{border-color:rgba(230,57,70,.5);color:#f87171;}
+.app-hdr-btn.bug:hover{border-color:rgba(251,191,36,.4);color:#fbbf24;}
+.app-hdr-badge{font-size:.44rem;font-weight:700;letter-spacing:.8px;padding:3px 8px;border-radius:10px;white-space:nowrap;}
 
 /* Elegant visible scrollbars – same style as fahrzeug-karten */
 ::-webkit-scrollbar{width:6px;height:6px;}
@@ -266,21 +275,23 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
 </head>
 <body>
 <div class="screen-ui">
-  <div class="hdr">
-    <div class="hdr-logo">🔥</div>
-    <div><h1>FEUERWEHR KARTEN</h1><p data-i18n="subtitle">Gerätekunde · Pokémon Edition</p></div>
-    <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-      <a class="hdr-home" href="index.html" title="Gerätekunde Aktuell – Startseite">🏠</a>
-      <a href="https://github.com/issues/new" target="_blank" rel="noopener"
-         style="display:inline-flex;align-items:center;gap:4px;background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text2);font-size:.7rem;cursor:pointer;transition:all .15s;font-family:'Libre Franklin',sans-serif;text-decoration:none;"
-         onmouseover="this.style.borderColor='#fff';this.style.color='#fff'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">🐛 Bug melden</a>
-      <button onclick="toggleLang()" id="langBtn" style="background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text2);font-size:.7rem;cursor:pointer;font-family:'Libre Franklin',sans-serif;transition:all .15s;" onmouseover="this.style.borderColor='#fff';this.style.color='#fff'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">🌐 EN</button>
-      <div class="hdr-counter">
-        <span class="hdr-cnt-num" id="hdrCnt">0</span>
-        <span class="hdr-cnt-lbl" data-i18n="cards">Karten</span>
-      </div>
+  <header class="app-hdr">
+    <div class="app-hdr-logo" style="background:linear-gradient(135deg,#dc2626,#991b1b);box-shadow:0 0 10px rgba(220,38,38,.3);">🔥</div>
+    <div>
+      <div class="app-hdr-title">FEUERWEHR KARTEN</div>
+      <div class="app-hdr-sub" data-i18n="subtitle">Gerätekunde · Pokémon Edition</div>
     </div>
-  </div>
+    <div class="app-hdr-sep"></div>
+    <nav class="app-hdr-nav">
+      <span class="app-hdr-badge" style="background:rgba(255,255,255,.05);border:0.5px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);">
+        <span class="hdr-cnt-num" id="hdrCnt">0</span> <span data-i18n="cards">Karten</span>
+      </span>
+      <button onclick="toggleLang()" id="langBtn" class="app-hdr-btn">🌐 EN</button>
+      <button class="app-hdr-btn" onclick="toggleTheme()" id="themeBtn" title="Dark/Light Mode">🌙</button>
+      <a class="app-hdr-btn bug" href="https://github.com/it4k4i/feuerwehr-karten/issues/new" target="_blank" rel="noopener">🐛 Bug melden</a>
+      <a class="app-hdr-btn home" href="index.html">🏠 Startseite</a>
+    </nav>
+  </header>
   <div class="body">
     <div class="sidebar">
 
@@ -812,6 +823,20 @@ let prefixes=[
   {id:'p3',value:'HLF-',label:'Hilfeleistungslöschfahrzeug'},
   {id:'p4',value:'TLF-',label:'Tanklöschfahrzeug'},
 ];
+// ── DARK / LIGHT MODE ──
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('gk_theme', isLight ? 'light' : 'dark');
+  const btn = document.getElementById('themeBtn');
+  if (btn) btn.textContent = isLight ? '☀' : '🌙';
+}
+if (localStorage.getItem('gk_theme') === 'light') {
+  document.body.classList.add('light-mode');
+  window.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('themeBtn'); if (btn) btn.textContent = '☀';
+  });
+}
+
 let cards=[];
 let curImg=null, bgImg=null, selCatId='c1', selPrefixId='p1', editingCatId=null, editingCardId=null, editCardImg=undefined;
 let editingPrefixId=null;
@@ -2382,14 +2407,29 @@ async function loadJSZip(){
 async function quickExportPNG(){
   if(!cards.length){alert('Keine Karten vorhanden!');return;}
   setStatus('Exportiere…');
-  for(let i=0;i<cards.length;i++){
-    const cv=await drawCardOnCanvas(cards[i], 630, 880);
+  if(cards.length === 1){
+    // Single card: direct download
+    const cv=await drawCardOnCanvas(cards[0], 630, 880);
     const a=document.createElement('a');
     a.href=cv.toDataURL('image/png');
-    a.download=`${cards[i].serial.replace(/[^a-z0-9äöü\-]/gi,'_')}_${cards[i].name.replace(/[^a-z0-9äöü]/gi,'_')}.png`;
+    a.download=`${cards[0].serial.replace(/[^a-z0-9äöü\-]/gi,'_')}_${cards[0].name.replace(/[^a-z0-9äöü]/gi,'_')}.png`;
     a.click();
-    document.getElementById('statusText').textContent=`Export ${i+1}/${cards.length}…`;
-    await new Promise(r=>setTimeout(r,80));
+  } else {
+    // Multiple cards: bundle as ZIP
+    let JSZipLib;
+    try { JSZipLib = await loadJSZip(); } catch(e) { alert('ZIP-Export benötigt Internetverbindung für JSZip.'); hideStatus(); return; }
+    const zip = new JSZipLib();
+    for(let i=0;i<cards.length;i++){
+      document.getElementById('statusText').textContent=`Rendere ${i+1}/${cards.length}…`;
+      const cv=await drawCardOnCanvas(cards[i], 630, 880);
+      const blob=await canvasToBlob(cv);
+      const fn=`${cards[i].serial.replace(/[^a-z0-9äöü\-]/gi,'_')}_${cards[i].name.replace(/[^a-z0-9äöü]/gi,'_')}.png`;
+      zip.file(fn, blob);
+      await new Promise(r=>setTimeout(r,30));
+    }
+    document.getElementById('statusText').textContent='ZIP erstellen…';
+    const blob=await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}});
+    downloadBlob(blob,`feuerwehr-karten-export-${new Date().toISOString().slice(0,10)}.zip`);
   }
   hideStatus();
 }
@@ -2903,6 +2943,13 @@ async function wzDoPaperExport(pCards){
   const showCrop=isCard?(document.getElementById('wzCbCrop').value==='1'):(document.getElementById('wzCropStd').value==='1');
   const bgColor=document.getElementById('wzPaperBg')?.value||'#ffffff';
 
+  // Use ZIP if multiple output files would be created
+  const frontCount = pages;
+  const backCount = isCard ? pages : 0;
+  const useZip = (frontCount + backCount) > 1;
+  let JSZipLib=null, zip=null;
+  if(useZip){ try{JSZipLib=await loadJSZip();zip=new JSZipLib();}catch(e){alert('ZIP benötigt Internetverbindung.');return;} }
+
   for(let p=0;p<pages;p++){
     document.getElementById('statusText').textContent=`Seite ${p+1}/${pages}…`;
     const cv=document.createElement('canvas');cv.width=pw;cv.height=ph;
@@ -2913,8 +2960,9 @@ async function wzDoPaperExport(pCards){
       const cc=await drawCardOnCanvas(slice[i],cw,ch);ctx.drawImage(cc,x,y,cw,ch);
       if(showCrop) wz_drawCropMarks(ctx,x,y,cw,ch,mm2px(3,PDPI),1);
     }
-    const a=document.createElement('a');a.href=cv.toDataURL('image/png');
-    a.download=`Export_${isCard?'Karton':'Papier'}_${papId}_Seite${p+1}.png`;a.click();
+    const fn=`Export_${isCard?'Karton':'Papier'}_${papId}_Seite${p+1}.png`;
+    if(useZip){ zip.file(fn, await canvasToBlob(cv)); }
+    else { const a=document.createElement('a');a.href=cv.toDataURL('image/png');a.download=fn;a.click(); }
     await new Promise(r=>setTimeout(r,80));
   }
   if(isCard){
@@ -2927,14 +2975,19 @@ async function wzDoPaperExport(pCards){
       const slice=pCards.slice(p*perPage,(p+1)*perPage);
       for(let i=0;i<slice.length;i++){
         const col=i%cols,row=Math.floor(i/cols),x=margin+col*(cw+gap),y=margin+row*(ch+gap);
-        // Use the geraetekunde back drawing
         const backCv=await drawBackOnCanvas(cw,ch);ctx.drawImage(backCv,x,y,cw,ch);
         if(showCrop) wz_drawCropMarks(ctx,x,y,cw,ch,mm2px(3,PDPI),1);
       }
-      const a=document.createElement('a');a.href=cv.toDataURL('image/png');
-      a.download=`Export_Karton_Rueckseite_Seite${p+1}.png`;a.click();
+      const fn=`Export_Karton_Rueckseite_Seite${p+1}.png`;
+      if(useZip){ zip.file(fn, await canvasToBlob(cv)); }
+      else { const a=document.createElement('a');a.href=cv.toDataURL('image/png');a.download=fn;a.click(); }
       await new Promise(r=>setTimeout(r,80));
     }
+  }
+  if(useZip){
+    document.getElementById('statusText').textContent='ZIP erstellen…';
+    const blob=await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}});
+    downloadBlob(blob,`Export_${isCard?'Karton':'Papier'}_${papId}_${new Date().toISOString().slice(0,10)}.zip`);
   }
 }
 
