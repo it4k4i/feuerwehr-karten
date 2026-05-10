@@ -35,17 +35,7 @@ const unkF=(inner='')=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
 </svg>`;
 
 // Einheitsgrößen-Markierungen über dem Zeichen (APP-6D §2.2)
-// Trupp: •  Gruppe: ••  Zug: •••  Kompanie: |  Bataillon: ||  Brigade: X  Division: XX
-const sz = {
-  'trupp':    `${c(45,-5,3,BLU,BLU,1)}`,
-  'gruppe':   `${c(38,-5,3,BLU,BLU,1)}${c(52,-5,3,BLU,BLU,1)}`,
-  'zug':      `${c(31,-5,3,BLU,BLU,1)}${c(45,-5,3,BLU,BLU,1)}${c(59,-5,3,BLU,BLU,1)}`,
-  'kompanie': `${l(45,-8,45,-2,BLU,2)}`,
-  'bataillon':`${l(40,-8,40,-2,BLU,2)}${l(50,-8,50,-2,BLU,2)}`,
-  'regiment': `${l(36,-8,36,-2,BLU,2)}${l(45,-8,45,-2,BLU,2)}${l(54,-8,54,-2,BLU,2)}`,
-  'brigade':  `${l(38,-8,52,-2,BLU,2)}${l(52,-8,38,-2,BLU,2)}`,
-  'division': `${l(33,-8,43,-2,BLU,2)}${l(43,-8,33,-2,BLU,2)}${l(47,-8,57,-2,BLU,2)}${l(57,-8,47,-2,BLU,2)}`,
-};
+// Einheitsgrößen werden direkt in den Symbol-SVGs definiert (s. nato_groesse Kategorie)
 
 const LIB = {
 
@@ -122,24 +112,24 @@ svg:()=>unkF(`${t('?',45,36,22,YEL,'bold')}`)},
 /* ── Einheitsgrößen (APP-6D §2.2) ── */
 nato_kompanie:{name:'Kompanie/Batterie (I)',ref:'NATO APP-6D §2.2',cat:'nato_groesse',
 svg:()=>boxF(`
-  ${t('Kp',45,32,14,BLU,'bold')}
-  ${l(45,-8,45,-2,BLU,2)}`)},
+  ${t('Kp',45,36,14,BLU,'bold')}
+  ${l(45,4,45,14,BLU,2)}`)},
 
 nato_bataillon:{name:'Bataillon/Abteilung (II)',ref:'NATO APP-6D §2.2',cat:'nato_groesse',
 svg:()=>boxF(`
-  ${t('Btl',45,32,13,BLU,'bold')}
-  ${l(40,-8,40,-2,BLU,2)}${l(50,-8,50,-2,BLU,2)}`)},
+  ${t('Btl',45,36,13,BLU,'bold')}
+  ${l(39,4,39,14,BLU,2)}${l(51,4,51,14,BLU,2)}`)},
 
 nato_brigade:{name:'Brigade (X)',ref:'NATO APP-6D §2.2',cat:'nato_groesse',
 svg:()=>boxF(`
-  ${t('Brig',45,32,12,BLU,'bold')}
-  ${l(36,-7,54,-1,BLU,2)}${l(54,-7,36,-1,BLU,2)}`)},
+  ${t('Brig',45,36,12,BLU,'bold')}
+  ${l(36,4,54,14,BLU,2)}${l(54,4,36,14,BLU,2)}`)},
 
 nato_division:{name:'Division (XX)',ref:'NATO APP-6D §2.2',cat:'nato_groesse',
 svg:()=>boxF(`
-  ${t('Div',45,32,13,BLU,'bold')}
-  ${l(30,-7,40,-1,BLU,2)}${l(40,-7,30,-1,BLU,2)}
-  ${l(50,-7,60,-1,BLU,2)}${l(60,-7,50,-1,BLU,2)}`)},
+  ${t('Div',45,36,13,BLU,'bold')}
+  ${l(29,4,39,14,BLU,2)}${l(39,4,29,14,BLU,2)}
+  ${l(51,4,61,14,BLU,2)}${l(61,4,51,14,BLU,2)}`)},
 
 /* ── ZDv 1-15 – Bundeswehr spezifisch ── */
 bw_gefechtsstand:{name:'Gefechtsstand Bundeswehr',ref:'ZDv 1-15 §3',cat:'nato_bw',

@@ -64,14 +64,6 @@ const txt = (t, x, y, sz, col='#000000', weight='normal', anchor='middle') =>
   `<text x="${x}" y="${y}" text-anchor="${anchor}" font-family="Arial,sans-serif" font-size="${sz}" font-weight="${weight}" fill="${col}">${t}</text>`;
 
 // Gefüllte Einheitsgrössen-Symbole über dem Zeichen (DV 102 §1.4)
-// Punkt = Trupp/Team, Linie = Gruppe, X = Zug usw.
-const groesse = {
-  'trupp':  `<circle cx="45" cy="-4" r="3" fill="#000"/>`,
-  'staffel':`<circle cx="40" cy="-4" r="3" fill="#000"/><circle cx="50" cy="-4" r="3" fill="#000"/>`,
-  'gruppe': `<line x1="42" y1="-6" x2="42" y2="-1" stroke="#000" stroke-width="2"/><line x1="48" y1="-6" x2="48" y2="-1" stroke="#000" stroke-width="2"/>`,
-  'zug':    `<line x1="38" y1="-6" x2="38" y2="-1" stroke="#000" stroke-width="2"/><line x1="45" y1="-6" x2="45" y2="-1" stroke="#000" stroke-width="2"/><line x1="52" y1="-6" x2="52" y2="-1" stroke="#000" stroke-width="2"/>`,
-};
-
 /* ══════════════════════════════════════════════════
    DV 102 §1 – GRUNDZEICHEN (korrekte Formen)
 ══════════════════════════════════════════════════ */
@@ -153,17 +145,13 @@ const symPumpe = (col) => `
   <line x1="59" y1="30" x2="70" y2="30" stroke="${col}" stroke-width="2.5"/>`;
 
 // Atom/Strahlung (korrektes Trefoil nach ISO 361)
-const symStrahlung = (col) => {
-  // cx=45, cy=30, ri=8, ro=20, Blätter bei -90°, 30°, 150°, je ±30°
-  const blades = [
-    'M 41,22.69 A 8,8 0 0,1 49,22.69 L 55.57,8.19 A 20,20 0 0,0 34.43,8.19 Z',
-    'M 52,30 A 8,8 0 0,1 49,37.31 L 63.57,43 A 20,20 0 0,0 65.57,8.19 Z',
-    'M 37,37.31 A 8,8 0 0,1 38,30 L 24.43,8.19 A 20,20 0 0,0 26.43,43 Z',
-  ];
-  return `
-    ${blades.map(d=>`<path d="${d}" fill="${col}"/>`).join('')}
-    <circle cx="45" cy="30" r="6" fill="${col}"/>`;
-};
+// Atom/Strahlung – ISO 361 Trefoil, mathematisch exakt
+// cx=45, cy=30, ri=8, ro=20, Blätter bei -90°, 30°, 150°, je ±30°
+const symStrahlung = (col) => `
+  <path d="M 41,23.07 A 8,8 0 0,1 49,23.07 L 55,12.68 A 20,20 0 0,0 35,12.68 Z" fill="${col}"/>
+  <path d="M 53,30 A 8,8 0 0,1 49,36.93 L 55,47.32 A 20,20 0 0,0 65,30 Z" fill="${col}"/>
+  <path d="M 41,36.93 A 8,8 0 0,1 37,30 L 25,30 A 20,20 0 0,0 35,47.32 Z" fill="${col}"/>
+  <circle cx="45" cy="30" r="6" fill="${col}"/>`;
 
 // ABC Warnung
 const symABC = (col) => `

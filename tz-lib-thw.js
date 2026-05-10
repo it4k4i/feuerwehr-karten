@@ -138,8 +138,8 @@ svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
 thw_boot:{name:'Schnelles Einsatzboot (SEB)',ref:'THW DV 1-100',cat:'thw_fz',
 svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
   ${rect(T)}
-  <path d="M15 40 Q45 22 75 40 L70 52 Q45 58 20 52 Z" fill="${TS}" opacity="0.9"/>
-  ${t('SEB',45,38,13,T,'bold')}
+  <path d="M12 42 Q45 20 78 42 L73 53 Q45 59 17 53 Z" fill="${TS}" stroke="${TS}" stroke-width="1.5"/>
+  ${t('SEB',45,15,13,TS,'bold')}
 </svg>`},
 
 };

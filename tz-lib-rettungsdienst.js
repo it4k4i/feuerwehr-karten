@@ -128,8 +128,9 @@ svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
 rd_mhd:{name:'Malteser Hilfsdienst (MHD)',ref:'DIN 13050',cat:'rd_hilfsorg',
 svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
   ${rect('#1a3a8a','#000000',2)}
-  <polygon points="45,10 52,28 72,28 57,40 63,58 45,48 27,58 33,40 18,28 38,28" fill="#FFFFFF"/>
-  ${t('MHD',45,36,11,'#1a3a8a','bold')}
+  <!-- 8-armed Maltese cross, mathematisch korrekt -->
+  <polygon points="67.2,20.8 55.2,34.2 67.2,39.2 49.2,40.2 54.2,52.2 40.8,40.2 35.8,52.2 34.8,34.2 22.8,39.2 34.8,25.8 22.8,20.8 40.8,19.8 35.8,7.8 49.2,19.8 54.2,7.8 55.2,25.8" fill="#FFFFFF"/>
+  ${t('MHD',45,37,10,'#1a3a8a','bold')}
 </svg>`},
 
 rd_juh:{name:'Johanniter-Unfall-Hilfe (JUH)',ref:'DIN 13050',cat:'rd_hilfsorg',
