@@ -1,192 +1,175 @@
 /**
- * TZ-Bibliothek: Katastrophenschutz / Bevölkerungsschutz
- * Ergänzende Zeichen für den Zivil- und Katastrophenschutz (KatS)
- * Enthält: BBK-Zeichen, Zivilschutz, Bevölkerungsschutz,
- *          gemeinsame Einsatzstäbe, Warnsystem, ABC-Schutz erweitert
+ * TZ-Bibliothek: Katastrophenschutz / BBK – NORMKONFORM
+ * Zeichen nach KatS-Vorschriften, BBK-Vorgaben und ABC-Schutz
  */
 'use strict';
 (function(){
-const K = '#7c3aed';   // Violett für KatS
-const KS = '#ffffff';
-const BBK = '#1d4ed8'; // BBK-Blau
-const ZS = '#4b5563';  // Zivilschutz grau
+const VB='0 0 90 60';
+const l=(x1,y1,x2,y2,col,sw=2)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="${sw}"/>`;
+const t=(text,x,y,sz,col,w='normal',a='middle')=>`<text x="${x}" y="${y}" text-anchor="${a}" font-family="Arial,sans-serif" font-size="${sz}" font-weight="${w}" fill="${col}">${text}</text>`;
+const c=(cx,cy,r,fill,stroke,sw=2)=>`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+const rect=(fill,stroke='#000',sw=2)=>`<rect x="1" y="1" width="88" height="58" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+const dash=(stroke,sw=2.5,da='8,4')=>`<rect x="1" y="1" width="88" height="58" fill="none" stroke="${stroke}" stroke-width="${sw}" stroke-dasharray="${da}"/>`;
+const tri=(pts,fill,stroke,sw=2)=>`<polygon points="${pts}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+const kreuz=(col,cx=45,cy=30,s=14)=>`${l(cx,cy-s,cx,cy+s,col,5)}${l(cx-s,cy,cx+s,cy,col,5)}`;
+
+// Strahlenwarnung Trefoil (korrekte Berechnung, cx=45, cy=30)
+const trefoil=(cx,cy,ri,ro,col)=>{
+  const pi=Math.PI;
+  const pt=(r,a)=>`${(cx+r*Math.cos(a)).toFixed(2)},${(cy+r*Math.sin(a)).toFixed(2)}`;
+  const blades=[-pi/2,pi/6,5*pi/6].map(center=>{
+    const a1=center-pi/6,a2=center+pi/6;
+    return `<path d="M ${pt(ri,a1)} A ${ri},${ri} 0 0,1 ${pt(ri,a2)} L ${pt(ro,a2)} A ${ro},${ro} 0 0,0 ${pt(ro,a1)} Z" fill="${col}"/>`;
+  }).join('');
+  return blades+`<circle cx="${cx}" cy="${cy}" r="${ri*0.7}" fill="${col}"/>`;
+};
 
 const LIB = {
 
-/* ══════════════════════════════════════════
-   BEVÖLKERUNGSSCHUTZ / KATASTROPHENSCHUTZ
-══════════════════════════════════════════ */
-kats_katastrophenschutzstab:{name:'Katastrophenschutzstab (KatS-Stab)',ref:'KatS / BBK',cat:'kats_fuehr',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <rect x="8" y="15" width="84" height="50" fill="${K}" stroke="${K}" stroke-width="2"/>
-  <line x1="8" y1="65" x2="92" y2="65" stroke="${KS}" stroke-width="5"/>
-  <text x="50" y="36" text-anchor="middle" font-size="11" font-weight="bold" fill="${KS}" font-family="Arial">KatS</text>
-  <text x="50" y="55" text-anchor="middle" font-size="10" fill="${KS}" font-family="Arial">Stab</text>
-</svg>`},
-
-kats_gemeinsamer_stab:{name:'Gemeinsamer Stab (BOS)',ref:'KatS §3',cat:'kats_fuehr',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <rect x="8" y="15" width="84" height="50" fill="${K}" stroke="${K}" stroke-width="2"/>
-  <text x="50" y="38" text-anchor="middle" font-size="11" font-weight="bold" fill="${KS}" font-family="Arial">Gem.</text>
-  <text x="50" y="55" text-anchor="middle" font-size="11" fill="${KS}" font-family="Arial">Stab</text>
+/* ── FÜHRUNG / STÄBE ── */
+kats_stab:{name:'Katastrophenschutzstab (KatS-Stab)',ref:'KatS / BBK',cat:'kats_fuehr',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  ${rect('#7c3aed')}
+  ${l(1,56,89,56,'#FFFFFF',6)}
+  ${t('KatS',45,26,14,'#FFFFFF','bold')}
+  ${t('Stab',45,44,14,'#FFFFFF','bold')}
 </svg>`},
 
 kats_krisenstab:{name:'Krisenstab',ref:'KatS / BBK',cat:'kats_fuehr',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <rect x="8" y="15" width="84" height="50" fill="${K}" stroke="${K}" stroke-width="2"/>
-  <line x1="8" y1="65" x2="92" y2="65" stroke="${KS}" stroke-width="5"/>
-  <text x="50" y="44" text-anchor="middle" font-size="14" font-weight="bold" fill="${KS}" font-family="Arial">KriSt</text>
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  ${rect('#7c3aed')}
+  ${l(1,56,89,56,'#FFFFFF',6)}
+  ${t('KriSt',45,34,18,'#FFFFFF','bold')}
 </svg>`},
 
-kats_fuehrungsgruppe:{name:'Führungsgruppe KatS',ref:'KatS §4',cat:'kats_fuehr',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <rect x="8" y="20" width="84" height="42" fill="${K}" stroke="${K}" stroke-width="1.5"/>
-  <line x1="50" y1="20" x2="50" y2="62" stroke="${KS}" stroke-width="2"/>
-  <text x="27" y="46" text-anchor="middle" font-size="10" fill="${KS}" font-family="Arial">FüGr</text>
-  <text x="73" y="46" text-anchor="middle" font-size="10" fill="${KS}" font-family="Arial">KatS</text>
+kats_gem_stab:{name:'Gemeinsamer Stab (BOS)',ref:'KatS §3',cat:'kats_fuehr',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  ${rect('#7c3aed')}
+  ${t('Gem.',45,24,14,'#FFFFFF','bold')}
+  ${t('Stab',45,42,14,'#FFFFFF','bold')}
+  ${t('BOS',45,56,9,'#c4b5fd')}
 </svg>`},
 
-/* ── Warnung & Information ── */
-kats_warnung:{name:'Warnung der Bevölkerung',ref:'BBK / Sirenenalarm',cat:'kats_warn',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <polygon points="50,6 94,72 6,72" fill="#fef08a" stroke="#ca8a04" stroke-width="2.5"/>
-  <text x="50" y="58" text-anchor="middle" font-size="30" font-weight="bold" fill="#ca8a04" font-family="Arial">!</text>
+kats_katgebiet:{name:'Katastrophengebiet',ref:'KatS §2',cat:'kats_fuehr',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  ${dash('#7c3aed',2.5,'8,4')}
+  ${t('KatS',45,28,14,'#7c3aed','bold')}
+  ${t('Gebiet',45,46,12,'#7c3aed','bold')}
+</svg>`},
+
+kats_hlz:{name:'Hilfeleistungszug (HLZ)',ref:'KatS',cat:'kats_fuehr',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  ${rect('#7c3aed')}
+  ${l(1,32,89,32,'#FFFFFF',1.5)}
+  ${t('HLZ',24,22,13,'#FFFFFF','bold')}
+  ${t('1/19',69,22,10,'#FFFFFF')}
+</svg>`},
+
+/* ── WARNUNG / ALARM (nach BBK) ── */
+kats_warnung:{name:'Warnung der Bevölkerung',ref:'BBK / NINA',cat:'kats_warn',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  ${tri('45,2 88,58 2,58','#fef08a','#ca8a04',2.5)}
+  ${t('!',45,50,30,'#ca8a04','bold')}
 </svg>`},
 
 kats_entwarnung:{name:'Entwarnung',ref:'BBK',cat:'kats_warn',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="50" cy="40" r="32" fill="#dcfce7" stroke="#16a34a" stroke-width="2.5"/>
-  <polyline points="32,40 44,52 68,28" fill="none" stroke="#16a34a" stroke-width="4"/>
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  ${c(45,30,28,'#dcfce7','#16a34a',2.5)}
+  <polyline points="30,30 42,43 63,17" fill="none" stroke="#16a34a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`},
 
-kats_strahlenwarnung:{name:'Strahlenwarnung (Atom/Radio)',ref:'KatS ABC',cat:'kats_warn',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="50" cy="40" r="34" fill="#fef08a" stroke="#ca8a04" stroke-width="2"/>
-  <!-- Blade 1: top (−90°) -->
-  <path d="M 45,31.34 A 10,10 0 0,1 55,31.34 L 64,15.75 A 28,28 0 0,0 36,15.75 Z" fill="#ca8a04"/>
-  <!-- Blade 2: lower-right (30°) -->
-  <path d="M 60,40 A 10,10 0 0,1 55,48.66 L 64,64.25 A 28,28 0 0,0 78,40 Z" fill="#ca8a04"/>
-  <!-- Blade 3: lower-left (150°) -->
-  <path d="M 45,48.66 A 10,10 0 0,1 40,40 L 22,40 A 28,28 0 0,0 36,64.25 Z" fill="#ca8a04"/>
-  <!-- Center circle -->
-  <circle cx="50" cy="40" r="7" fill="#ca8a04"/>
+kats_strahlenwarnung:{name:'Strahlenwarnung – ISO 361 / DIN 25430',ref:'ISO 361 / KatS ABC',cat:'kats_warn',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  ${c(45,30,28,'#fef08a','#ca8a04',2)}
+  ${trefoil(45,30,9,24,'#ca8a04')}
 </svg>`},
 
-kats_chemikalienwarnung:{name:'Chemikalien-Warnung',ref:'KatS ABC / Gefahrgut',cat:'kats_warn',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <polygon points="50,6 94,72 6,72" fill="#fef08a" stroke="#ca8a04" stroke-width="2.5"/>
-  <text x="50" y="60" text-anchor="middle" font-size="18" font-weight="bold" fill="#ca8a04" font-family="Arial">C</text>
+kats_chemwarnung:{name:'Chemikalien-Warnung (C)',ref:'KatS ABC / GHS',cat:'kats_warn',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  ${tri('45,2 88,58 2,58','#fef08a','#ca8a04',2.5)}
+  ${t('C',45,48,24,'#ca8a04','bold')}
 </svg>`},
 
-/* ── Aufnahme & Unterbringung ── */
-kats_notunterkunft:{name:'Notunterkunft / Notlager',ref:'KatS §5',cat:'kats_versorgg',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <rect x="14" y="32" width="72" height="38" fill="none" stroke="${K}" stroke-width="2.5"/>
-  <polygon points="50,8 86,32 14,32" fill="none" stroke="${K}" stroke-width="2.5"/>
-  <text x="50" y="56" text-anchor="middle" font-size="12" font-weight="bold" fill="${K}" font-family="Arial">NL</text>
+kats_biowarnung:{name:'Biologische Warnung (B)',ref:'KatS ABC',cat:'kats_warn',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  ${tri('45,2 88,58 2,58','#dcfce7','#16a34a',2.5)}
+  ${t('B',45,48,24,'#16a34a','bold')}
+</svg>`},
+
+/* ── VERSORGUNG / UNTERBRINGUNG ── */
+kats_notunterkunft:{name:'Notunterkunft / Notlager (NL)',ref:'KatS §5',cat:'kats_versorgg',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  <rect x="14" y="24" width="62" height="34" fill="none" stroke="#7c3aed" stroke-width="2.5"/>
+  <polygon points="45,4 76,24 14,24" fill="none" stroke="#7c3aed" stroke-width="2.5"/>
+  ${t('NL',45,45,14,'#7c3aed','bold')}
 </svg>`},
 
 kats_aufnahmelager:{name:'Aufnahmelager / Evakuierungslager',ref:'KatS §5',cat:'kats_versorgg',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <rect x="8" y="15" width="84" height="50" fill="none" stroke="${K}" stroke-width="2" stroke-dasharray="6,3"/>
-  <text x="50" y="38" text-anchor="middle" font-size="11" font-weight="bold" fill="${K}" font-family="Arial">Aufn.</text>
-  <text x="50" y="55" text-anchor="middle" font-size="11" fill="${K}" font-family="Arial">Lager</text>
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  ${dash('#7c3aed',2,'6,3')}
+  ${t('Aufn.',45,28,12,'#7c3aed','bold')}
+  ${t('Lager',45,46,12,'#7c3aed','bold')}
 </svg>`},
 
-kats_notversorgungspunkt:{name:'Notversorgungspunkt',ref:'KatS §5',cat:'kats_versorgg',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="50" cy="40" r="32" fill="none" stroke="${K}" stroke-width="2.5"/>
-  <text x="50" y="45" text-anchor="middle" font-size="14" font-weight="bold" fill="${K}" font-family="Arial">NVP</text>
+kats_trinkwasser:{name:'Trinkwasser-Notversorgung',ref:'KatS §5',cat:'kats_versorgg',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  ${c(45,30,28,'none','#1d4ed8',2.5)}
+  <path d="M45,12 Q52,22 54,30 Q56,40 45,46 Q34,40 36,30 Q38,22 45,12Z" fill="#1d4ed8"/>
 </svg>`},
 
-kats_trinkwassernotversorgung:{name:'Trinkwasser-Notversorgung',ref:'KatS §5',cat:'kats_versorgg',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="50" cy="40" r="32" fill="none" stroke="#1d4ed8" stroke-width="2.5"/>
-  <path d="M50 18 Q56 28 58 36 Q62 48 50 54 Q38 48 42 36 Q44 28 50 18Z" fill="#1d4ed8"/>
+kats_notstrom:{name:'Notstromaggregat',ref:'KatS §5',cat:'kats_versorgg',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  <rect x="1" y="1" width="88" height="58" fill="none" stroke="#ca8a04" stroke-width="2.5"/>
+  <polygon points="50,8 38,30 44,30 40,52 52,28 46,28 50,8" fill="#ca8a04"/>
 </svg>`},
 
-kats_notstromaggregat:{name:'Notstromaggregat',ref:'KatS §5',cat:'kats_versorgg',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <rect x="8" y="15" width="84" height="50" fill="none" stroke="#ca8a04" stroke-width="2.5"/>
-  <text x="50" y="38" text-anchor="middle" font-size="20" font-weight="bold" fill="#ca8a04" font-family="Arial">⚡</text>
-  <text x="50" y="58" text-anchor="middle" font-size="10" fill="#ca8a04" font-family="Arial">Notstrom</text>
+/* ── ABC / CBRN SCHUTZ ── */
+kats_dekon:{name:'Dekontaminationsstelle (Dekon)',ref:'KatS ABC / FwDV',cat:'kats_abc',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  ${rect('#FFFFFF','#7c3aed',2.5)}
+  ${t('Dekon',45,28,14,'#7c3aed','bold')}
+  ${t('Stelle',45,46,11,'#7c3aed','bold')}
 </svg>`},
 
-/* ── ABC-Schutz (erweitert) ── */
-kats_dekontaminationsstelle:{name:'Dekontaminationsstelle (Dekon)',ref:'KatS ABC / FwDV',cat:'kats_abc',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <rect x="8" y="15" width="84" height="50" fill="#ffffff" stroke="#7c3aed" stroke-width="2.5"/>
-  <text x="50" y="38" text-anchor="middle" font-size="14" font-weight="bold" fill="#7c3aed" font-family="Arial">Dekon</text>
-  <text x="50" y="57" text-anchor="middle" font-size="11" fill="#7c3aed" font-family="Arial">Stelle</text>
+kats_abc_lage:{name:'ABC/CBRN-Lage',ref:'KatS ABC',cat:'kats_abc',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  ${tri('45,2 88,58 2,58','rgba(124,58,237,0.1)','#7c3aed',2.5)}
+  ${t('ABC',45,46,18,'#7c3aed','bold')}
 </svg>`},
 
-kats_kontaminationsgrenze:{name:'Kontaminationsgrenze',ref:'KatS ABC',cat:'kats_abc',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <line x1="10" y1="40" x2="90" y2="40" stroke="#7c3aed" stroke-width="4"/>
-  <line x1="20" y1="28" x2="20" y2="52" stroke="#7c3aed" stroke-width="3"/>
-  <line x1="40" y1="28" x2="40" y2="52" stroke="#7c3aed" stroke-width="3"/>
-  <line x1="60" y1="28" x2="60" y2="52" stroke="#7c3aed" stroke-width="3"/>
-  <line x1="80" y1="28" x2="80" y2="52" stroke="#7c3aed" stroke-width="3"/>
-  <text x="50" y="68" text-anchor="middle" font-size="8" fill="#7c3aed" font-family="Arial">Kont.Grenze</text>
+kats_messst:{name:'Messstelle ABC',ref:'KatS ABC',cat:'kats_abc',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  <rect x="1" y="1" width="88" height="58" fill="none" stroke="#7c3aed" stroke-width="2.5"/>
+  ${c(45,28,16,'none','#7c3aed',2)}
+  ${l(45,12,45,20,'#7c3aed',2)}
+  ${l(45,28,56,18,'#7c3aed',2)}
+  ${c(45,28,3,'#7c3aed','#7c3aed',1)}
+  ${t('CBRN',45,52,9,'#7c3aed','bold')}
 </svg>`},
 
-kats_abc_lage:{name:'ABC-Lage / CBRN-Einsatz',ref:'KatS ABC / FwDV',cat:'kats_abc',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <polygon points="50,6 94,72 6,72" fill="rgba(124,58,237,0.1)" stroke="#7c3aed" stroke-width="2.5"/>
-  <text x="50" y="58" text-anchor="middle" font-size="14" font-weight="bold" fill="#7c3aed" font-family="Arial">ABC</text>
+kats_kontgrenze:{name:'Kontaminationsgrenze',ref:'KatS ABC',cat:'kats_abc',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  ${l(5,30,85,30,'#7c3aed',4)}
+  ${l(14,22,14,38,'#7c3aed',3)}
+  ${l(31,22,31,38,'#7c3aed',3)}
+  ${l(48,22,48,38,'#7c3aed',3)}
+  ${l(65,22,65,38,'#7c3aed',3)}
+  ${l(82,22,82,38,'#7c3aed',3)}
+  ${t('Kont.Gr.',45,52,9,'#7c3aed','bold')}
 </svg>`},
 
-kats_messtrupp_abc:{name:'Messtrupp ABC/CBRN',ref:'KatS ABC',cat:'kats_abc',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <rect x="8" y="15" width="84" height="50" fill="none" stroke="#7c3aed" stroke-width="2"/>
-  <circle cx="50" cy="38" r="16" fill="none" stroke="#7c3aed" stroke-width="2"/>
-  <line x1="50" y1="22" x2="50" y2="30" stroke="#7c3aed" stroke-width="2"/>
-  <line x1="50" y1="38" x2="62" y2="26" stroke="#7c3aed" stroke-width="2"/>
-  <circle cx="50" cy="38" r="3" fill="#7c3aed"/>
-  <text x="50" y="60" text-anchor="middle" font-size="8" fill="#7c3aed" font-family="Arial">CBRN</text>
+/* ── ZIVILSCHUTZ / BBK ── */
+kats_zs:{name:'Zivilschutz (ZS)',ref:'ZSKG / BBK',cat:'kats_zs',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  ${rect('#4b5563')}
+  ${t('ZS',45,36,28,'#FFFFFF','bold')}
 </svg>`},
 
-/* ── Zivilschutz / BBK ── */
-kats_zivilschutz:{name:'Zivilschutz (ZS)',ref:'ZSKG / BBK',cat:'kats_zs',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <rect x="8" y="15" width="84" height="50" fill="${ZS}" stroke="${ZS}" stroke-width="2"/>
-  <text x="50" y="46" text-anchor="middle" font-size="20" font-weight="bold" fill="#ffffff" font-family="Arial">ZS</text>
-</svg>`},
-
-kats_bbk_einsatz:{name:'BBK / Bundesbehörde',ref:'BBK',cat:'kats_zs',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <rect x="8" y="15" width="84" height="50" fill="${BBK}" stroke="${BBK}" stroke-width="2"/>
-  <text x="50" y="38" text-anchor="middle" font-size="14" font-weight="bold" fill="#ffffff" font-family="Arial">BBK</text>
-  <text x="50" y="56" text-anchor="middle" font-size="10" fill="#93c5fd" font-family="Arial">Bundesbehörde</text>
-</svg>`},
-
-kats_bund_land_koordination:{name:'Bund-Land Koordination',ref:'BBK §6',cat:'kats_zs',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <rect x="8" y="15" width="40" height="50" fill="${BBK}" stroke="${BBK}" stroke-width="1.5"/>
-  <rect x="52" y="15" width="40" height="50" fill="#374151" stroke="#374151" stroke-width="1.5"/>
-  <text x="27" y="46" text-anchor="middle" font-size="10" font-weight="bold" fill="#ffffff" font-family="Arial">Bund</text>
-  <text x="73" y="46" text-anchor="middle" font-size="10" font-weight="bold" fill="#ffffff" font-family="Arial">Land</text>
-</svg>`},
-
-kats_katastrophengebiet:{name:'Katastrophengebiet',ref:'KatS §2',cat:'kats_fuehr',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <rect x="8" y="15" width="84" height="50" fill="rgba(124,58,237,0.08)" stroke="${K}" stroke-width="2.5" stroke-dasharray="8,4"/>
-  <text x="50" y="38" text-anchor="middle" font-size="11" font-weight="bold" fill="${K}" font-family="Arial">KatS</text>
-  <text x="50" y="57" text-anchor="middle" font-size="11" fill="${K}" font-family="Arial">Gebiet</text>
-</svg>`},
-
-kats_schadensschwerpunkt:{name:'Schadensschwerpunkt',ref:'KatS',cat:'kats_fuehr',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <polygon points="50,6 94,40 50,74 6,40" fill="rgba(124,58,237,0.15)" stroke="${K}" stroke-width="2.5"/>
-  <text x="50" y="46" text-anchor="middle" font-size="20" font-weight="bold" fill="${K}" font-family="Arial">!</text>
-</svg>`},
-
-kats_hilfeleistungszug:{name:'Hilfeleistungszug (HLZ)',ref:'KatS',cat:'kats_fuehr',
-svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-  <rect x="8" y="20" width="84" height="42" fill="${K}" stroke="${K}" stroke-width="1.5"/>
-  <line x1="50" y1="20" x2="50" y2="62" stroke="${KS}" stroke-width="2"/>
-  <text x="27" y="46" text-anchor="middle" font-size="10" fill="${KS}" font-family="Arial">1/19</text>
-  <text x="73" y="44" text-anchor="middle" font-size="12" fill="${KS}" font-family="Arial">HLZ</text>
+kats_bbk:{name:'BBK / Bundesamt Bevölkerungsschutz',ref:'BBK',cat:'kats_zs',
+svg:()=>`<svg viewBox="${VB}" xmlns="http://www.w3.org/2000/svg">
+  ${rect('#1d4ed8')}
+  ${t('BBK',45,30,18,'#FFFFFF','bold')}
+  ${t('Bundesbehörde',45,50,7,'#93c5fd')}
 </svg>`},
 
 };
@@ -194,13 +177,12 @@ svg:(s,f)=>`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
 Object.assign(window.SYM, LIB);
 
 const newCats = [
-  {id:'kats_fuehr',   label:'KatS – Führung / Stäbe',           color:'#c084fc', official:true},
-  {id:'kats_warn',    label:'KatS – Warnung / Alarm',            color:'#fbbf24', official:true},
-  {id:'kats_versorgg',label:'KatS – Versorgung / Unterbringung', color:'#c084fc', official:true},
-  {id:'kats_abc',     label:'KatS – ABC / CBRN Schutz',          color:'#c084fc', official:true},
-  {id:'kats_zs',      label:'KatS – Zivilschutz / BBK',          color:'#60a5fa', official:true},
+  {id:'kats_fuehr',   label:'KatS – Führung/Stäbe',              color:'#c084fc', official:true},
+  {id:'kats_warn',    label:'KatS – Warnung/Alarm (BBK/ISO)',     color:'#fbbf24', official:true},
+  {id:'kats_versorgg',label:'KatS – Versorgung/Unterbringung',    color:'#c084fc', official:true},
+  {id:'kats_abc',     label:'KatS – ABC/CBRN-Schutz',            color:'#c084fc', official:true},
+  {id:'kats_zs',      label:'KatS – Zivilschutz/BBK',            color:'#60a5fa', official:true},
 ];
 newCats.forEach(c => { if (!window.CATS.find(x=>x.id===c.id)) window.CATS.push(c); });
-
-console.log(`[TZ-Lib] Katastrophenschutz geladen: ${Object.keys(LIB).length} Zeichen`);
+console.log(`[TZ-Lib] KatS normkonform: ${Object.keys(LIB).length} Zeichen`);
 })();
