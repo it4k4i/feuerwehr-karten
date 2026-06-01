@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Impressum · BOS Ausbildungstools</title>
+<meta name="description" content="Impressum / Anbieterkennzeichnung gemäß § 5 DDG.">
+<meta name="robots" content="index,follow">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Libre+Franklin:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0d0f14;--panel:#1a1d26;--border:#2a2e3d;
+  --text:#e8eaf0;--text2:#6a7a99;
+  --accent:#e63946;--yellow:#ffd600;--teal:#06b6d4;
+}
+body.light-mode{--bg:#f2f4fa;--panel:#ffffff;--border:#d0d4e0;--text:#0d0f18;--text2:#5060a0;}
+body.light-mode header{background:linear-gradient(90deg,#0d1020,#181d38 40%,#0d1020);}
+*{transition:background-color .2s,border-color .18s,color .1s;}
+body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 20% 20%,rgba(230,57,70,.06) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(255,214,0,.04) 0%,transparent 60%);pointer-events:none;z-index:0;}
+
+header{position:relative;z-index:10;border-bottom:1px solid var(--border);background:linear-gradient(90deg,#080a0e,#141720 40%,#080a0e);padding:0 32px;height:64px;display:flex;align-items:center;gap:14px;}
+.logo{width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 0 20px rgba(230,57,70,.45);flex-shrink:0;}
+.logo-text h1{font-family:'Oswald',sans-serif;font-weight:700;font-size:1.25rem;letter-spacing:3px;background:linear-gradient(90deg,#fff 30%,var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.logo-text p{font-size:.5rem;color:var(--text2);letter-spacing:3px;text-transform:uppercase;margin-top:1px;}
+.back-link{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:.62rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;color:var(--text2);text-decoration:none;border:1px solid var(--border);border-radius:20px;padding:6px 14px;transition:all .15s;}
+.back-link:hover{color:#fff;border-color:var(--accent);}
+
+main{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:48px 24px 64px;}
+.page-title{font-family:'Oswald',sans-serif;font-size:clamp(1.6rem,5vw,2.6rem);font-weight:700;letter-spacing:3px;margin-bottom:6px;}
+.page-title span{background:linear-gradient(90deg,var(--accent),var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.page-sub{font-size:.75rem;color:var(--text2);letter-spacing:1px;margin-bottom:36px;}
+
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:26px 28px;margin-bottom:18px;}
+.card h2{font-family:'Oswald',sans-serif;font-size:1.05rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.card h3{font-size:.82rem;letter-spacing:1px;text-transform:uppercase;color:var(--text2);margin:18px 0 6px;}
+.card p,.card li{font-size:.86rem;line-height:1.75;color:var(--text);}
+.card p+p{margin-top:10px;}
+.card a{color:var(--teal);text-decoration:none;}
+.card a:hover{text-decoration:underline;}
+.addr{font-size:.95rem;line-height:1.85;}
+.addr strong{font-weight:700;}
+.muted{color:var(--text2);font-size:.78rem;}
+ul{padding-left:20px;}
+li{margin-bottom:5px;}
+
+.warn{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.35);border-radius:12px;padding:16px 20px;margin-bottom:24px;display:flex;gap:12px;align-items:flex-start;font-size:.8rem;line-height:1.6;color:#fbbf24;}
+.warn b{color:#fcd34d;}
+.disclaimer{font-size:.72rem;color:var(--text2);line-height:1.7;border-top:1px solid var(--border);margin-top:30px;padding-top:18px;}
+
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:20px 32px;display:flex;align-items:center;justify-content:center;gap:14px;font-size:.58rem;color:var(--text2);letter-spacing:2px;text-transform:uppercase;flex-wrap:wrap;}
+footer a{color:var(--text2);text-decoration:none;}
+footer a:hover{color:var(--accent);}
+.theme-btn{margin-left:8px;padding:5px 10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:rgba(255,255,255,.5);font-size:.7rem;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🚒</div>
+  <div class="logo-text">
+    <h1>IMPRESSUM</h1>
+    <p>Anbieterkennzeichnung</p>
+  </div>
+  <a href="index.html" class="back-link">← Zur Suite</a>
+  <button onclick="toggleTheme()" id="themeBtn" class="theme-btn" title="Dark/Light Mode">🌙</button>
+</header>
+
+<main>
+  <h1 class="page-title">Impres<span>sum</span></h1>
+  <p class="page-sub">Angaben gemäß § 5 DDG (Digitale-Dienste-Gesetz)</p>
+
+  <div id="cfg-warning"></div>
+  <div id="content"></div>
+
+  <p class="disclaimer">
+    Diese Vorlage wurde sorgfältig nach aktueller Rechtslage (Stand: DDG seit 14.05.2024)
+    erstellt, stellt jedoch keine Rechtsberatung dar. Für die inhaltliche Richtigkeit und
+    Vollständigkeit im Einzelfall ist der Betreiber selbst verantwortlich. Im Zweifel sollte
+    eine anwaltliche Prüfung erfolgen.
+  </p>
+</main>
+
+<footer>
+  <span>BOS Ausbildungstools</span>
+  <a href="datenschutz.html">Datenschutz</a>
+  <a href="index.html">Startseite</a>
+</footer>
+
+<script src="legal-config.js"></script>
+<script>
+function toggleTheme(){
+  const light=document.body.classList.toggle('light-mode');
+  localStorage.setItem('idx_theme',light?'light':'dark');
+  document.getElementById('themeBtn').textContent=light?'☀':'🌙';
+}
+if(localStorage.getItem('idx_theme')==='light'){
+  document.body.classList.add('light-mode');
+  addEventListener('DOMContentLoaded',()=>document.getElementById('themeBtn').textContent='☀');
+}
+
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+(function render(){
+  const C = window.LEGAL_CONFIG || {};
+  const out = document.getElementById('content');
+  const warnBox = document.getElementById('cfg-warning');
+
+  if(!C.name || !C.email){
+    warnBox.innerHTML =
+      '<div class="warn"><span>⚠️</span><div><b>Konfiguration unvollständig.</b> '+
+      'In <code>legal-config.js</code> (bzw. <code>.env</code> / GitHub-Variables) fehlen '+
+      'noch Pflichtangaben (Name und/oder E-Mail). Diese Seite ist erst rechtssicher, '+
+      'wenn alle Felder gefüllt sind.</div></div>';
+  }
+
+  // E-Mail leicht obfuskiert zusammensetzen (Spamschutz), aber sichtbar/klickbar
+  let mail='—';
+  if(C.email && C.email.includes('@')){
+    const [u,d]=C.email.split('@');
+    mail='<a href="mailto:'+esc(u)+'&#64;'+esc(d)+'">'+esc(u)+'<span>&#64;</span>'+esc(d)+'</a>';
+  }
+
+  const responsible = C.responsible && C.responsible.trim() ? C.responsible : C.name;
+
+  let html = '';
+
+  /* Diensteanbieter */
+  html += '<div class="card"><h2>Diensteanbieter</h2>'+
+    '<p class="addr"><strong>'+esc(C.name||'[Name eintragen]')+'</strong><br>'+
+    esc(C.street||'[Straße + Hausnummer]')+'<br>'+
+    esc((C.zip||'[PLZ]')+' '+(C.city||'[Ort]'))+'<br>'+
+    esc(C.country||'Deutschland')+'</p></div>';
+
+  /* Kontakt */
+  html += '<div class="card"><h2>Kontakt</h2><p class="addr">';
+  if(C.phone) html += 'Telefon: '+esc(C.phone)+'<br>';
+  html += 'E-Mail: '+mail+'</p></div>';
+
+  /* Verantwortlich für den Inhalt */
+  html += '<div class="card"><h2>Inhaltlich verantwortlich</h2>'+
+    '<p>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:</p>'+
+    '<p class="addr"><strong>'+esc(responsible||'[Name]')+'</strong><br>'+
+    esc((C.zip||'')+' '+(C.city||''))+'</p></div>';
+
+  /* USt-IdNr. nur wenn vorhanden */
+  if(C.ustId){
+    html += '<div class="card"><h2>Umsatzsteuer-ID</h2>'+
+      '<p>Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG:<br>'+
+      '<strong>'+esc(C.ustId)+'</strong></p></div>';
+  }
+
+  /* Streitschlichtung – Stand 2026 (EU-OS-Plattform am 20.07.2025 eingestellt) */
+  html += '<div class="card"><h2>Verbraucherstreitbeilegung</h2>'+
+    '<p>Die EU-Plattform zur Online-Streitbeilegung (OS) wurde zum 20.07.2025 '+
+    'eingestellt und steht nicht mehr zur Verfügung.</p>'+
+    '<p>Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren '+
+    'vor einer Verbraucherschlichtungsstelle teilzunehmen.</p></div>';
+
+  /* Haftung & Urheberrecht */
+  html += '<div class="card"><h2>Haftung & Urheberrecht</h2>'+
+    '<h3>Haftung für Inhalte</h3>'+
+    '<p>Die Inhalte dieser Seiten wurden mit größter Sorgfalt erstellt. Für die '+
+    'Richtigkeit, Vollständigkeit und Aktualität der Inhalte kann jedoch keine Gewähr '+
+    'übernommen werden. Als Diensteanbieter sind wir gemäß § 7 Abs. 1 DDG für eigene '+
+    'Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach '+
+    '§§ 8 bis 10 DDG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte '+
+    'oder gespeicherte fremde Informationen zu überwachen.</p>'+
+    '<h3>Haftung für Links</h3>'+
+    '<p>Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir '+
+    'keinen Einfluss haben. Für die Inhalte der verlinkten Seiten ist stets der jeweilige '+
+    'Anbieter oder Betreiber verantwortlich.</p>'+
+    '<h3>Urheberrecht</h3>'+
+    '<p>Dieses Projekt steht unter der Lizenz <strong>CC BY-NC 4.0</strong>. '+
+    'Weitergabe und Anpassung sind unter Namensnennung für private, gemeinnützige und '+
+    'BOS-Zwecke erlaubt; kommerzielle Nutzung nur mit schriftlicher Genehmigung.</p></div>';
+
+  /* Fachlicher Hinweis */
+  html += '<div class="card"><h2>Fachlicher Hinweis</h2>'+
+    '<p>Die hier erstellten Materialien (u.a. Taktische Zeichen, Gerätekunde- und '+
+    'Fahrzeugkarten) dienen ausschließlich Ausbildungs- und Übungszwecken. '+
+    'Eigeninterpretationen ersetzen keine offiziellen Vorschriften '+
+    '(DV 102 / FwDV 102 / THW DV 1-102 / PDV 100 etc.). Maßgeblich sind stets die '+
+    'jeweils geltenden amtlichen Vorschriften.</p></div>';
+
+  out.innerHTML = html;
+})();
+</script>
+</body>
+</html>

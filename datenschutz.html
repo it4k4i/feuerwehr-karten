@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Datenschutzerklärung · BOS Ausbildungstools</title>
+<meta name="description" content="Datenschutzerklärung gemäß DSGVO.">
+<meta name="robots" content="index,follow">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Libre+Franklin:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0d0f14;--panel:#1a1d26;--border:#2a2e3d;
+  --text:#e8eaf0;--text2:#6a7a99;
+  --accent:#e63946;--yellow:#ffd600;--teal:#06b6d4;
+}
+body.light-mode{--bg:#f2f4fa;--panel:#ffffff;--border:#d0d4e0;--text:#0d0f18;--text2:#5060a0;}
+body.light-mode header{background:linear-gradient(90deg,#0d1020,#181d38 40%,#0d1020);}
+*{transition:background-color .2s,border-color .18s,color .1s;}
+body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 20% 20%,rgba(6,182,212,.05) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(255,214,0,.04) 0%,transparent 60%);pointer-events:none;z-index:0;}
+
+header{position:relative;z-index:10;border-bottom:1px solid var(--border);background:linear-gradient(90deg,#080a0e,#141720 40%,#080a0e);padding:0 32px;height:64px;display:flex;align-items:center;gap:14px;}
+.logo{width:40px;height:40px;background:var(--teal);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;box-shadow:0 0 20px rgba(6,182,212,.4);flex-shrink:0;}
+.logo-text h1{font-family:'Oswald',sans-serif;font-weight:700;font-size:1.15rem;letter-spacing:2px;background:linear-gradient(90deg,#fff 30%,var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.logo-text p{font-size:.5rem;color:var(--text2);letter-spacing:3px;text-transform:uppercase;margin-top:1px;}
+.back-link{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:.62rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;color:var(--text2);text-decoration:none;border:1px solid var(--border);border-radius:20px;padding:6px 14px;transition:all .15s;}
+.back-link:hover{color:#fff;border-color:var(--teal);}
+
+main{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:48px 24px 64px;}
+.page-title{font-family:'Oswald',sans-serif;font-size:clamp(1.5rem,4.5vw,2.4rem);font-weight:700;letter-spacing:2px;margin-bottom:6px;}
+.page-title span{background:linear-gradient(90deg,var(--teal),var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.page-sub{font-size:.75rem;color:var(--text2);letter-spacing:1px;margin-bottom:30px;}
+
+.toc{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:24px;}
+.toc h2{font-family:'Oswald',sans-serif;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:10px;}
+.toc ol{padding-left:20px;columns:2;column-gap:28px;}
+.toc li{font-size:.78rem;line-height:1.7;margin-bottom:2px;}
+.toc a{color:var(--teal);text-decoration:none;}
+.toc a:hover{text-decoration:underline;}
+@media(max-width:560px){.toc ol{columns:1;}}
+
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:24px 28px;margin-bottom:16px;scroll-margin-top:80px;}
+.card h2{font-family:'Oswald',sans-serif;font-size:1rem;letter-spacing:1px;text-transform:uppercase;color:var(--teal);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.card h3{font-size:.8rem;letter-spacing:.5px;text-transform:uppercase;color:var(--text2);margin:16px 0 6px;}
+.card p,.card li{font-size:.85rem;line-height:1.75;}
+.card p+p{margin-top:9px;}
+.card a{color:var(--teal);text-decoration:none;word-break:break-word;}
+.card a:hover{text-decoration:underline;}
+.card ul{padding-left:20px;margin-top:6px;}
+.card li{margin-bottom:5px;}
+.addr{font-size:.92rem;line-height:1.8;}
+.legal-basis{display:inline-block;font-size:.68rem;letter-spacing:.5px;background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.25);color:var(--teal);border-radius:6px;padding:2px 8px;margin-top:8px;}
+
+.warn{border-radius:12px;padding:16px 20px;margin-bottom:16px;display:flex;gap:12px;align-items:flex-start;font-size:.8rem;line-height:1.65;}
+.warn.amber{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.35);color:#fbbf24;}
+.warn.amber b{color:#fcd34d;}
+.warn.good{background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.3);color:#34d399;}
+.warn.good b{color:#6ee7b7;}
+
+.disclaimer{font-size:.72rem;color:var(--text2);line-height:1.7;border-top:1px solid var(--border);margin-top:30px;padding-top:18px;}
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:20px 32px;display:flex;align-items:center;justify-content:center;gap:14px;font-size:.58rem;color:var(--text2);letter-spacing:2px;text-transform:uppercase;flex-wrap:wrap;}
+footer a{color:var(--text2);text-decoration:none;}footer a:hover{color:var(--teal);}
+.theme-btn{margin-left:8px;padding:5px 10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:rgba(255,255,255,.5);font-size:.7rem;cursor:pointer;}
+code{background:rgba(127,127,127,.15);padding:1px 5px;border-radius:4px;font-size:.82em;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🔒</div>
+  <div class="logo-text">
+    <h1>DATENSCHUTZ</h1>
+    <p>Gemäß DSGVO</p>
+  </div>
+  <a href="index.html" class="back-link">← Zur Suite</a>
+  <button onclick="toggleTheme()" id="themeBtn" class="theme-btn" title="Dark/Light Mode">🌙</button>
+</header>
+
+<main>
+  <h1 class="page-title">Datenschutz<span>erklärung</span></h1>
+  <p class="page-sub" id="stand">Stand: —</p>
+
+  <div id="cfg-warning"></div>
+  <div id="toc"></div>
+  <div id="content"></div>
+
+  <p class="disclaimer">
+    Diese Datenschutzerklärung wurde nach aktueller Rechtslage (DSGVO, TDDDG) erstellt und
+    auf die konkret in dieser Anwendung eingesetzten Dienste zugeschnitten. Sie stellt keine
+    Rechtsberatung dar; für die Richtigkeit im Einzelfall ist der Betreiber verantwortlich.
+    Bei Änderungen an den eingebundenen Diensten ist die Erklärung anzupassen.
+  </p>
+</main>
+
+<footer>
+  <span>BOS Ausbildungstools</span>
+  <a href="impressum.html">Impressum</a>
+  <a href="index.html">Startseite</a>
+</footer>
+
+<script src="legal-config.js"></script>
+<script>
+function toggleTheme(){
+  const light=document.body.classList.toggle('light-mode');
+  localStorage.setItem('idx_theme',light?'light':'dark');
+  document.getElementById('themeBtn').textContent=light?'☀':'🌙';
+}
+if(localStorage.getItem('idx_theme')==='light'){
+  document.body.classList.add('light-mode');
+  addEventListener('DOMContentLoaded',()=>document.getElementById('themeBtn').textContent='☀');
+}
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+(function render(){
+  const C = window.LEGAL_CONFIG || {};
+  const h = C.hosting || 'both';
+  const useGitHub = (h==='github'||h==='both');
+  const useCloudflare = (h==='cloudflare'||h==='both');
+  const useSelf = (h==='self');
+
+  // Stand
+  document.getElementById('stand').textContent = 'Stand: ' + (C.lastUpdated || new Date().toLocaleDateString('de-DE'));
+
+  // Konfig-Warnung
+  if(!C.name || !C.email){
+    document.getElementById('cfg-warning').innerHTML =
+      '<div class="warn amber"><span>⚠️</span><div><b>Konfiguration unvollständig.</b> '+
+      'In <code>legal-config.js</code> fehlen noch Verantwortlicher (Name) und/oder Kontakt-E-Mail. '+
+      'Bitte über <code>.env</code> bzw. GitHub-Variables setzen.</div></div>';
+  }
+
+  // E-Mail
+  let mail='[E-Mail eintragen]';
+  if(C.email && C.email.includes('@')){
+    const [u,d]=C.email.split('@');
+    mail='<a href="mailto:'+esc(u)+'&#64;'+esc(d)+'">'+esc(u)+'&#64;'+esc(d)+'</a>';
+  }
+  const F = 'Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse)';
+
+  const sections = [];
+  const S = (id,title,body)=>sections.push({id,title,body});
+
+  /* 1 — Verantwortlicher */
+  S('verantwortlicher','1. Verantwortlicher',
+    '<p>Verantwortlich für die Datenverarbeitung auf dieser Website im Sinne der '+
+    'Datenschutz-Grundverordnung (DSGVO) ist:</p>'+
+    '<p class="addr"><strong>'+esc(C.name||'[Name]')+'</strong><br>'+
+    esc(C.street||'[Straße]')+'<br>'+
+    esc((C.zip||'[PLZ]')+' '+(C.city||'[Ort]'))+'<br>'+
+    esc(C.country||'Deutschland')+'<br>'+
+    'E-Mail: '+mail+(C.phone?'<br>Telefon: '+esc(C.phone):'')+'</p>'+
+    '<p>Die vollständige Anbieterkennzeichnung finden Sie im '+
+    '<a href="impressum.html">Impressum</a>.</p>');
+
+  /* 2 — Grundsätzliches / Datensparsamkeit */
+  S('grundlagen','2. Allgemeines zur Datenverarbeitung',
+    '<p>Der Schutz Ihrer personenbezogenen Daten ist uns wichtig. Diese Anwendung ist '+
+    'bewusst <strong>datensparsam</strong> aufgebaut: Es gibt kein Benutzerkonto, keine '+
+    'Anmeldung, keine Cookies zu Tracking-Zwecken und kein Analyse-Tool. Die eigentlichen '+
+    'Werkzeuge (Karten-Generatoren, Annotator, Taktische-Zeichen-Editor, Sticker Creator) '+
+    'laufen vollständig in Ihrem Browser.</p>'+
+    '<p>Personenbezogene Daten sind alle Daten, mit denen Sie persönlich identifiziert '+
+    'werden können (z.B. die IP-Adresse). Beim bloßen Aufruf der Website werden technisch '+
+    'zwingend Zugriffsdaten verarbeitet, wie nachfolgend beschrieben.</p>');
+
+  /* 3 — Hosting & Server-Logfiles */
+  let hostBody =
+    '<p>Beim Aufruf der Website überträgt Ihr Browser automatisch Daten an den Server des '+
+    'Hosting-Anbieters. Diese werden in sog. Server-Logfiles verarbeitet:</p>'+
+    '<ul>'+
+    '<li>IP-Adresse des anfragenden Geräts</li>'+
+    '<li>Datum und Uhrzeit der Anfrage</li>'+
+    '<li>aufgerufene Seite/Datei sowie übertragene Datenmenge</li>'+
+    '<li>HTTP-Statuscode</li>'+
+    '<li>zuvor besuchte Seite (Referrer), sofern übermittelt</li>'+
+    '<li>Browsertyp, Browserversion und Betriebssystem</li>'+
+    '</ul>'+
+    '<p>Zweck der Verarbeitung ist die Auslieferung der Website sowie die Gewährleistung '+
+    'von Stabilität und Sicherheit. Es findet kein Zusammenführen dieser Daten mit anderen '+
+    'Quellen und kein Tracking statt.</p>'+
+    '<span class="legal-basis">'+F+'</span>';
+
+  if(useGitHub){
+    hostBody += '<h3>GitHub Pages</h3>'+
+      '<p>Diese Website wird (auch) über GitHub Pages gehostet. Anbieter ist die '+
+      '<strong>GitHub Inc.</strong>, 88 Colin P Kelly Jr St, San Francisco, CA 94107, USA. '+
+      'GitHub ist Empfänger der oben genannten Zugriffsdaten. Da der Serverstandort in den '+
+      'USA liegt, findet eine Übermittlung in ein Drittland statt. GitHub hat hierfür '+
+      'EU-Standardvertragsklauseln (Art. 46 DSGVO) implementiert. Weitere Informationen: '+
+      '<a href="https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">GitHub Datenschutzerklärung</a>.</p>';
+  }
+  if(useCloudflare){
+    hostBody += '<h3>Cloudflare</h3>'+
+      '<p>Zur sicheren und schnellen Auslieferung wird (auch) die Infrastruktur von '+
+      'Cloudflare genutzt. Anbieter ist die <strong>Cloudflare Germany GmbH</strong>, '+
+      'Rosental 7, c/o Mindspace, 80331 München, Deutschland (Konzernmutter: Cloudflare, '+
+      'Inc., USA). Cloudflare wird als Auftragsverarbeiter (Art. 28 DSGVO) tätig; ein '+
+      'entsprechender Vertrag zur Auftragsverarbeitung besteht. Dabei kann es zu einer '+
+      'Übermittlung in die USA kommen, abgesichert über EU-Standardvertragsklauseln bzw. '+
+      'das EU-US Data Privacy Framework. Weitere Informationen: '+
+      '<a href="https://www.cloudflare.com/de-de/privacypolicy/" target="_blank" rel="noopener">Cloudflare Datenschutzrichtlinie</a>.</p>';
+  }
+  if(useSelf){
+    const sh = C.selfHost||{};
+    hostBody += '<h3>Hosting</h3>'+
+      '<p>Diese Website wird bei folgendem Anbieter gehostet:</p>'+
+      '<p class="addr"><strong>'+esc(sh.name||'[Hoster]')+'</strong><br>'+
+      esc(sh.address||'[Anschrift]')+'<br>'+esc(sh.country||'Deutschland')+'</p>'+
+      '<p>'+(sh.avContract
+        ? 'Mit dem Anbieter wurde ein Vertrag zur Auftragsverarbeitung nach Art. 28 DSGVO geschlossen.'
+        : '<b style="color:#fbbf24">Hinweis: Es sollte ein Vertrag zur Auftragsverarbeitung (Art. 28 DSGVO) mit dem Hoster geschlossen werden.</b>')+'</p>';
+  }
+  S('hosting','3. Hosting & Server-Logfiles', hostBody);
+
+  /* 4 — Cookies & Tracking */
+  S('cookies','4. Cookies & Tracking',
+    '<div class="warn good"><span>✅</span><div><b>Diese Anwendung setzt keine Tracking- '+
+    'oder Marketing-Cookies und kein Webanalyse-Tool ein.</b> Es findet keine Reichweiten- '+
+    'oder Nutzungsanalyse statt. Ein Cookie-Banner ist daher nicht erforderlich.</div></div>');
+
+  /* 5 — Lokale Speicherung */
+  S('localstorage','5. Lokale Speicherung im Browser (localStorage / IndexedDB)',
+    '<p>Die Werkzeuge speichern Ihre Eingaben, Projekte und Einstellungen (z.B. Karten, '+
+    'Annotationen, gewähltes Design, Sprache, Dark-/Light-Modus) lokal in Ihrem Browser '+
+    'über <code>localStorage</code> bzw. <code>IndexedDB</code> (Autosave).</p>'+
+    '<p>Diese Daten verbleiben ausschließlich auf Ihrem Gerät und werden <strong>zu keinem '+
+    'Zeitpunkt an uns oder Dritte übertragen</strong>. Wir haben darauf keinen Zugriff. Sie '+
+    'können diese Daten jederzeit selbst löschen, indem Sie die Websitedaten in Ihrem '+
+    'Browser entfernen.</p>'+
+    '<p>Da die Speicherung für die ausdrücklich von Ihnen gewünschte Funktion (Bearbeiten '+
+    'und Sichern Ihrer Projekte) unbedingt erforderlich ist, ist hierfür keine Einwilligung '+
+    'notwendig.</p>'+
+    '<span class="legal-basis">§ 25 Abs. 2 Nr. 2 TDDDG · Art. 6 Abs. 1 lit. f DSGVO</span>');
+
+  /* 6 — Externe Ressourcen: Google Fonts */
+  if(C.googleFonts){
+    S('fonts','6. Schriftarten (Google Fonts)',
+      '<p>Zur einheitlichen Darstellung werden Schriftarten von Google Fonts eingebunden. '+
+      'Beim Seitenaufruf lädt Ihr Browser die Schriften von Servern der '+
+      '<strong>Google Ireland Limited</strong>, Gordon House, Barrow Street, Dublin 4, '+
+      'Irland (bzw. Google LLC, USA). Dabei wird Ihre IP-Adresse an Google übertragen. '+
+      'Dies dient dem berechtigten Interesse an einer ansprechenden, einheitlichen '+
+      'Darstellung. Weitere Informationen: '+
+      '<a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Datenschutzerklärung</a>.</p>'+
+      '<span class="legal-basis">'+F+'</span>'+
+      '<div class="warn amber" style="margin-top:14px"><span>💡</span><div>'+
+      '<b>Empfehlung:</b> Datenschutzfreundlicher ist es, die Schriften lokal mitzuliefern '+
+      '(Self-Hosting). Dann entfällt die IP-Übermittlung an Google und dieser Abschnitt '+
+      'kann gestrichen werden (in der Konfiguration <code>googleFonts:false</code> setzen).'+
+      '</div></div>');
+  }
+
+  /* 7 — Externe Ressourcen: cdnjs */
+  if(C.cdnjs){
+    S('cdn','7. Programmbibliotheken (cdnjs / Cloudflare)',
+      '<p>Für einzelne Funktionen (z.B. PDF- und ZIP-Export) werden JavaScript-Bibliotheken '+
+      'über das Content-Delivery-Network <strong>cdnjs</strong> der Cloudflare, Inc. (101 '+
+      'Townsend St., San Francisco, CA 94107, USA) nachgeladen. Dabei wird Ihre IP-Adresse '+
+      'an Cloudflare übertragen. Dies dient dem berechtigten Interesse an einer schnellen, '+
+      'zuverlässigen Bereitstellung dieser Funktionen.</p>'+
+      '<span class="legal-basis">'+F+'</span>'+
+      '<div class="warn amber" style="margin-top:14px"><span>💡</span><div>'+
+      '<b>Empfehlung:</b> Auch diese Bibliotheken lassen sich lokal mitliefern. Dann '+
+      'entfällt die Übertragung an Cloudflare (<code>cdnjs:false</code> setzen).</div></div>');
+  }
+
+  /* 8 — Externe Links */
+  if(C.githubLinks){
+    S('links','8. Externe Links',
+      '<p>Diese Website enthält Links zu externen Seiten (z.B. zu GitHub zum Melden von '+
+      'Fehlern). Erst beim aktiven Anklicken eines solchen Links werden Daten an den '+
+      'jeweiligen Anbieter übertragen. Für deren Datenverarbeitung gelten die '+
+      'Datenschutzbestimmungen des jeweiligen Anbieters.</p>');
+  }
+
+  /* 9 — Kontaktaufnahme */
+  S('kontakt','9. Kontaktaufnahme per E-Mail',
+    '<p>Wenn Sie uns per E-Mail kontaktieren, werden Ihre Angaben (E-Mail-Adresse, Inhalt '+
+    'der Nachricht) zur Bearbeitung Ihres Anliegens verarbeitet und gespeichert. Diese '+
+    'Daten geben wir nicht ohne Ihre Einwilligung weiter. Die Daten werden gelöscht, sobald '+
+    'die Bearbeitung abgeschlossen ist und keine gesetzlichen Aufbewahrungspflichten '+
+    'entgegenstehen.</p>'+
+    '<span class="legal-basis">Art. 6 Abs. 1 lit. b und lit. f DSGVO</span>');
+
+  /* 10 — Betroffenenrechte */
+  S('rechte','10. Ihre Rechte als betroffene Person',
+    '<p>Ihnen stehen gegenüber dem Verantwortlichen folgende Rechte hinsichtlich Ihrer '+
+    'personenbezogenen Daten zu:</p>'+
+    '<ul>'+
+    '<li>Recht auf Auskunft (Art. 15 DSGVO)</li>'+
+    '<li>Recht auf Berichtigung (Art. 16 DSGVO)</li>'+
+    '<li>Recht auf Löschung (Art. 17 DSGVO)</li>'+
+    '<li>Recht auf Einschränkung der Verarbeitung (Art. 18 DSGVO)</li>'+
+    '<li>Recht auf Datenübertragbarkeit (Art. 20 DSGVO)</li>'+
+    '<li>Recht auf Widerspruch gegen die Verarbeitung (Art. 21 DSGVO)</li>'+
+    '</ul>'+
+    '<p>Zur Ausübung genügt eine formlose Nachricht an: '+mail+'.</p>');
+
+  /* 11 — Widerspruchsrecht */
+  S('widerspruch','11. Widerspruchsrecht (Art. 21 DSGVO)',
+    '<p>Soweit die Verarbeitung auf Grundlage eines berechtigten Interesses '+
+    '(Art. 6 Abs. 1 lit. f DSGVO) erfolgt, haben Sie das Recht, aus Gründen, die sich aus '+
+    'Ihrer besonderen Situation ergeben, jederzeit Widerspruch gegen diese Verarbeitung '+
+    'einzulegen. Wir verarbeiten die Daten dann nicht mehr, es sei denn, wir können '+
+    'zwingende schutzwürdige Gründe nachweisen, die Ihre Interessen überwiegen.</p>');
+
+  /* 12 — Beschwerderecht */
+  S('beschwerde','12. Beschwerderecht bei der Aufsichtsbehörde',
+    '<p>Unbeschadet anderer Rechtsbehelfe haben Sie das Recht, sich bei einer '+
+    'Datenschutz-Aufsichtsbehörde zu beschweren (Art. 77 DSGVO), insbesondere in dem '+
+    'Mitgliedstaat Ihres Aufenthaltsorts, Ihres Arbeitsplatzes oder des Orts des '+
+    'mutmaßlichen Verstoßes.</p>'+
+    (C.authority?('<p class="addr"><strong>'+esc(C.authority)+'</strong>'+
+      (C.authorityUrl?'<br><a href="'+esc(C.authorityUrl)+'" target="_blank" rel="noopener">'+esc(C.authorityUrl)+'</a>':'')+'</p>'):''));
+
+  /* 13 — TLS */
+  S('tls','13. SSL-/TLS-Verschlüsselung',
+    '<p>Diese Seite nutzt aus Sicherheitsgründen eine TLS-Verschlüsselung. Eine '+
+    'verschlüsselte Verbindung erkennen Sie am Schloss-Symbol in der Adresszeile Ihres '+
+    'Browsers und am Präfix <code>https://</code>.</p>');
+
+  /* 14 — Änderungen */
+  S('aenderungen','14. Änderung dieser Datenschutzerklärung',
+    '<p>Wir behalten uns vor, diese Datenschutzerklärung anzupassen, damit sie stets den '+
+    'aktuellen rechtlichen Anforderungen entspricht oder um Änderungen unserer Leistungen '+
+    'umzusetzen. Für Ihren erneuten Besuch gilt dann die jeweils aktuelle Fassung.</p>');
+
+  /* TOC + Content ausgeben */
+  let toc = '<div class="toc"><h2>Inhalt</h2><ol>';
+  sections.forEach(s=> toc += '<li><a href="#'+s.id+'">'+esc(s.title.replace(/^\d+\.\s*/,''))+'</a></li>');
+  toc += '</ol></div>';
+  document.getElementById('toc').innerHTML = toc;
+
+  let html='';
+  sections.forEach(s=> html += '<div class="card" id="'+s.id+'"><h2>'+esc(s.title)+'</h2>'+s.body+'</div>');
+  document.getElementById('content').innerHTML = html;
+})();
+</script>
+</body>
+</html>
