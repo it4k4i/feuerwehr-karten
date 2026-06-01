@@ -279,7 +279,9 @@ body{background:var(--bg);color:var(--text);font-family:'Libre Franklin',sans-se
     <span class="app-hdr-badge" style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);color:#60a5fa;">📋 DV 102 / Stand 2023</span>
     <button class="app-hdr-btn" onclick="toggleTheme()" id="themeBtn" title="Dark/Light Mode">🌙</button>
     <a class="app-hdr-btn bug" href="https://github.com/it4k4i/feuerwehr-karten/issues/new" target="_blank" rel="noopener">🐛 Bug melden</a>
-    <a class="app-hdr-btn home" href="index.html">🏠 Startseite</a>
+    <a class="app-hdr-btn" href="../legal/impressum.html">📄 Impressum</a>
+    <a class="app-hdr-btn" href="../legal/datenschutz.html">🔒 Datenschutz</a>
+    <a class="app-hdr-btn home" href="../index.html">🏠 Startseite</a>
   </nav>
 </header>
 
@@ -1081,7 +1083,7 @@ const TZ_LIBS = [
     id: 'dv102norm',
     name: 'DV 102 Normkonform – vollständiges Kombinationssystem',
     desc: 'Alle DV 102 Zeichen 1:1 nach Norm: §1 Grundzeichen, §3 Fachaufgaben, §4 Einheitsgrößen, §5 Führung, §6 Fahrzeuge, §7 Richtungen, Anh. 1.1/1.3/1.9',
-    file: 'tz-lib-dv102-norm.js',
+    file: 'lib/tz-lib-dv102-norm.js',
     color: '#4ade80',
     count: '~65 Zeichen',
     org: '🔴 DV 102 offiziell',
@@ -1090,7 +1092,7 @@ const TZ_LIBS = [
     id: 'fwdv100',
     name: 'FwDV 100 / FwDV 3 / FwDV 7',
     desc: 'Führung, Einsatzabschnitte, MANV/Sichtungskategorien, FwDV 3 Einheiten, FwDV 7 Atemschutz – normkonform',
-    file: 'tz-lib-fwdv100.js',
+    file: 'lib/tz-lib-fwdv100.js',
     color: '#f87171',
     count: '~29 Zeichen',
     org: '🔴 Feuerwehr',
@@ -1099,7 +1101,7 @@ const TZ_LIBS = [
     id: 'polizei',
     name: 'PDV 100 – Polizei',
     desc: 'Führung, Fahrzeuge, Einheiten, Sperren, Ermittlung, BPol, Zoll – normkonform nach PDV 100',
-    file: 'tz-lib-polizei.js',
+    file: 'lib/tz-lib-polizei.js',
     color: '#4ade80',
     count: '~17 Zeichen',
     org: '🟢 Polizei',
@@ -1108,7 +1110,7 @@ const TZ_LIBS = [
     id: 'thw',
     name: 'THW DV 1-100 – alle 16 Fachgruppen',
     desc: 'Alle 16 Fachgruppen normkonform, Führung, Fahrzeuge – 1:1 nach THW DV 1-100',
-    file: 'tz-lib-thw.js',
+    file: 'lib/tz-lib-thw.js',
     color: '#60a5fa',
     count: '~26 Zeichen',
     org: '🔵 THW',
@@ -1117,7 +1119,7 @@ const TZ_LIBS = [
     id: 'rettungsdienst',
     name: 'Rettungsdienst (DIN 13050 / DIN EN 1789)',
     desc: 'RTW/NEF/KTW normkonform, Hilfsorganisationen (DRK, ASB, MHD, JUH, DLRG), Behandlungsplätze',
-    file: 'tz-lib-rettungsdienst.js',
+    file: 'lib/tz-lib-rettungsdienst.js',
     color: '#fb7185',
     count: '~19 Zeichen',
     org: '🏥 Rettungsdienst',
@@ -1126,7 +1128,7 @@ const TZ_LIBS = [
     id: 'militar',
     name: 'Militär – NATO APP-6D / ZDv 1-15',
     desc: 'Grundformen exakt nach APP-6D, Einheitsgrößen (Trupp–Division), Truppengattungen, Bundeswehr ZDv 1-15',
-    file: 'tz-lib-militar.js',
+    file: 'lib/tz-lib-militar.js',
     color: '#9ca3af',
     count: '~22 Zeichen',
     org: '⚙ Bundeswehr / NATO',
@@ -1135,7 +1137,7 @@ const TZ_LIBS = [
     id: 'katschutz',
     name: 'Katastrophenschutz / BBK',
     desc: 'KatS-Stäbe, Warnung/Entwarnung (BBK), ISO 361 Strahlenwarnung, CBRN-Schutz, Zivilschutz – normkonform',
-    file: 'tz-lib-katschutz.js',
+    file: 'lib/tz-lib-katschutz.js',
     color: '#c084fc',
     count: '~20 Zeichen',
     org: '🟣 KatS / BBK',
